@@ -4,6 +4,7 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="{{ static_url("map.css") }}">
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript" src="{{ static_url("map.js") }}"></script>
         <title>Parking Finder</title>
     </head>
@@ -15,7 +16,8 @@
         </div>
          
         <script type="text/javascript">
-            google.maps.event.addDomListener(window, 'load', initialize);         
+        $("document").ready(function() {initialize() });
+          <!--  google.maps.event.addDomListener(window, 'load', initialize); -->         
         </script>
     </body>
 </html>

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-import os, sys, time, json, uuid
+import os, sys, time, json
 
 from static import Zone as zn, Queue as qe, ReqType as rt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './lib/botornado')))
-import botornado.sqs
+import botornado.sqs  # @UnresolvedImport
 from boto.sqs.message import Message
 
 import tornado.httpserver
@@ -34,7 +34,7 @@ class MapHandler(tornado.web.RequestHandler):
 	@tornado.gen.coroutine
 	def post(self):
 		start_time = time.time()
-		id = self.get_argument('id')
+		idReq = self.get_argument('id')
 		zoom_level = self.get_argument('zoom_level')
 		neLat = self.get_argument('neLat')
 		neLon = self.get_argument('neLon')
@@ -45,14 +45,14 @@ class MapHandler(tornado.web.RequestHandler):
 		data = {}
 		if int(zoom_level) >= 15:
 			req_type = rt.SPECIFIC + zoom_level
-			data = self._create_request_message(id, req_type, zoom_level, neLat, neLon, swLat, swLon)
+			data = self._create_request_message(idReq, req_type, zoom_level, neLat, neLon, swLat, swLon)
 		else:
 			req_type = rt.GLOBAL
-			data = self._create_request_message(id, req_type, zoom_level=zoom_level)
+			data = self._create_request_message(idReq, req_type, zoom_level=zoom_level)
 		print data
 		
 		#scruttura sulla coda di sqs in maniera asincrona		
-		res = yield self._send_parking_spots_request(data)
+		yield self._send_parking_spots_request(data)
 		write_time = time.time() - start_time  
 		print "done writing ", write_time
 		
@@ -95,12 +95,12 @@ class MapHandler(tornado.web.RequestHandler):
 	def _delete_messages(self, messages, callback=None):
 		
 		for msg in messages:
-			res = yield tornado.gen.Task(self._sqs_send_queue.delete_message, msg)
+			yield tornado.gen.Task(self._sqs_send_queue.delete_message, msg)
 		return	
 
 	@staticmethod
-	def _create_request_message(id, reqType, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
-		return {"id":id, "zoom":zoom_level, "neLat":neLat, "neLon":neLon, "swLat":swLat, "seLon":swLon, "reqType":reqType}
+	def _create_request_message(idReq, reqType, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
+		return {"id":idReq, "zoom":zoom_level, "neLat":neLat, "neLon":neLon, "swLat":swLat, "seLon":swLon, "reqType":reqType}
 	
 
 def connect():	

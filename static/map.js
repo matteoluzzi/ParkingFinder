@@ -1,6 +1,6 @@
 var map;
 function initialize() {
-                var element = document.getElementById("map");
+                var element = $("#map")[0];
  
                 window.map = new google.maps.Map(element, {
                 center: new google.maps.LatLng(41.88976989299657, 12.514091491699224),
@@ -9,6 +9,7 @@ function initialize() {
                 mapTypeControl: false,
                 streetViewControl: false
             });
+                
  
             //Define OSM map type pointing at the OpenStreetMap tile server
                 window.map.mapTypes.set("OSM", new google.maps.ImageMapType({
@@ -42,37 +43,56 @@ function checkMapInfo()
 
 function sendZoomLevel(zoom, bounds) {
 
-    var xmlhttp;
-    if (window.XMLHttpRequest)
-    {// code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    }
-    else
-    {// code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
+    //var xmlhttp;
+    //if (window.XMLHttpRequest)
+    //{// code for IE7+, Firefox, Chrome, Opera, Safari
+//        xmlhttp = new XMLHttpRequest();
+//    }
+//    else
+//    {// code for IE6, IE5
+//        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+//    }
 
-    xmlhttp.open("POST","http://localhost:8080/map",true);
-    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    //xmlhttp.open("POST","http://localhost:8080/map",true);
+    //xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 
 
     var neLat = bounds.getNorthEast().lat();
     var neLon = bounds.getNorthEast().lng();
     var swLat = bounds.getSouthWest().lat();
     var swLon = bounds.getSouthWest().lng();
-
     var id = generateUUID();
+    
+	var data = "id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat + "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon;
 
-    xmlhttp.send("id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat + "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon);
+	$.ajax({
+		type : "POST",
+		url : "http://localhost:8080/map",
+		data : data,
+		contentType : "application/x-www-form-urlencoded",
+		success : function (result) {
+			var response = JSON.parse(result);
+			console.log(response, typeof response);
+			parseAndDrow(response);
+		},
+		error: function (jqXHR, textStatus, errorThrown)
+	    {
+			jsonValue = $.parseJSON( jqXHR.responseText );
+			console.log(jsonValue.Message);
+	    } 
+		
+	});
 
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var JSONresponse = this.responseText;
-            var response = JSON.parse(JSONresponse);
-            console.log(response, typeof response);
-            parseAndDrow(response);
-        }
-    }
+    //xmlhttp.send("id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat + "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon);
+
+//    xmlhttp.onreadystatechange = function () {
+//        if (this.readyState == 4 && this.status == 200) {
+//            var JSONresponse = this.responseText;
+//            var response = JSON.parse(JSONresponse);
+//            console.log(response, typeof response);
+//            parseAndDrow(response);
+//        }
+//    }
 }
 
 function generateUUID() {
