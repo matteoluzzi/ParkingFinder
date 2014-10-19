@@ -33,6 +33,7 @@ class MapHandler(tornado.web.RequestHandler):
 	
 	@tornado.gen.coroutine
 	def post(self):
+		
 		start_time = time.time()
 		idReq = self.get_argument('id')
 		zoom_level = self.get_argument('zoom_level')

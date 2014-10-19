@@ -106,6 +106,7 @@ function generateUUID() {
 };
 
 function parseAndDrow(msg) {
+	
     if(msg.length > 0) {
         for (var i = 0; i < msg.length; i++) {
             var zoom = msg[i].zoom;
