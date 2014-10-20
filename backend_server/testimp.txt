@@ -1,0 +1,6 @@
+prova#stocazzo
+prova2#a|b|c
+quadrants#98|147|2
+cacheexpire#3600
+region#EMEA
+SQSzone#us-west-2
