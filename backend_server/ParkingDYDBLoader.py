@@ -9,12 +9,14 @@ class ParkingDYDBLoader:
 	__cache			=	0
 	__cacheClient	=	0
 	__cexpire		=	0
+	__qexpire		=	0
 	
-	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=60):
+	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=60,queryCacheExpire=30):
 		self.database	=	boto.connect_dynamodb()
 		self.table		=	self.database.get_table(str(myTableName))
 		self.cache		=	enableCache
 		self.cexpire	=	cacheExpireTime
+		self.qexpire	=	queryCacheExpire
 		if (enableCache==True):	#sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211
 			urlstring	=	str(myCacheURL)
 			self.cacheClient	=	memcache.Client([urlstring])
@@ -44,6 +46,18 @@ class ParkingDYDBLoader:
 		#print "parking updated"
 		return 0
 		
+	def getUtilizationPercentage(aQuadrant):
+		quadrantID	=	aQuadrant.getID()
+		if (enableCache==True):
+			unastat	=	self.cacheClient.get("Q_"+str(parkingId))
+			return unastat
+		return -1
+		
+	def setUtilizationPercentage(aQuadrant,perc):
+		quadrantID	=	aQuadrant.getID()
+		if (enableCache==True):
+			self.cacheClient.set("Q_"+str(parkingId),perc,time=self.qexpire)
+			
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
 		batch	=	self.database.new_batch_list()

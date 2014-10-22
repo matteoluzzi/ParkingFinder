@@ -42,12 +42,16 @@ class Quadrant:
 	
 	def getPercentageFreeParkings(self):
 		self.updater.batchUpdate(self.parklist)
+		cacheRis	=	self.updater.getUtilizationPercentage(self)
+		if (int(cacheRis)>-1):
+			return cacheRis
 		free	=	0
 		for item in self.parklist:
 			state	=	item.getStatus()
 			if str(state)=="E":
 				free	=	free+1
 		perc	=	(free/len(self.parklist))*100
+		self.updater.setUtilizationPercentage(self,perc)
 		return perc
 		
 		
