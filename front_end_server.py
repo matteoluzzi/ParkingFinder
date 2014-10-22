@@ -8,6 +8,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './li
 import botornado.sqs  # @UnresolvedImport
 from boto.sqs.message import Message
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './backend_server')))
+from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest # @UnresolvedImport
+import QuadrantTextFileLoader as loader # @UnresolvedImport
+import SearchQuadrant as searcher # @UnresolvedImport
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -26,10 +31,12 @@ class BaseHandler(tornado.web.RequestHandler):
 class MapHandler(tornado.web.RequestHandler):
 
 
-	def initialize(self, sqs_conn, sqs_queue):
+	def initialize(self, sqs_conn, sqs_queue, q_list):
 
 		self._sqs_conn = sqs_conn
 		self._sqs_send_queue = sqs_queue
+		self._quadrant_list = q_list
+#		print self._quadrant_list
 	
 	@tornado.gen.coroutine
 	def post(self):
@@ -41,15 +48,21 @@ class MapHandler(tornado.web.RequestHandler):
 		neLon = self.get_argument('neLon')
 		swLat = self.get_argument('swLat')
 		swLon = self.get_argument('swLon')
+		centerLat = self.get_argument("centerlat")
+		centerLng = self.get_argument("centerlng")
+		
+		quadrantSearcher = searcher.SearchQuadrant(self._quadrant_list)
+		center = (float(centerLat), float(centerLng))
+		q_id = quadrantSearcher.searchQuadrant(center)
 		
 		req_type = ""
-		data = {}
+		data = ""
 		if int(zoom_level) >= 15:
 			req_type = rt.SPECIFIC + zoom_level
-			data = self._create_request_message(idReq, req_type, zoom_level, neLat, neLon, swLat, swLon)
+			data = self._create_request_message(idReq, req_type, q_id.getID(), zoom_level, neLat, neLon, swLat, swLon)
 		else:
 			req_type = rt.GLOBAL
-			data = self._create_request_message(idReq, req_type, zoom_level=zoom_level)
+			data = self._create_request_message(idReq, req_type, q_id.getID() , zoom_level=zoom_level)
 		print data
 		
 		#scruttura sulla coda di sqs in maniera asincrona		
@@ -100,17 +113,30 @@ class MapHandler(tornado.web.RequestHandler):
 		return	
 
 	@staticmethod
-	def _create_request_message(idReq, reqType, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
-		return {"id":idReq, "zoom":zoom_level, "neLat":neLat, "neLon":neLon, "swLat":swLat, "seLon":swLon, "reqType":reqType}
+	def _create_request_message(idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
+		
+		request = ""
+		if reqType == rt.GLOBAL:
+			request = createOverviewRequest(idReq, qe.FRONT_END_QUEUE, q_id)
+		elif reqType == rt.SPECIFIC:
+			request = createFullListRequest(idReq, qe.FRONT_END_QUEUE, q_id)
+		else:
+			request = createBoundedListRequest(idReq, qe.FRONT_END_QUEUE, q_id, (neLat, neLon), (swLat, swLon))
+		
+		return request
+		
+		
 	
 
 def connect():	
 	return botornado.sqs.connect_to_region(zn.ZONE_2)
 
-def get_queue(name, sqs_conn):
+def initialize(name, sqs_conn):
   def cb(response):
+  	
+  	q_list = loader.QuadrantTextFileLoader.load("backend_server/listaquadranti.txt")
   	queue = response
-  	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queue=queue))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+  	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queue=queue, q_list=q_list))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
   	http_server = tornado.httpserver.HTTPServer(app)
   	http_server.listen(options.port)
 
@@ -123,7 +149,7 @@ if __name__ == "__main__":
 	
 	ioloop = tornado.ioloop.IOLoop.instance()
 	sqs = connect()
-	ioloop.add_timeout(time.time(), get_queue(qe.FRONT_END_QUEUE, sqs))
+	ioloop.add_timeout(time.time(), initialize(qe.FRONT_END_QUEUE, sqs))
 	ioloop.start()
 
 

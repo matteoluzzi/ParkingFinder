@@ -23,7 +23,7 @@ function initialize() {
 
 	google.maps.event.addListener(map, 'zoom_changed', function() {
 		// alert(window.map.getZoom() + "\n" + window.map.getBounds());
-		sendZoomLevel(map.getZoom(), map.getBounds());
+		sendZoomLevel(map.getZoom(), map.getBounds(), map.getCenter());
 
 	});
 
@@ -86,7 +86,7 @@ function checkMapInfo() {
 	alert("zoom:" + zoom + "center: " + center);
 }
 
-function sendZoomLevel(zoom, bounds) {
+function sendZoomLevel(zoom, bounds, center) {
 
 	// var xmlhttp;
 	// if (window.XMLHttpRequest)
@@ -108,7 +108,7 @@ function sendZoomLevel(zoom, bounds) {
 	var id = generateUUID();
 
 	var data = "id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat
-			+ "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon;
+			+ "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon + "&centerlat=" + center.lat() + "&centerlng=" + center.lng();
 
 	$.ajax({
 		type : "POST",
@@ -154,23 +154,33 @@ function generateUUID() {
 function parseAndDrow(msg) {
 
 	if (msg.length > 0) {
-		for (var i = 0; i < msg.length; i++) {
-			var zoom = msg[i].zoom;
-			var int_zoom = parseInt(zoom, 10);
-			console.log(zoom + " " + window.map.getZoom());
+//		for (var i = 0; i < msg.length; i++) {
+//			var zoom = msg[i].zoom;
+//			var int_zoom = parseInt(zoom, 10);
+//			console.log(zoom + " " + window.map.getZoom());
+//
+//			if (int_zoom >= 15 && zoom == window.map.getZoom()) {
+//				var image = 'http://icons.iconarchive.com/icons/e-young/gur-project/32/map-pointer-icon.png';
+//				console.log(image);
+//				var latLng = window.map.getCenter()
+//				var marker = new google.maps.Marker({
+//					position : latLng,
+//					map : window.map,
+//					icon : image
+//				});
+//			}
+//		}
 
-			if (int_zoom >= 15 && zoom == window.map.getZoom()) {
-				var image = 'http://icons.iconarchive.com/icons/e-young/gur-project/32/map-pointer-icon.png';
-				console.log(image);
-				var latLng = window.map.getCenter()
-				var marker = new google.maps.Marker({
-					position : latLng,
-					map : window.map,
-					icon : image
-				});
-			}
-		}
+		appendText(msg);
 
 	}
 
+};
+
+function appendText(text) {
+	var messageContainer = $("#logArea");
+	console.log(messageContainer);
+	var entry = $("<div id='entriesDiv'>").append(document.createTextNode(text));
+	var data = document.createTextNode(text);
+	messageContainer.append(entry);
 }
