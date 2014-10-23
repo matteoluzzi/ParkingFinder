@@ -1,4 +1,6 @@
 #this class models the entity "quadrant", each quadrant has an ID and is bounded by 4 coordinates and a parklist
+import copy
+
 class Quadrant:
 	__qid	=	0
 	__NW	=	0
@@ -71,6 +73,14 @@ class Quadrant:
 						#print "Punto appartenente al quadrante "+self.qid
 						return True
 		return False
+		
+	def getBoundaries(self):
+		retVal			=	dict()
+		retVal['NW']	=	copy.deepcopy(self.NW)
+		retVal['NE']	=	copy.deepcopy(self.NE)
+		retVal['SW']	=	copy.deepcopy(self.SW)
+		retVal['SE']	=	copy.deepcopy(self.NE)
+		return retVal
 		
 	def getSplitted(self,obsize): #return list of 4 quarters of quadrant
 		minlon		=	float(self.NW[1])
