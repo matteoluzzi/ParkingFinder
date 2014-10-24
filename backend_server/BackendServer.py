@@ -37,7 +37,7 @@ for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
 	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
 	#print aquadrant.getParkList()
-	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
+	myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
 	try:
 		anHandler	=	qh.QuadrantHandler(aquadrant,settingsHandler,myDBLoader)
 		anHandler.start()
