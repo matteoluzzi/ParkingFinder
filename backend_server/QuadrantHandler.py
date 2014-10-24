@@ -28,7 +28,7 @@ class QuadrantHandler(threading.Thread):
 			if my_queue==None:
 				print "queue creation failed"
 		print my_queue
-		while 1:
+		"""while 1:
 			#print "Working"
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
 			print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
@@ -70,6 +70,6 @@ class QuadrantHandler(threading.Thread):
 					print "bounded list request"
 				else:
 					raise Exception("Unknown type request")
-					
+"""					
 
 
