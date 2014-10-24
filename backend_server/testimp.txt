@@ -5,4 +5,4 @@ cacheexpire#3600
 region#EMEA
 SQSzone#us-west-2
 rangeStart#1
-rangeEnd#500
+rangeEnd#1300
