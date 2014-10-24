@@ -31,7 +31,7 @@ if (myQuadrantsRangeStart >-1):
 	myQuadrantsId	=	list()
 	for fakeitem in fakelist:
 		myQuadrantsId.append(myCounter)
-		++myCounter
+		myCounter=myCounter+1
 	
 for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
