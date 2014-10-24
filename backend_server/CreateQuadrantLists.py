@@ -53,6 +53,14 @@ for item in mylist:
 		itemlat =	itemint.getLatitude()
 		itemlon	=	itemint.getLongitude()
 		out_file.write(str(itemid)+"#"+str(itemlat)+"#"+str(itemlon)+"\n")
+		testl	=	list()
+		testl.append(itemlat)
+		testl.append(itemlon)
+		testr	=	item.inside(testl)
+		if (testr==False):
+			raise Exception("wrong quadrants")
+		else:
+			print "#"
 	bounds	=	item.getBoundaries()
 	NWString=	str(bounds['NW'][0])+"|"+str(bounds['NW'][1])
 	NEString=	str(bounds['NE'][0])+"|"+str(bounds['NE'][1])

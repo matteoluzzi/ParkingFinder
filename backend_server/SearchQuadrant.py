@@ -27,6 +27,3 @@ class SearchQuadrant:
 				return item
 		return -1
 		
-	def balanceQuadrants(self):
-		pass #effettuare ottimizzazione quadranti in modo da distribuire in modo uniforme il numero di posti auto
-
