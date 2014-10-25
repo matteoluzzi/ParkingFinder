@@ -27,6 +27,15 @@ class SearchQuadrant:
 				return item
 		return -1
 		
-	def balanceQuadrants(self):
-		pass #effettuare ottimizzazione quadranti in modo da distribuire in modo uniforme il numero di posti auto
-
+	def getQuadrantsForAnArea(self,NW,NE,SW,SE):
+		fakeQuadrant	=	Quadrant(-1,NW,NE,SW,SE)
+		resultList		=	list()
+		for item in self.quadrantsList:
+			coord	=	item.getBoundaries()
+			aNW		=	coord['NW']
+			aNE		=	coord['NE']
+			aSW		=	coord['SW']
+			aSE		=	coord['SE']
+			if(fakeQuadrant.inside(aNW) or fakeQuadrant.inside(aNE) or fakeQuadrant.inside(aSW) or fakeQuadrant.inside(aSE)):
+				returnList.append(item)
+		return returnList

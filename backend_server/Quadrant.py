@@ -1,4 +1,6 @@
 #this class models the entity "quadrant", each quadrant has an ID and is bounded by 4 coordinates and a parklist
+import copy
+
 class Quadrant:
 	__qid	=	0
 	__NW	=	0
@@ -42,12 +44,16 @@ class Quadrant:
 	
 	def getPercentageFreeParkings(self):
 		self.updater.batchUpdate(self.parklist)
+		cacheRis	=	self.updater.getUtilizationPercentage(self)
+		if (int(cacheRis)>-1):
+			return cacheRis
 		free	=	0
 		for item in self.parklist:
 			state	=	item.getStatus()
 			if str(state)=="E":
 				free	=	free+1
 		perc	=	(free/len(self.parklist))*100
+		self.updater.setUtilizationPercentage(self,perc)
 		return perc
 		
 		
@@ -56,10 +62,10 @@ class Quadrant:
 	def inside(self,point):
 		pointlatitude	=	float(point[0])
 		pointlongitude	=	float(point[1])
-		minlon		=	float(self.NW[1])
+		minlon		=	float(self.SW[1])
 		maxlon		=	float(self.NE[1])
-		minlat		=	float(self.NW[0])
-		maxlat		=	float(self.SE[0])
+		minlat		=	float(self.SW[0])
+		maxlat		=	float(self.NE[0])
 		if pointlongitude>minlon:
 			if	pointlongitude<=maxlon:
 				if	pointlatitude>minlat:
@@ -67,6 +73,14 @@ class Quadrant:
 						#print "Punto appartenente al quadrante "+self.qid
 						return True
 		return False
+		
+	def getBoundaries(self):
+		retVal			=	dict()
+		retVal['NW']	=	copy.deepcopy(self.NW)
+		retVal['NE']	=	copy.deepcopy(self.NE)
+		retVal['SW']	=	copy.deepcopy(self.SW)
+		retVal['SE']	=	copy.deepcopy(self.SE)
+		return retVal
 		
 	def getSplitted(self,obsize): #return list of 4 quarters of quadrant
 		minlon		=	float(self.NW[1])
@@ -77,7 +91,7 @@ class Quadrant:
 		centerlon	=	minlon + ((maxlon-minlon)/2)
 		q1			=	Quadrant(-1,self.NW,[maxlat,centerlon],[centerlat,minlon],[centerlat,centerlon])
 		q2			=	Quadrant(-1,[maxlat,centerlon],self.NE,[centerlat,centerlon],[centerlat,maxlon])
-		q3			=	Quadrant(-1,[centerlat,minlon],[centerlat,centerlon],[minlat,minlon],[minlat,centerlon])
+		q3			=	Quadrant(-1,[centerlat,minlon],[centerlat,centerlon],self.SW,[minlat,centerlon])
 		q4			=	Quadrant(-1,[centerlat,centerlon],[centerlat,maxlon],[minlat,centerlon],self.SE)
 		for item in self.parklist:
 			coordinates = [item.getLatitude(),item.getLongitude()]
@@ -89,8 +103,13 @@ class Quadrant:
 				q3.addToParkList(item)	
 			elif q4.inside(coordinates):
 				q4.addToParkList(item)
+			#else:
+			#	raise Exception("error while splitting")
 		total	=	int(len(q1.getParkList()))+int(len(q2.getParkList()))+int(len(q3.getParkList()))+int(len(q4.getParkList()))
+		value1	=	len(self.parklist)
 		print "check "+str(len(self.parklist))+" "+str(total)
+		if not (total==value1):
+			raise Exception("Wrong splitting error!")
 		print "check2 "+str(len(q1.getParkList()))+" "+str(len(q2.getParkList()))+" "+str(len(q3.getParkList()))+" "+str(len(q4.getParkList()))
 		returnlist	=	list()
 		templist	=	[q1,q2,q3,q4]
