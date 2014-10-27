@@ -1,0 +1,1 @@
+il tutto è ancora da automatizzare, l’install prende un file txt stile paride e crea item nel db(da usare per l’inizializzazione), il sensorclient invia il proprio id e stato(senza lat e long) al server che aggiorna l’entry nel db, il tutto in UDP(leggero, si spera) e ancora da “scriptare”
