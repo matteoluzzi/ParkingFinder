@@ -6,3 +6,6 @@ region#EMEA
 SQSzone#us-west-2
 rangeStart#1
 rangeEnd#1300
+awsRegion#us-west-2
+nQuadrants#1267
+notificationFreq#10000

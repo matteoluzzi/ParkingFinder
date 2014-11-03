@@ -21,9 +21,9 @@ class QuadrantHandler(threading.Thread):
 		conn = boto.sqs.connect_to_region(self.mySettings.settings['SQSzone'])
 		queueName	=	"_SDCC_"+str(self.quadrant.getID())
 		my_queue = conn.get_queue(queueName)
-		print "pippo" + str(my_queue)
+		#print "pippo" + str(my_queue)
 		while my_queue == None:
-			print "creating SQS queue "+queueName
+			#print "creating SQS queue "+queueName
 			my_queue = conn.create_queue(str(queueName))
 			if my_queue==None:
 				print "queue creation failed"
