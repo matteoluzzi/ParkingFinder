@@ -1,10 +1,11 @@
 var map;
-function initialize() {
+function initialize(my_center) {
 	var element = $("#map")[0];
+	
 
 	window.map = new google.maps.Map(element, {
-		center : new google.maps.LatLng(41.88976989299657, 12.514091491699224),
-		zoom : 12,
+		center : my_center,
+		zoom : 16,
 		mapTypeId : "OSM",
 		mapTypeControl : false,
 		streetViewControl : false
@@ -20,26 +21,24 @@ function initialize() {
 		name : "OpenStreetMap",
 		maxZoom : 18
 	}));
-
+	// invia una richiesta al primo caricamento della mappa
 	google.maps.event.addListener(map, 'zoom_changed', function() {
-		// alert(window.map.getZoom() + "\n" + window.map.getBounds());
-		sendZoomLevel(map.getZoom(), map.getBounds(), map.getCenter());
+		sendZoomLevel();
+
+	});
+	
+	google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+	 	
+		sendZoomLevel();
 
 	});
 
-	google.maps.event.addListener(map, 'bounds_changed', function() {
-		// evento che cattura i cambiamenti di confine della mappa visualizzati,
-		// può essere oneroso
-	});
-
-	var centerControlDiv = document.createElement('div');
-	var centrerControl = new CenterControl(centerControlDiv, window.map);
+//	var centerControlDiv = document.createElement('div');
+//	var centrerControl = new CenterControl(centerControlDiv, window.map);
 	
 	//centerControlDiv.index = 1;
-	window.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
-
-
-}
+	//window.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
+};
 
 function CenterControl(div, map) {
 
@@ -61,32 +60,32 @@ function CenterControl(div, map) {
 	controlText.innerHTML = '<b>My position</b>';
 	controlUI.appendChild(controlText);
 
-	google.maps.event.addDomListener(controlUI, 'click', function() {
+	google.maps.event.addDomListener(controlUI, 'click', get_my_position());
+};
+
+function get_my_position(callback) {
 
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(displayPosition);
+			navigator.geolocation.getCurrentPosition(function (position)
+				{
+					callback(new google.maps.LatLng(position.coords.latitude,
+	                position.coords.longitude));
+				}
+				);
 		} else {
-			var defaultPosition = new google.maps.LatLng(41.88976989299657,
-					12.514091491699224);
-			window.map.setCenter(defaultPosition);
+			callback(new google.maps.LatLng(41.88976989299657,
+			12.514091491699224));
 		}
+};
 
-		function displayPosition(position) {
-			console.log(position.coords.latitude, position.coords.longitude);
-			var currentPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-			window.map.setCenter(currentPosition);
-			window.map.setZoom(15);
-		}
-	});
-}
-
-function checkMapInfo() {
+function checkMapInfo(msg) {
 	zoom = window.map.getZoom();
 	center = window.map.getCenter().toString();
-	alert("zoom:" + zoom + "center: " + center);
-}
+	bounds = window.map.getBounds().toString();
+	alert("msg: " + msg + "\nzoom:" + zoom + "\ncenter: " + center+ "\nbounds: " + bounds);
+};
 
-function sendZoomLevel(zoom, bounds, center) {
+function sendZoomLevel() {
 
 	// var xmlhttp;
 	// if (window.XMLHttpRequest)
@@ -100,7 +99,12 @@ function sendZoomLevel(zoom, bounds, center) {
 
 	// xmlhttp.open("POST","http://localhost:8080/map",true);
 	// xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-
+    var zoom = map.getZoom();
+    var bounds = map.getBounds();
+    var center = map.getCenter();
+    
+    console.log(zoom + " " + bounds + " " + center);
+    
 	var neLat = bounds.getNorthEast().lat();
 	var neLon = bounds.getNorthEast().lng();
 	var swLat = bounds.getSouthWest().lat();
@@ -117,7 +121,6 @@ function sendZoomLevel(zoom, bounds, center) {
 		contentType : "application/x-www-form-urlencoded",
 		success : function(result) {
 			var response = JSON.parse(result);
-			console.log(response, typeof response);
 			parseAndDrow(response);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
@@ -138,7 +141,7 @@ function sendZoomLevel(zoom, bounds, center) {
 	// parseAndDrow(response);
 	// }
 	// }
-}
+};
 
 function generateUUID() {
 	var d = new Date().getTime();
@@ -177,10 +180,16 @@ function parseAndDrow(msg) {
 
 };
 
-function appendText(text) {
+function appendText(response) {
 	var messageContainer = $("#logArea");
-	console.log(messageContainer);
-	var entry = $("<div id='entriesDiv'>").append(document.createTextNode(text));
-	var data = document.createTextNode(text);
-	messageContainer.append(entry);
-}
+	console.log(response);
+	var entry = $("<div id='entriesDiv'>");
+	var i;
+	for (i = 0; i < response.length; i++)
+		{
+			entry.append(document.createTextNode(JSON.stringify(response[i])));		
+			messageContainer.append(entry);
+		}
+		
+	
+};

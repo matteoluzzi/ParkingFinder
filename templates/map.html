@@ -17,7 +17,10 @@
         </div>
          
         <script type="text/javascript">
-        $("document").ready(function() {initialize() });
+        get_my_position(function(center) {
+        	$("document").ready(function() {initialize(center)});
+        });
+        
                  
         </script>
     </body>
