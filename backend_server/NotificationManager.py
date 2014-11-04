@@ -30,7 +30,7 @@ class NotificationManager(threading.Thread):
 		my_queue = conn.get_queue(queueName)
 		#print "pippo" + str(my_queue)
 		while my_queue == None:
-			#print "creating SQS queue "+queueName
+			print "creating SQS queue "+queueName
 			my_queue = conn.create_queue(str(queueName))
 			if my_queue==None:
 				print "queue creation failed"
@@ -66,6 +66,7 @@ end			=	int(myQuadrantsRangeEnd)
 myCounter	=	st
 fakelist	=	range(end-st)
 for item in fakelist:
+	print "creating threads"
 	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ)
 	aNotManager.start()
 	myConter	=	myCounter+1
