@@ -25,6 +25,7 @@ class NotificationManager(threading.Thread):
 	
 	def run(self):
 		prevStatus	=	0
+		print "connecting to SQS service"
 		conn = boto.sqs.connect_to_region(self.mySettings.settings[self.mysqsZone])
 		queueName	=	"_SDCC_NOTIFICATION"+str(self.quadrant.getID())
 		my_queue = conn.get_queue(queueName)
@@ -49,6 +50,10 @@ class NotificationManager(threading.Thread):
 			m = Message()
 			m.set_body(str(JsonRequest))
 			dest_queue.write(m)
+			print "message sent"
+			
+			#implementare gestione risposta ed invio notifica
+			
 			sleep(frequency)
 		
 settingsHandler		=	settings.Settings("testimp.txt")
@@ -69,5 +74,6 @@ for item in fakelist:
 	print "creating threads"
 	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ)
 	aNotManager.start()
+	print "thread started"
 	myConter	=	myCounter+1
 aNotManager.join()
