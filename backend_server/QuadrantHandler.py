@@ -20,8 +20,10 @@ class QuadrantHandler(threading.Thread):
 		self.myLoader	=	aLoader
 		
 	def run(self):
-		conn = boto.sqs.connect_to_region(self.mySettings.settings['SQSzone'])
+		print "connecting to "+str(self.mySettings.settings['SQSzone'])+"region"
+		conn = boto.sqs.connect_to_region(self.mySettings.settings['SQSzone'][:-1])
 		queueName	=	"_SDCC_"+str(self.quadrant.getID())
+		print queueName
 		my_queue = conn.get_queue(queueName)
 		#print "pippo" + str(my_queue)
 		while my_queue == None:
@@ -80,9 +82,9 @@ class QuadrantHandler(threading.Thread):
 					raise Exception("Unknown type request")
 				#CODICE DA TESTARE!!!
 				if myResponse:
-					resp_queue = conn.get_queue(str(responseQueue))
+					my_resp_queue = conn.get_queue(str(responseQueue))
 					print "Response queue" + str(my_queue)
-					while my_resp_queue == None:
+					while not my_resp_queue:
 						#print "creating SQS queue "+queueName
 						my_resp_queue = conn.create_queue(str(responseQueue))
 					if my_resp_queue==None:

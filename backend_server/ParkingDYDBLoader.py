@@ -46,17 +46,19 @@ class ParkingDYDBLoader:
 		#print "parking updated"
 		return 0
 		
-	def getUtilizationPercentage(aQuadrant):
+	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
-		if (enableCache==True):
-			unastat	=	self.cacheClient.get("Q_"+str(parkingId))
+		if (self.cache==True):
+			unastat	=	self.cacheClient.get("Q_"+str(quadrantID))
+			if not unastat:
+				return -1
 			return unastat
 		return -1
 		
-	def setUtilizationPercentage(aQuadrant,perc):
+	def setUtilizationPercentage(self,aQuadrant,perc):
 		quadrantID	=	aQuadrant.getID()
-		if (enableCache==True):
-			self.cacheClient.set("Q_"+str(parkingId),perc,time=self.qexpire)
+		if (self.cache==True):
+			self.cacheClient.set("Q_"+str(quadrantID),perc,time=self.qexpire)
 			
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
