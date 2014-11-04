@@ -28,7 +28,7 @@ class SearchQuadrant:
 		return -1
 		
 	def getQuadrantsForAnArea(self,NW,NE,SW,SE):
-		fakeQuadrant	=	Quadrant(-1,NW,NE,SW,SE)
+		fakeQuadrant	=	quadrant.Quadrant(-1,NW,NE,SW,SE)
 		resultList		=	list()
 		for item in self.quadrantsList:
 			coord	=	item.getBoundaries()
@@ -37,5 +37,5 @@ class SearchQuadrant:
 			aSW		=	coord['SW']
 			aSE		=	coord['SE']
 			if(fakeQuadrant.inside(aNW) or fakeQuadrant.inside(aNE) or fakeQuadrant.inside(aSW) or fakeQuadrant.inside(aSE)):
-				returnList.append(item)
-		return returnList
+				resultList.append(item)
+		return resultList
