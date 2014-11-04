@@ -5,6 +5,7 @@ import QuadrantTextFileLoader as loader
 import Settings as settings
 import threading
 
+print "starting server"
 settingsHandler		=	settings.Settings("testimp.txt")
 expiretime			=	int(settingsHandler.settings['cacheexpire'])
 myQuadrantsId		=	settingsHandler.settings['quadrants']

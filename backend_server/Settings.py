@@ -17,6 +17,7 @@ class Settings:
 			value	=	onesetting[1].split("|")
 			if len(value)==1:
 				value	=	value[0]
+				value	=	value.decode('string_escape')
 			self.settings[key]	=	value
 			mystring=inputFile.readline()
 			mystring=mystring.split('\n')[0]

@@ -43,7 +43,6 @@ class QuadrantHandler(threading.Thread):
 				aQuadrantID		=	myrequest[0]["quadrant"]
 				requestID		=	myrequest[0]["r_id"]
 				responseQueue	=	myrequest[0]["resp_queue"]
-				myResponse		=	-1
 				if int(aQuadrantID)!=int(self.quadrant.getID()):
 					raise Exception("wrong quadrant request "+str(aQuadrantID)+" on "+str(self.quadrant.getID()))
 				self.myLoader.batchUpdate(self.quadrant.getParkList())	#update status
@@ -80,7 +79,7 @@ class QuadrantHandler(threading.Thread):
 				else:
 					raise Exception("Unknown type request")
 				#CODICE DA TESTARE!!!
-				if myResponse not -1:
+				if myResponse:
 					resp_queue = conn.get_queue(str(responseQueue))
 					print "Response queue" + str(my_queue)
 					while my_resp_queue == None:
