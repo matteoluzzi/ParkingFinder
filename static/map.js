@@ -1,5 +1,3 @@
-var map;
-
 function get_my_position(callback) {
 
 			navigator.geolocation.getCurrentPosition(function (position){
@@ -17,7 +15,7 @@ function get_my_position(callback) {
 function initialize(my_center) {
 	var element = $("#map")[0];
 	
-	console.log(my_center);
+	init = true;
 
 	window.map = new google.maps.Map(element, {
 		center : my_center,
@@ -27,7 +25,6 @@ function initialize(my_center) {
 		streetViewControl : false
 	});
 
-	// Define OSM map type pointing at the OpenStreetMap tile server
 	window.map.mapTypes.set("OSM", new google.maps.ImageMapType({
 		getTileUrl : function(coord, zoom) {
 			return "http://tile.openstreetmap.org/" + zoom + "/" + coord.x
@@ -37,18 +34,33 @@ function initialize(my_center) {
 		name : "OpenStreetMap",
 		maxZoom : 18
 	}));
-	// invia una richiesta al primo caricamento della mappa
-	google.maps.event.addListener(map, 'zoom_changed', function() {
-		sendZoomLevel();
 
+	loadQuadrantsList(function(quadranList) {
+
+
+		google.maps.event.addListener(map, 'zoom_changed', function() {
+		sendZoomLevel();
+		});
+		
+		google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+			
+				sendZoomLevel();	
+		});
+		
+		google.maps.event.addListener(map, 'idle', function(){
+			
+			if(!init)
+			{
+				console.log("idle");
+
+			}
+			else init = false;			
+		});
 	});
+
 	
-	google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
-	 	
-		sendZoomLevel();
-
-	});
-
+	
+	
 //	var centerControlDiv = document.createElement('div');
 //	var centrerControl = new CenterControl(centerControlDiv, window.map);
 	
@@ -90,23 +102,10 @@ function checkMapInfo(msg) {
 
 function sendZoomLevel() {
 
-	// var xmlhttp;
-	// if (window.XMLHttpRequest)
-	// {// code for IE7+, Firefox, Chrome, Opera, Safari
-	// xmlhttp = new XMLHttpRequest();
-	// }
-	// else
-	// {// code for IE6, IE5
-	// xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-	// }
-
-	// xmlhttp.open("POST","http://localhost:8080/map",true);
-	// xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+/*
     var zoom = map.getZoom();
     var bounds = map.getBounds();
     var center = map.getCenter();
-    
-    console.log(zoom + " " + bounds + " " + center);
     
 	var neLat = bounds.getNorthEast().lat();
 	var neLon = bounds.getNorthEast().lng();
@@ -132,18 +131,7 @@ function sendZoomLevel() {
 		}
 
 	});
-
-	// xmlhttp.send("id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat +
-	// "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon);
-
-	// xmlhttp.onreadystatechange = function () {
-	// if (this.readyState == 4 && this.status == 200) {
-	// var JSONresponse = this.responseText;
-	// var response = JSON.parse(JSONresponse);
-	// console.log(response, typeof response);
-	// parseAndDrow(response);
-	// }
-	// }
+*/
 };
 
 function generateUUID() {
