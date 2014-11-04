@@ -1,7 +1,23 @@
 var map;
+
+function get_my_position(callback) {
+
+			navigator.geolocation.getCurrentPosition(function (position){
+				
+					callback(new google.maps.LatLng(position.coords.latitude,
+	                position.coords.longitude));
+				},
+				function () {
+				
+					callback(new google.maps.LatLng(41.88976989299657,
+					12.514091491699224));
+				});			
+};
+
 function initialize(my_center) {
 	var element = $("#map")[0];
 	
+	console.log(my_center);
 
 	window.map = new google.maps.Map(element, {
 		center : my_center,
@@ -63,20 +79,7 @@ function CenterControl(div, map) {
 	google.maps.event.addDomListener(controlUI, 'click', get_my_position());
 };
 
-function get_my_position(callback) {
 
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(function (position)
-				{
-					callback(new google.maps.LatLng(position.coords.latitude,
-	                position.coords.longitude));
-				}
-				);
-		} else {
-			callback(new google.maps.LatLng(41.88976989299657,
-			12.514091491699224));
-		}
-};
 
 function checkMapInfo(msg) {
 	zoom = window.map.getZoom();
@@ -187,7 +190,7 @@ function appendText(response) {
 	var i;
 	for (i = 0; i < response.length; i++)
 		{
-			entry.append(document.createTextNode(JSON.stringify(response[i])));		
+			entry.append(document.createTextNode(JSON.stringify(response[i][0])));		
 			messageContainer.append(entry);
 		}
 		
