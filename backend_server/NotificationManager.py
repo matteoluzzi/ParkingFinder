@@ -1,6 +1,6 @@
 import thread
 import boto
-import Settings
+import Settings as settings
 import boto.sqs
 from boto.sqs.message import Message
 import threading
@@ -20,14 +20,17 @@ class NotificationManager(threading.Thread):
 		threading.Thread.__init__(self)
 		self.myQuadrantID	=	anId
 		self.frequency		=	freq	
-		self.mysqsZone		=	(str)sqsZone
+		myRegion			=	str(sqsZone)
+		self.mysqsZone		=	myRegion[:-1] #mistero... backspace in fondo a stringa
 	
 	
 	def run(self):
 		prevStatus	=	0
 		print "connecting to SQS service"
-		conn = boto.sqs.connect_to_region(self.mySettings.settings[self.mysqsZone])
-		queueName	=	"_SDCC_NOTIFICATION"+str(self.quadrant.getID())
+		conn = boto.sqs.connect_to_region(self.mysqsZone)
+		if not conn:
+			print "error while connecting at"+self.mysqsZone+"zone"
+		queueName	=	"_SDCC_NOTIFICATION"+str(self.myQuadrantID)
 		my_queue = conn.get_queue(queueName)
 		#print "pippo" + str(my_queue)
 		while my_queue == None:
@@ -46,15 +49,15 @@ class NotificationManager(threading.Thread):
 				dest_queue = conn.create_queue(str(destinationQueueName))
 				if dest_queue==None:
 					print "queue creation failed"
-			print "destination queue"+str(dest_queue)
+			print "destination queue "+str(dest_queue)
 			m = Message()
 			m.set_body(str(JsonRequest))
 			dest_queue.write(m)
-			print "message sent"
+			print "message sent on "+str(dest_queue)
 			
 			#implementare gestione risposta ed invio notifica
 			
-			sleep(frequency)
+			time.sleep(float(self.frequency))
 		
 settingsHandler		=	settings.Settings("testimp.txt")
 try:
@@ -64,7 +67,6 @@ try:
 	SQSZ					=	settingsHandler.settings['SQSzone']
 except:
 	print "error while loading settings"
-	return
 	
 st			=	int(myQuadrantsRangeStart)
 end			=	int(myQuadrantsRangeEnd)
@@ -75,5 +77,5 @@ for item in fakelist:
 	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ)
 	aNotManager.start()
 	print "thread started"
-	myConter	=	myCounter+1
+	myCounter	=	myCounter+1
 aNotManager.join()
