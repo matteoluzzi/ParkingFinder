@@ -4,8 +4,6 @@ import os, sys, time, json, itertools
 
 from static import Zone as zn, ReqType as rt
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './lib/botornado')))
-import botornado.sqs  # @UnresolvedImport
 from boto.sqs.message import Message
 import boto.sqs as sqs
 
@@ -15,7 +13,6 @@ import QuadrantTextFileLoader as loader # @UnresolvedImport
 import SearchQuadrant as searcher # @UnresolvedImport
 
 from multiprocessing.pool import ThreadPool
-from multiprocessing.pool import ApplyResult
 
 import tornado.httpserver
 import tornado.ioloop
@@ -112,10 +109,10 @@ class MapHandler(tornado.web.RequestHandler):
 		 			
 		if int(zoom_level) >= 17:
 			req_type = rt.SPECIFIC + zoom_level
-			data = self._create_request_message(idReq, req_type, q_id, zoom_level, neLat, neLon, swLat, swLon)
+			data = self.__create_request_message(idReq, req_type, q_id, zoom_level, neLat, neLon, swLat, swLon)
 		else:
 			req_type = rt.GLOBAL
-			data = self._create_request_message(idReq, req_type, q_id , zoom_level=zoom_level)
+			data = self.__create_request_message(idReq, req_type, q_id , zoom_level=zoom_level)
 
 		msg = Message()
 		msg.set_body(data)	
@@ -156,7 +153,7 @@ class MapHandler(tornado.web.RequestHandler):
 
 
 	@staticmethod
-	def _create_request_message(idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
+	def __create_request_message(idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
 		
 		request = ""
 		if reqType == rt.GLOBAL:
@@ -166,14 +163,7 @@ class MapHandler(tornado.web.RequestHandler):
 		else:
 			request = createBoundedListRequest(idReq, "_SDCC_" + str(q_id), q_id, (neLat, neLon), (swLat, swLon))
 		
-		return request
-	
-	@staticmethod
-	def _get_queue_index_from_message(msg):
-		
-		queue = msg.queue
-		return queue.name[queue.name.rfind("_") + 1:]	
-	
+		return request	
 
 def connect():	
 	return sqs.connect_to_region(zn.ZONE_2, aws_access_key_id = "AKIAITUR2OQ2ZQA3ODQQ", aws_secret_access_key = "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")
@@ -188,6 +178,7 @@ def initialize(sqs_conn):
 	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
+	tornado.ioloop.IOLoop.instance().start()
 
 
 def preapareDict(queue_list):
@@ -198,11 +189,10 @@ def preapareDict(queue_list):
 	return res
 
 if __name__ == "__main__":
-	
-	ioloop = tornado.ioloop.IOLoop.instance()
+
 	sqs = connect()
 	initialize(sqs)
-	ioloop.start()
+	
 
 
 
