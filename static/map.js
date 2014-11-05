@@ -1,3 +1,8 @@
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
+
 function get_my_position(callback) {
 
 			navigator.geolocation.getCurrentPosition(function (position){
@@ -37,24 +42,44 @@ function initialize(my_center) {
 
 	loadQuadrantsList(function(quadranList) {
 
+		var quadrants = parseQuadrantList(quadranList);
 
-		google.maps.event.addListener(map, 'zoom_changed', function() {
-		sendZoomLevel();
-		});
-		
+		var currentQuadrants = new Array();
+
 		google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
 			
-				sendZoomLevel();	
+			var currentBounds = window.map.getBounds();
+			var currentWindow = getWindowsFromBounds(currentBounds);
+
+			currentQuadrants.push.apply(currentQuadrants, getCurrentQuadrants(currentWindow, quadrants));
+
+			console.log(currentQuadrants);
+			sendZoomLevel(currentQuadrants);	
 		});
-		
+
+/*
+		google.maps.event.addListener(map, 'zoom_changed', function() {
+			
+			sendZoomLevel();
+		});
+*/			
 		google.maps.event.addListener(map, 'idle', function(){
 			
-			if(!init)
+			if(init) init = false;
+			else
 			{
-				console.log("idle");
+				var newBounds = window.map.getBounds();
+				var newWindow = getWindowsFromBounds(newBounds);
+				var newQuadrants = getCurrentQuadrants(newWindow, quadrants);
 
-			}
-			else init = false;			
+				var quadrantsToBeQuered = newQuadrants.diff(currentQuadrants);
+
+				currentQuadrants = newQuadrants;
+				sendZoomLevel(quadrantsToBeQuered);
+
+
+
+			}		
 		});
 	});
 
@@ -100,12 +125,11 @@ function checkMapInfo(msg) {
 	alert("msg: " + msg + "\nzoom:" + zoom + "\ncenter: " + center+ "\nbounds: " + bounds);
 };
 
-function sendZoomLevel() {
+function sendZoomLevel(quadrants) {
 
-/*
+	var quadrants_str = quadrants.join("|");
     var zoom = map.getZoom();
     var bounds = map.getBounds();
-    var center = map.getCenter();
     
 	var neLat = bounds.getNorthEast().lat();
 	var neLon = bounds.getNorthEast().lng();
@@ -114,7 +138,7 @@ function sendZoomLevel() {
 	var id = generateUUID();
 
 	var data = "id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat
-			+ "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon + "&centerlat=" + center.lat() + "&centerlng=" + center.lng();
+			+ "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon + "&quadrants=" + quadrants_str ;
 
 	$.ajax({
 		type : "POST",
@@ -131,7 +155,7 @@ function sendZoomLevel() {
 		}
 
 	});
-*/
+
 };
 
 function generateUUID() {

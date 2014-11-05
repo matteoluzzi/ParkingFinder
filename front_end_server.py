@@ -50,16 +50,12 @@ class MapHandler(tornado.web.RequestHandler):
 		neLon = self.get_argument('neLon')
 		swLat = self.get_argument('swLat')
 		swLon = self.get_argument('swLon')
-		centerLat = self.get_argument("centerlat")
-		centerLng = self.get_argument("centerlng")
+		quadrants = self.get_argument('quadrants')
 		
-		quadrantSearcher = searcher.SearchQuadrant(self._quadrant_list)
-		center = (float(centerLat), float(centerLng))
+		print quadrants
 		#q_id = quadrantSearcher.searchQuadrant(center)
-		q_list = quadrantSearcher.getQuadrantsForAnArea((neLat, swLon), (neLat, neLon), (swLat, swLon), (swLat, neLon))
+		q_ids = map(lambda x: int(x),quadrants.split("|"))
 		#q_ids = itertools.chain(map(lambda x: x.getID(), q_list))
-		q_ids = map(lambda x: x.getID(), q_list)
-		res = []
 		#q_ids = q_ids[:2]	
 		print q_ids
 		
@@ -76,10 +72,12 @@ class MapHandler(tornado.web.RequestHandler):
  		json_response = json.dumps(re_read)
  		self.write(json_response)
  		
-		pool.close()
  		
 		#chiusura connessione ad operazioni terminate
 		self.finish()
+		
+		pool.terminate()
+		
 	
 	def __write_background(self, func, callback, args=(), kwargs={}):
 		
