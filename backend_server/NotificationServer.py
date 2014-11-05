@@ -77,6 +77,7 @@ class NotificationServer(threading.Thread):
 		
 testmio	=	NotificationServer()
 testmio.start()
+testmio.join()
 #testq	=	quad.Quadrant(25,0,0,0,0)
 #testmio.mailSubscribe(testq.getID(),"paride.casulli@gmail.com")
 	

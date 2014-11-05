@@ -4,6 +4,7 @@ import SearchQuadrant as searchquadrant
 import QuadrantTextFileLoader as loader
 import Settings as settings
 import threading
+import traceback
 
 print "starting server"
 settingsHandler		=	settings.Settings("testimp.txt")
@@ -45,7 +46,9 @@ for item in myQuadrantsId:
 		threadList.append(anHandler)
 	except: 
 		print "error while starting threads"
-for item in threadList:
-	item.join()
+		print traceback.format_exc()
+anHandler.join()
+print "non devo stampare questo messaggio..."
+
 	
 

@@ -32,7 +32,7 @@ def createListResponse(arg_id,parkingList): #da testare
 	return data_string
 
 def createOverviewResponse(arg_id,percentage,quadrantID):
-	data		=	[{"type":"overview_response" , "percentage":percentage , "quadrantID":quadrantID}]
+	data		=	[{"type":"overview_response" , "r_id" : arg_id, "percentage":percentage , "quadrantID":quadrantID}]
 	data_string =	json.dumps(data)
 	return data_string
 	

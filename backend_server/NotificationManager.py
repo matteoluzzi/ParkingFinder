@@ -25,13 +25,14 @@ class NotificationManager(threading.Thread):
 	
 	
 	def run(self):
-		prevStatus	=	0
+		prevStatus	=	0	#0% free parkings
 		print "connecting to SQS service"
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "error while connecting at"+self.mysqsZone+"zone"
 		queueName	=	"_SDCC_NOTIFICATION"+str(self.myQuadrantID)
-		my_queue = conn.get_queue(queueName)
+		my_queue 	= 	conn.get_queue(queueName)
+		notifQueue	=	conn.get_queue("notificationQueue")
 		#print "pippo" + str(my_queue)
 		while my_queue == None:
 			print "creating SQS queue "+queueName
@@ -54,9 +55,36 @@ class NotificationManager(threading.Thread):
 			m.set_body(str(JsonRequest))
 			dest_queue.write(m)
 			print "message sent on "+str(dest_queue)
-			
-			#implementare gestione risposta ed invio notifica
-			
+			receivedAnswer	= False
+			while not receivedAnswer:
+				requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
+				print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
+				for item in requests:
+					text		=	item.get_body()
+					my_queue.delete_message(item)
+					response	=	json.loads(text)
+					response_id	=	response[0]
+					print response[0]
+					print response[0]["r_id"]
+					responseID	=	int(response[0]["r_id"])
+					if responseID==aRequestId:
+						print "fetched response "+str(response_id)
+						receivedAnswer	=	True
+						newPercentage	=	response[0]["percentage"]
+						send	=	False
+						if prevStatus>50:
+							if newPercentage<=50:
+								send	=	True
+						elif prevStatus>25:
+							if newPercentage<=25:
+								send	=	True
+						elif newPercentage>5:
+								send	=	True
+						if send==True:
+							notifPayload	=	jm.sendNotificationForQuadrant(response[0]["quadrantID"],"New parkings available in quadrant "+str(response[0]["quadrantID"]),"The available parkings are now "+str(newPercentage))
+							m = Message()
+							m.set_body(str(notifPayload))
+							notifQueue.write(m)
 			time.sleep(float(self.frequency))
 		
 settingsHandler		=	settings.Settings("testimp.txt")

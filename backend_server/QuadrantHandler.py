@@ -51,7 +51,7 @@ class QuadrantHandler(threading.Thread):
 				rtype	=	myrequest[0]["type"]
 				if str(rtype)=="overview":
 					freePercentage	=	int(self.quadrant.getPercentageFreeParkings())
-					print "percentuale parcheggi liberi "+str(requestID)
+					print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
 					print "Serving an overview request"
 					myResponse	=	jm.createOverviewResponse(requestID,freePercentage,self.quadrant.getID())
 					print "Overview JSON response "+str(myResponse)
