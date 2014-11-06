@@ -16,12 +16,13 @@ class NotificationManager(threading.Thread):
 	__frequency		=	0
 	__queueName		=	0
 	__mysqsZone		=	0
+	
 	def __init__(self,anId,freq,sqsZone):
 		threading.Thread.__init__(self)
-		self.myQuadrantID	=	anId
-		self.frequency		=	freq	
-		myRegion			=	str(sqsZone)
-		self.mysqsZone		=	myRegion[:-1] #mistero... backspace in fondo a stringa
+		self.myQuadrantID	=	anId			#quadrante da gestire
+		self.frequency		=	freq			#frequenza di polling
+		myRegion			=	str(sqsZone)	#regione SQS
+		self.mysqsZone		=	myRegion[:-1] 	#mistero... backspace in fondo a stringa
 	
 	
 	def run(self):
@@ -39,7 +40,7 @@ class NotificationManager(threading.Thread):
 			my_queue = conn.create_queue(str(queueName))
 			if my_queue==None:
 				print "queue creation failed"
-		print my_queue
+		print my_queue	#connected to answer queue, polling quadrants status
 		while True:
 			print "Checking status notifications for the following quadrant"+str(self.myQuadrantID)
 			aRequestId				=	int(time.time())
@@ -61,13 +62,13 @@ class NotificationManager(threading.Thread):
 				print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
 				for item in requests:
 					text		=	item.get_body()
-					my_queue.delete_message(item)
 					response	=	json.loads(text)
 					response_id	=	response[0]
 					print response[0]
 					print response[0]["r_id"]
 					responseID	=	int(response[0]["r_id"])
 					if responseID==aRequestId:
+						my_queue.delete_message(item)
 						print "fetched response "+str(response_id)
 						receivedAnswer	=	True
 						newPercentage	=	response[0]["percentage"]
