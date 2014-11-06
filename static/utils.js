@@ -27,7 +27,7 @@ function parseQuadrantList(list)
 	quadrants = new Array();
 
 
-	for (var index = 0; index < lines.length -1; index++)
+	for (var index = 0; index < lines.length; index++)
 	{
 		var quadrant = {};
 		var line_arr = lines[index].split("#");
@@ -52,7 +52,7 @@ function parseQuadrantList(list)
 		}
 		quadrants.push(quadrant);
 	}
-
+	console.log(quadrants);
 	return quadrants;
 };
 
@@ -90,4 +90,15 @@ function getWindowsFromBounds(bounds) {
 	var swLon = bounds.getSouthWest().lng();
 	return {SE : {lat : swLat, lon : neLon}, NE : {lat : neLat, lon : neLon}, SW : {lat : swLat, lon : swLon}, NW : {lat : neLat, lon : swLon}};
 
+};
+
+
+function contains(a, obj) {
+    var i = a.length;
+    while (i--) {
+       if (a[i] === obj) {
+           return true;
+       }
+    }
+    return false;
 };

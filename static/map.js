@@ -1,7 +1,3 @@
-Array.prototype.diff = function(a) {
-    return this.filter(function(i) {return a.indexOf(i) < 0;});
-};
-
 
 function get_my_position(callback) {
 
@@ -62,7 +58,8 @@ function initialize(my_center) {
 			
 			sendZoomLevel();
 		});
-*/			
+*/
+			
 		google.maps.event.addListener(map, 'idle', function(){
 			
 			if(init) init = false;
@@ -72,11 +69,21 @@ function initialize(my_center) {
 				var newWindow = getWindowsFromBounds(newBounds);
 				var newQuadrants = getCurrentQuadrants(newWindow, quadrants);
 
-				var quadrantsToBeQuered = newQuadrants.diff(currentQuadrants);
+				var quadrantsToBeQuered = new Array();
+
+				var i = newQuadrants.length;
+
+				while(i--) {
+					if(!contains(currentQuadrants, newQuadrants[i])) 
+						quadrantsToBeQuered.push(newQuadrants[i]);
+				}
 
 				currentQuadrants = newQuadrants;
-				sendZoomLevel(quadrantsToBeQuered);
 
+				console.log(quadrantsToBeQuered);
+
+				if(quadrantsToBeQuered.length > 0)
+					sendZoomLevel(quadrantsToBeQuered);
 
 
 			}		

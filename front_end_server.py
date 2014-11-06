@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 import os, sys, time, json, itertools
 
@@ -51,46 +52,51 @@ class MapHandler(tornado.web.RequestHandler):
 		swLat = self.get_argument('swLat')
 		swLon = self.get_argument('swLon')
 		quadrants = self.get_argument('quadrants')
-		
-		print quadrants
-		#q_id = quadrantSearcher.searchQuadrant(center)
-		q_ids = map(lambda x: int(x),quadrants.split("|"))
-		#q_ids = itertools.chain(map(lambda x: x.getID(), q_list))
-		#q_ids = q_ids[:2]	
+
+		q_ids = set(map(lambda x: int(x),quadrants.split("|")))
 		print q_ids
 		
 		#ad ogni richiesta instanzio un pool di thread per gestire le chiamate ad sqs
 		pool = ThreadPool(len(q_ids))
-		start_time = time.time()
+		print pool
+		
+		
+		#rimango in attesa finche tutte le scritture sono completate
 		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':pool})
-		write_time = time.time() -start_time
-		#scruttura sulla coda di sqs in maniera asincrona		
+		
+		#rimango in attesa finche tutte le letture e cancellazioni sono completate		
  		re_read = yield tornado.gen.Task(self.__read_and_delete_background, self.__retrieve_parking_spots, args=(q_ids, ), kwargs={'pool':pool})
- 		read_time = time.time() - write_time - start_time
  		
  		print re_read
+ 		#invio al client i messaggi letti sulle code
  		json_response = json.dumps(re_read)
  		self.write(json_response)
  		
- 		
 		#chiusura connessione ad operazioni terminate
 		self.finish()
-		
-		pool.terminate()
+		print "session closed"
 		
 	
 	def __write_background(self, func, callback, args=(), kwargs={}):
+		'''funzione che lancia la scrittura sulle code'''
 		
 		def _callback(result):
+			'''ritorno i risultati delle scritture sull IOLoop tramite una callback'''
 			tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(result))
 		
 		sqs_queues_ids	= args[2]
 		pool = kwargs['pool']		
 		queues = []
 		for id in sqs_queues_ids:
-			queues.append((id, self._sqs_send_queues[id]))
-			
-		arguments = [(queue, id, args[0], args[1], args[3], args[4], args[5], args[6]) for id, queue in queues]
+			try:
+				queues.append((id, self._sqs_send_queues[id]))
+			except KeyError:
+				print "coda " + repr(id) + " non trovata"
+		
+		'''stratagemma per passare più argomenti tramite la map_async che di default ne prende uno solo'''	
+		arguments = ((queue, id, args[0], args[1], args[3], args[4], args[5], args[6]) for id, queue in queues)
+		
+		'''ogni thread nel pool esegue la funzione passata come primo argomento'''
 		pool.map_async(func, arguments, callback=_callback)
 	
 		
@@ -118,8 +124,10 @@ class MapHandler(tornado.web.RequestHandler):
 		return res
 	
 	def __read_and_delete_background(self,  func, callback, args=(), kwargs={}):
+		'''funzione che lancia la lettura e cancellazione sulle code'''
 		
 		def _callback(result):
+			'''ritorno i risultati delle scritture sull IOLoop tramite una callback'''
 			tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(result))
 			
 		sqs_queues_ids	= args[0]
@@ -130,6 +138,9 @@ class MapHandler(tornado.web.RequestHandler):
 			queues.append(self._sqs_send_queues[id])		
 			
 		pool.map_async(func, queues, callback=_callback)
+		
+		'''al termine delle operazioni correnti i threads vengono eliminati'''
+		pool.close()
 
 		
 
@@ -141,7 +152,7 @@ class MapHandler(tornado.web.RequestHandler):
 			for msg in response_read:				
 				msg_body = json.loads(msg.get_body())
 
-				response_delete = queue.delete_message(msg)
+				queue.delete_message(msg)
 								
 			return msg_body
 				
@@ -173,6 +184,8 @@ def initialize(sqs_conn):
 	for i in range(1,10):
 		curr_queues = sqs.get_all_queues(prefix = "_SDCC_" + str(i))  # @UndefinedVariable
 		sqs_queues.update(preapareDict(curr_queues))
+		
+	print len(sqs_queues)
 	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
