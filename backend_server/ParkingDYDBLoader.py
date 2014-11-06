@@ -2,6 +2,7 @@ import boto
 from boto.dynamodb2.table import Table
 import Parking as parking
 import memcache
+import traceback
 
 class ParkingDYDBLoader:
 	__table			=	0
@@ -64,16 +65,21 @@ class ParkingDYDBLoader:
 		parkingListDict	=	parkDict
 		batch	=	self.database.new_batch_list()
 		batch.add_batch(self.table,idlist)
-		res		=	batch.submit()
-		for item in res['Responses']['posti']['Items']:
-			idp	=	item['idposto']
-			lat		=	item['latitudine']
-			lon		=	item['longitudine']
-			state	=	item['stato']
-			extra	=	item['extra']
-			if(self.cache==True):
-				self.cacheClient.set(str(idp),item,time=self.cexpire)
-			parkingListDict[idp].updateStatus(lat,lon,state,extra)
+		try:
+			res		=	batch.submit()
+			print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses']['posti']['Items']))
+			for item in res['Responses']['posti']['Items']:
+				idp	=	item['idposto']
+				lat		=	item['latitudine']
+				lon		=	item['longitudine']
+				state	=	item['stato']
+				extra	=	item['extra']
+				if(self.cache==True):
+					self.cacheClient.set(str(idp),item,time=self.cexpire)
+				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+				print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
+		except:
+			print traceback.format_exc()
 		return res['UnprocessedKeys']
 			
 		
@@ -86,7 +92,7 @@ class ParkingDYDBLoader:
 			if (self.cache==True):
 				unposto	= self.cacheClient.get(str(parkId))
 				if not unposto:
-					#print "CACHE MISS"
+					print "ParkingDYDBLoader.py batch update CACHE MISS"
 					parkingListDict[parkId]=item
 					idList.append(parkId)	
 				else:
@@ -94,7 +100,7 @@ class ParkingDYDBLoader:
 					lon		=	unposto['longitudine']
 					state	=	unposto['stato']
 					extra	=	unposto['extra']
-					#print "CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
+					print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
 					item.updateStatus(lat,lon,state,extra)
 					 
 			else:
@@ -102,23 +108,24 @@ class ParkingDYDBLoader:
 				idList.append(parkId)
 		if(len(idList)>0):
 			hundreds	=	int(len(idList)/100)+1
-			#print "preparo "+str(hundreds)+" liste" 
+			print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
 			iterations	=	range(hundreds)
 			counter		=	0
 			for item in iterations:
-				#print "elaboro lista "+str(counter)
+				print "ParkingDYDBLoader.py: elaboro lista "+str(counter)
 				if counter<=hundreds:	
 					templist	=	idList[counter*100:(((counter+1)*100))]
+					print "ParkingDYDBLoader.py: lunghezza lista da elaborare: "+str(len(templist))
 					res = self.batchQuery(templist,parkingListDict)
 					while len(res) >0:
+						print "failed, retry"
 						templist2	=	list()
 						for item in res['posti']['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
-						print "failed, retry"
 						#raise Exception("Error while inserting in DYDB "+str(len(templist))+" "+str(len(parkingList))+" "+str(len(res['posti']['Keys'])))
 				elif counter==hundreds:
-					#print "ultimo batch"
+					print "ultimo batch"
 					res = batchQuery(idList[counter*100:],parkingListDict)
 					while len(res) >0:
 						templist2	=	list()

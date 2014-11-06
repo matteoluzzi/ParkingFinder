@@ -1,2 +1,11 @@
 prova#stocazzo
-prova2#a#b#c
+prova2#a|b|c
+quadrants#98|147|2
+cacheexpire#90
+region#EMEA
+SQSzone#us-west-2
+rangeStart#1
+rangeEnd#200
+awsRegion#us-west-2
+nQuadrants#1267
+notificationFreq#600
