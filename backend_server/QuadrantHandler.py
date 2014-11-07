@@ -9,6 +9,9 @@ import ParkingDYDBLoader as DBloader
 import JSONManager as jm
 from boto.sqs.message import Message
 
+#backend server of a quadrant, makes an endless cycle: fetch request, select the right method for the kind of
+#request and send back an answer on a queue
+
 class QuadrantHandler(threading.Thread):
 	__quadrant	=	0
 	__mySettings	=	0
@@ -58,10 +61,8 @@ class QuadrantHandler(threading.Thread):
 				elif str(rtype)=="full_list":
 					tempList	=	list()
 					myParkList	=	self.quadrant.getParkList()
-					for item in myParkList:
-						tempList.append(item.getDictionary()) #creates a list of dictionary, each item in dictionary is a parking
 					print "full list request"
-					myResponse	=	jm.createListResponse(requestID,tempList)
+					myResponse	=	jm.createListResponse(requestID,myParkList)
 					print "full list JSON response"+str(myResponse)
 				elif str(rtype)=="bounded_list":
 					tempList	=	list()
@@ -74,13 +75,13 @@ class QuadrantHandler(threading.Thread):
 						itemLat	=	float(item.getLatitude())
 						itemLon	=	float(item.getLongitude())
 						if((itemLat<=maxlat)and(itemLat>=minlat)and(itemLon>=minlon)and(itemLon<=maxlon)):
-							tempList.append(item.getDictionary())
+							tempList.append(item)
 					print "bounded list request"
 					myResponse	=	jm.createListResponse(requestID,tempList)
 					print "bounded list JSON response"+str(myResponse)
 				else:
 					raise Exception("Unknown type request")
-				#CODICE DA TESTARE!!!
+				#CODICE DA TESTARE!!! (dovrebbe funzionare
 				if myResponse:
 					my_resp_queue = conn.get_queue(str(responseQueue))
 					print "Response queue" + str(my_queue)

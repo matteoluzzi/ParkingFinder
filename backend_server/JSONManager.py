@@ -4,6 +4,7 @@
 #	overview request (contains requestid, response queue name, quadrant id)
 #	full list	(same as above)
 #	partial list(same as above plus 2 coordinates NW and NE)
+# 	updated with methods for notification handling 
 
 import json
 import Parking as park
