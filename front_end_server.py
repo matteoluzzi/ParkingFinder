@@ -13,7 +13,7 @@ from JSONManager import createOverviewRequest, createFullListRequest, createBoun
 import QuadrantTextFileLoader as loader # @UnresolvedImport
 import SearchQuadrant as searcher # @UnresolvedImport
 
-from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import Pool, ThreadPool
 
 import tornado.httpserver
 import tornado.ioloop
@@ -33,11 +33,13 @@ class BaseHandler(tornado.web.RequestHandler):
 class MapHandler(tornado.web.RequestHandler):
 
 
-	def initialize(self, sqs_conn, sqs_queues, q_list):
+	def initialize(self, sqs_conn, sqs_queues, q_list, pool, response_queue):
 
 		self._sqs_conn = sqs_conn
 		self._sqs_send_queues = sqs_queues
 		self._quadrant_list = q_list
+		self._pool = pool
+		self._response_queue=response_queue
 #		print self._quadrant_list
 	
 	@tornado.web.asynchronous
@@ -57,17 +59,15 @@ class MapHandler(tornado.web.RequestHandler):
 		print q_ids
 		
 		#ad ogni richiesta instanzio un pool di thread per gestire le chiamate ad sqs
-		pool = ThreadPool(len(q_ids))
-		print pool
-		
+#		pool = ThreadPool(len(q_ids))
 		
 		#rimango in attesa finche tutte le scritture sono completate
-		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':pool})
+		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool})
 		
 		#rimango in attesa finche tutte le letture e cancellazioni sono completate		
- 		re_read = yield tornado.gen.Task(self.__read_and_delete_background, self.__retrieve_parking_spots, args=(q_ids, ), kwargs={'pool':pool})
+ 		re_read = yield tornado.gen.Task(self.__read_and_delete_background, self.__retrieve_parking_spots, args=(q_ids, ), kwargs={'pool':self._pool})
  		
- 		print re_read
+ 		#print re_read
  		#invio al client i messaggi letti sulle code
  		json_response = json.dumps(re_read)
  		self.write(json_response)
@@ -86,12 +86,14 @@ class MapHandler(tornado.web.RequestHandler):
 		
 		sqs_queues_ids	= args[2]
 		pool = kwargs['pool']		
-		queues = []
+		queues = set()
 		for id in sqs_queues_ids:
 			try:
-				queues.append((id, self._sqs_send_queues[id]))
+				queues.add((id, self._sqs_send_queues[id]))
 			except KeyError:
 				print "coda " + repr(id) + " non trovata"
+				
+		print "caricate le code"
 		
 		'''stratagemma per passare più argomenti tramite la map_async che di default ne prende uno solo'''	
 		arguments = ((queue, id, args[0], args[1], args[3], args[4], args[5], args[6]) for id, queue in queues)
@@ -134,13 +136,14 @@ class MapHandler(tornado.web.RequestHandler):
 		pool = kwargs['pool']
 		
 		queues = []
-		for id in sqs_queues_ids:
-			queues.append(self._sqs_send_queues[id])		
+#		for id in sqs_queues_ids:
+#			queues.append(self._sqs_send_queues[id])
+		queues.add(self._response_queue)		
 			
 		pool.map_async(func, queues, callback=_callback)
 		
 		'''al termine delle operazioni correnti i threads vengono eliminati'''
-		pool.close()
+		#pool.close()
 
 		
 
@@ -166,7 +169,7 @@ class MapHandler(tornado.web.RequestHandler):
 		
 		request = ""
 		if reqType == rt.GLOBAL:
-			request = createOverviewRequest(idReq, "_SDCC_" + str(q_id), q_id)
+			request = createOverviewRequest(idReq, "_SDCC_response", q_id)
 		elif reqType == rt.SPECIFIC:
 			request = createFullListRequest(idReq, "_SDCC_" + str(q_id), q_id)
 		else:
@@ -185,8 +188,16 @@ def initialize(sqs_conn):
 		curr_queues = sqs.get_all_queues(prefix = "_SDCC_" + str(i))  # @UndefinedVariable
 		sqs_queues.update(preapareDict(curr_queues))
 		
-	print len(sqs_queues)
-	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+	response_queue = sqs.get_queue("_SDCC_response")
+		#print "pippo" + str(my_queue)
+	while response_queue == None:
+			#print "creating SQS queue "+queueName
+		my_queue = sqs.create_queue(str("_SDCC_response"))
+		if my_queue==None:
+			print "queue creation failed"
+		
+	pool = ThreadPool(len(sqs_queues))
+	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list, pool=pool, response_queue=response_queue))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()

@@ -1,4 +1,3 @@
-
 function get_my_position(callback) {
 
 			navigator.geolocation.getCurrentPosition(function (position){
@@ -78,12 +77,17 @@ function initialize(my_center) {
 						quadrantsToBeQuered.push(newQuadrants[i]);
 				}
 
-				currentQuadrants = newQuadrants;
+				console.log("quadranti correnti: " + currentQuadrants + "\nNuovi quadranti: " + newQuadrants);
 
-				console.log(quadrantsToBeQuered);
+
+				console.log("quadranti da interrogare: " + quadrantsToBeQuered);
 
 				if(quadrantsToBeQuered.length > 0)
+				{
+					currentQuadrants = newQuadrants;
 					sendZoomLevel(quadrantsToBeQuered);
+				}
+					
 
 
 			}		
@@ -215,3 +219,12 @@ function appendText(response) {
 		
 	
 };
+
+function setQuadrantColor(quadrant, color)
+{
+	var polygon = quadrant.polygon;
+	polygon.setEditable(true);
+	polygon.setVisible(true);
+	
+
+}

@@ -32,24 +32,41 @@ function parseQuadrantList(list)
 		var quadrant = {};
 		var line_arr = lines[index].split("#");
 		quadrant.id = parseInt(line_arr.splice(0, 1)[0]);
+		var NW, NE, SW, SE;
+		coordinates = new Array();
 		for(var i = 0; i < line_arr.length; i++)
 		{
 			var point_arr = line_arr[i].split("|");
 			switch (i) {
 				case 0:
-					quadrant.NW = {lat : parseFloat(point_arr[0]), lon : parseFloat(point_arr[1])};
+					NW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+					coordinates.push(NW);
 					break;
 				case 1:
-					quadrant.NE = {lat : parseFloat(point_arr[0]), lon : parseFloat(point_arr[1])};
+					NE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+					coordinates.push(NE);
 					break;
 				case 2:
-					quadrant.SW = {lat : parseFloat(point_arr[0]), lon : parseFloat(point_arr[1])};
+					SW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+					coordinates.push(SW);
 					break;
 				case 3:
-					quadrant.SE = {lat : parseFloat(point_arr[0]), lon : parseFloat(point_arr[1])};
+					SE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+					coordinates.push(SE);
 					break;
 			}
 		}
+		/*
+		quadrant.polygon = new google.maps.Polygon({
+			path: coordinates,
+			strokeColor: "#FF0000",
+			strokeOpacity: 0.5,
+			strokeWeight: 1,
+			fillColor: "#FF0000",
+			fillOpacity: 0.20,
+			map: window.map
+		});
+*/
 		quadrants.push(quadrant);
 	}
 	console.log(quadrants);
@@ -70,12 +87,18 @@ function isInside(quadrant, point) {
 function getCurrentQuadrants(currentWindow, quadrants) {
 
 	var result_list = new Array();
-
 	for (var i = 0; i < quadrants.length ; i++) {
 
-		if(isInside(currentWindow, quadrants[i].NW) || isInside(currentWindow, quadrants[i].NE) || isInside(currentWindow, quadrants[i].SE) || isInside(currentWindow, quadrants[i].SW)) 
+		var quadrantCoordinates = quadrants[i].polygon.getPath().getArray();
+		var j = quadrantCoordinates.length;
+		while(j--) {
+			if (google.maps.geometry.poly.containsLocation(quadrantCoordinates[j], currentWindow))
+			{
 				result_list.push(quadrants[i].id);
-	};
+				break;
+			}
+		}
+	}
 	return result_list;
 
 };
@@ -88,8 +111,14 @@ function getWindowsFromBounds(bounds) {
 	var neLon = bounds.getNorthEast().lng();
 	var swLat = bounds.getSouthWest().lat();
 	var swLon = bounds.getSouthWest().lng();
-	return {SE : {lat : swLat, lon : neLon}, NE : {lat : neLat, lon : neLon}, SW : {lat : swLat, lon : swLon}, NW : {lat : neLat, lon : swLon}};
-
+	return new google.maps.Polygon({
+		path: [
+			new google.maps.LatLng(swLat, neLon),
+			new google.maps.LatLng(neLat, neLon),
+			new google.maps.LatLng(swLat, swLon),
+			new google.maps.LatLng(neLat, swLon)
+		]		
+	});
 };
 
 
