@@ -31,7 +31,7 @@ class NotificationManager(threading.Thread):
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "error while connecting at"+self.mysqsZone+"zone"
-		queueName	=	"_SDCC_NOTIFICATION"+str(self.myQuadrantID)
+		queueName	=	"_APPosto_SDCC_NOTIFICATION"+str(self.myQuadrantID)
 		my_queue 	= 	conn.get_queue(queueName)
 		notifQueue	=	conn.get_queue("notificationQueue")
 		#print "pippo" + str(my_queue)
@@ -45,7 +45,7 @@ class NotificationManager(threading.Thread):
 			print "Checking status notifications for the following quadrant"+str(self.myQuadrantID)
 			aRequestId				=	int(time.time())
 			JsonRequest				=	jm.createOverviewRequest(aRequestId,queueName,self.myQuadrantID)
-			destinationQueueName	=	"_SDCC_"+str(self.myQuadrantID)
+			destinationQueueName	=	"_APPosto_SDCC_"+str(self.myQuadrantID)
 			dest_queue = conn.get_queue(destinationQueueName)
 			while dest_queue == None:
 				dest_queue = conn.create_queue(str(destinationQueueName))

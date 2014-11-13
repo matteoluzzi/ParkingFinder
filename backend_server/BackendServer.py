@@ -20,7 +20,7 @@ except:
 
 #initialize the loader from DB and a quadrant list
 
-myDBLoader		= DBloader.ParkingDYDBLoader('posti',True,str("sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211"),expiretime)
+myDBLoader		= DBloader.ParkingDYDBLoader('_APPosto_posti',True,str("sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211"),expiretime)
 listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
 #print expiretime
 threadList	=	list()

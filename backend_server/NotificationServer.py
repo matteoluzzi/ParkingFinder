@@ -22,7 +22,7 @@ class NotificationServer(threading.Thread):
 		fakelist	=	range(int(self.nQuadrants))
 		counter 	=	1
 		for item in fakelist:
-			myTopic	=	self.snsConnection.create_topic("quadrant_"+str(counter))['CreateTopicResponse']['CreateTopicResult']['TopicArn']
+			myTopic	=	self.snsConnection.create_topic("_APPosto_quadrant_"+str(counter))['CreateTopicResponse']['CreateTopicResult']['TopicArn']
 			if myTopic:
 				self.topics[str(counter)] 	=	myTopic
 			counter	=	counter	+	1
@@ -30,7 +30,7 @@ class NotificationServer(threading.Thread):
 	def run(self):
 		print "inizio thread"
 		conn = boto.sqs.connect_to_region(self.snsRegion)
-		queueName	=	"notificationQueue"
+		queueName	=	"_APPosto_notificationQueue"
 		my_queue = conn.get_queue(queueName)
 		print "pippo" + str(my_queue)
 		while my_queue == None:
