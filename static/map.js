@@ -35,9 +35,18 @@ function initialize(my_center) {
 		maxZoom : 18
 	}));
 
-	loadQuadrantsList(function(quadranList) {
 
-		var quadrants = parseQuadrantList(quadranList);
+	loadQuadrantsList(function(quadrantList) {
+
+		
+
+		var ws = create_connection();
+
+		var quadrants = parseQuadrantList(quadrantList);
+
+		ws.onmessage = function(event) { on_message(event, quadrants); }
+		ws.onerror = function(event) { on_error(event); }
+		ws.onclose = function(event) { on_close(event, ws); };
 
 		var currentQuadrants = new Array();
 
@@ -49,7 +58,8 @@ function initialize(my_center) {
 			currentQuadrants.push.apply(currentQuadrants, getCurrentQuadrants(currentWindow, quadrants));
 
 			console.log(currentQuadrants);
-			sendZoomLevel(currentQuadrants);	
+			if(currentQuadrants.length > 0)
+				sendZoomLevel(ws, currentQuadrants);	
 		});
 
 /*
@@ -85,24 +95,22 @@ function initialize(my_center) {
 				if(quadrantsToBeQuered.length > 0)
 				{
 					currentQuadrants = newQuadrants;
-					sendZoomLevel(quadrantsToBeQuered);
+					sendZoomLevel(ws, quadrantsToBeQuered);
 				}
 					
 
 
 			}		
 		});
-	});
-
-	
-	
-	
+	});	
 //	var centerControlDiv = document.createElement('div');
 //	var centrerControl = new CenterControl(centerControlDiv, window.map);
 	
 	//centerControlDiv.index = 1;
 	//window.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
 };
+
+//funzione che viene eseguita ogni volta che arriva un messaggio sulla websocket
 
 function CenterControl(div, map) {
 
@@ -136,7 +144,7 @@ function checkMapInfo(msg) {
 	alert("msg: " + msg + "\nzoom:" + zoom + "\ncenter: " + center+ "\nbounds: " + bounds);
 };
 
-function sendZoomLevel(quadrants) {
+function sendZoomLevel(ws, quadrants) {
 
 	var quadrants_str = quadrants.join("|");
     var zoom = map.getZoom();
@@ -148,24 +156,13 @@ function sendZoomLevel(quadrants) {
 	var swLon = bounds.getSouthWest().lng();
 	var id = generateUUID();
 
-	var data = "id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat
-			+ "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon + "&quadrants=" + quadrants_str ;
+	// var data = "id=" + id + "&zoom_level=" + zoom + "&neLat=" + neLat
+	// 		+ "&neLon=" + neLon + "&swLat=" + swLat + "&swLon=" + swLon + "&quadrants=" + quadrants_str ;
 
-	$.ajax({
-		type : "POST",
-		url : "http://localhost:8080/map",
-		data : data,
-		contentType : "application/x-www-form-urlencoded",
-		success : function(result) {
-			var response = JSON.parse(result);
-			parseAndDrow(response);
-		},
-		error : function(jqXHR, textStatus, errorThrown) {
-			jsonValue = $.parseJSON(jqXHR.responseText);
-			console.log(jsonValue.Message);
-		}
+	var message = JSON.stringify({"id":id, "zoom_level" :zoom, "neLat": neLat, "neLon":neLon, "swLat":swLat, "swLon":swLon, "quadrants":quadrants_str});
 
-	});
+
+	sendMessage(ws, message, true);
 
 };
 
@@ -220,11 +217,34 @@ function appendText(response) {
 	
 };
 
+function colorPolygon(data, quadrants) {
+
+	q_id = data['quadrantID'];
+	quadrant = quadrants[q_id - 1];
+	percentage = data['percentage'];
+	if(percentage > 66)
+	{
+		setQuadrantColor(quadrant, "#00FF00");
+	}
+	else if(percentage > 33)
+	{
+		setQuadrantColor(quadrant, "#FF9900");
+	}
+	else
+	{
+		setQuadrantColor(quadrant, "#CC0000");
+	}
+	
+}
+
+
+
 function setQuadrantColor(quadrant, color)
 {
+	console.log("coloro il quadrante " + quadrant.polygon.id + " con il colore " + color);
 	var polygon = quadrant.polygon;
+	polygon.setOptions({fillColor: color, fillOpacity: 0.20, map: window.map, strokeColor : "#FFFFFF", strokeOpacity : 0});
 	polygon.setEditable(true);
 	polygon.setVisible(true);
 	
-
 }
