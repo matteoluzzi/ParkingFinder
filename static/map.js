@@ -42,15 +42,17 @@ function initialize(my_center) {
 
 		var ws = create_connection();
 
-		var quadrants = parseQuadrantList(quadrantList);
+		var quadrants;
 
 		ws.onmessage = function(event) { on_message(event, quadrants); }
 		ws.onerror = function(event) { on_error(event); }
 		ws.onclose = function(event) { on_close(event, ws); };
 
-		var currentQuadrants = new Array();
+		var currentQuadrants = [];
 
 		google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+
+			quadrants = parseQuadrantList(quadrantList);
 			
 			var currentBounds = window.map.getBounds();
 			var currentWindow = getWindowsFromBounds(currentBounds);
@@ -76,6 +78,7 @@ function initialize(my_center) {
 			{
 				var newBounds = window.map.getBounds();
 				var newWindow = getWindowsFromBounds(newBounds);
+				console.log(newWindow);
 				var newQuadrants = getCurrentQuadrants(newWindow, quadrants);
 
 				var quadrantsToBeQuered = new Array();

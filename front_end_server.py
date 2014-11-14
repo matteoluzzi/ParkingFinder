@@ -70,6 +70,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':pool})
 
+		pool.close()
 
 	def on_close(self):
 		print "WebSocket closed!"
@@ -116,8 +117,6 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 					self.write_message(json.dumps({"type": "error", "res" : -1, "data" : -1, "quadrantID" : id, "percentage": 20}))
 			except KeyError:
 				print "coda " + repr(id) + " non trovata"
-
-		pool.close()
 
 		if request == False:
 			tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(json.dumps("{res : -1}")))

@@ -3,7 +3,7 @@ function loadQuadrantsList(callback)
 {
 		$.ajax({
 			type : "GET",
-			url : "http://localhost:8888/backend_server/listaquadranti.txt",
+			url : "http://ec2-54-68-136-156.us-west-2.compute.amazonaws.com:8888/backend_server/parkings/listaquadranti.txt",
 			data : null,
 			success : function(response) {
 				callback(response);
@@ -33,40 +33,39 @@ function parseQuadrantList(list)
 		var line_arr = lines[index].split("#");
 		quadrant.id = parseInt(line_arr.splice(0, 1)[0]);
 		var NW, NE, SW, SE;
-		coordinates = new Array();
+		var coordinates = new google.maps.LatLngBounds();
 		for(var i = 0; i < line_arr.length; i++)
 		{
 			var point_arr = line_arr[i].split("|");
 			switch (i) {
 				case 0:
 					NW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.push(NW);
+					coordinates.extend(NW);
 					break;
 				case 1:
 					NE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.push(NE);
+					coordinates.extend(NE);
 					break;
 				case 2:
 					SW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.push(SW);
+					coordinates.extend(SW);
 					break;
 				case 3:
 					SE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.push(SE);
+					coordinates.extend(SE);
 					break;
 			}
 		}
-		/*
-		quadrant.polygon = new google.maps.Polygon({
-			path: coordinates,
-			strokeColor: "#FF0000",
-			strokeOpacity: 0.5,
-			strokeWeight: 1,
-			fillColor: "#FF0000",
-			fillOpacity: 0.20,
+		
+			quadrant.polygon = new google.maps.Rectangle({
+			bounds: coordinates,
+		//	strokeColor: "#FF0000",
+		//	strokeOpacity: 0.5,
+		//	strokeWeight: 1,
+		//	fillColor: "#FF0000",
+		//	fillOpacity: 0.20,
 			map: window.map
 		});
-*/
 		quadrants.push(quadrant);
 	}
 	console.log(quadrants);
@@ -86,22 +85,36 @@ function isInside(quadrant, point) {
 //funzione che data la finestra corrente sulla mappa, resistuisce quali quadranti sono inclusi in essa
 function getCurrentQuadrants(currentWindow, quadrants) {
 
-	var result_list = new Array();
+	var result_list = [];
 	for (var i = 0; i < quadrants.length ; i++) {
 
-		var quadrantCoordinates = quadrants[i].polygon.getPath().getArray();
-		var j = quadrantCoordinates.length;
-		while(j--) {
-			if (google.maps.geometry.poly.containsLocation(quadrantCoordinates[j], currentWindow))
-			{
-				result_list.push(quadrants[i].id);
-				break;
-			}
+		var quadrantCoordinates = quadrants[i].polygon.getBounds();
+		
+		if (quadrantCoordinates.intersects(currentWindow.getBounds()))
+		{
+			result_list.push(quadrants[i].id);
 		}
+
 	}
 	return result_list;
 
 };
+
+function getQuadrants(point, quadrants)
+{
+	var j = quadrants.length;
+	while(j--)
+	{
+		var currentQuadrant = quadrants[j].polygon
+		if (currentQuadrant.getBounds().contains(point))
+		{
+			console.log("punto " + JSON.stringify(point) + " appartiene al quadrante " + quadrants[j].id);
+			return;
+		}
+	}
+	console.log("punto " + JSON.stringify(point) + " non ha quadranti!");
+	
+}
 
 //funzione che dati i bounds di una finestra, ritorna un ogetto di tipo quadrante
 
@@ -111,13 +124,15 @@ function getWindowsFromBounds(bounds) {
 	var neLon = bounds.getNorthEast().lng();
 	var swLat = bounds.getSouthWest().lat();
 	var swLon = bounds.getSouthWest().lng();
-	return new google.maps.Polygon({
-		path: [
-			new google.maps.LatLng(swLat, neLon),
-			new google.maps.LatLng(neLat, neLon),
-			new google.maps.LatLng(swLat, swLon),
-			new google.maps.LatLng(neLat, swLon)
-		]		
+
+	var bounds = new google.maps.LatLngBounds();
+	bounds.extend(new google.maps.LatLng(swLat, neLon));
+	bounds.extend(new google.maps.LatLng(neLat, neLon));
+	bounds.extend(new google.maps.LatLng(swLat, swLon));
+	bounds.extend(new google.maps.LatLng(neLat, swLon));
+
+	return new google.maps.Rectangle({
+		bounds : bounds
 	});
 };
 

@@ -1,5 +1,5 @@
 function create_connection() {
-	return new WebSocket("ws://ec2-54-69-247-222.us-west-2.compute.amazonaws.com:8000/map");
+	return new WebSocket("ws://ec2-54-68-136-156.us-west-2.compute.amazonaws.com:8000/map");
 }
 
 function on_message(message, quadrants) {
@@ -12,7 +12,7 @@ function on_message(message, quadrants) {
 			colorPolygon(data, quadrants);
 		default:
 			console.log(data);
-			colorPolygon(data, quadrants);
+		//	colorPolygon(data, quadrants);
 
 	};
 
