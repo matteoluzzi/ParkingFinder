@@ -1,5 +1,5 @@
 //carica la lista dei quadranti in modo asincrono, eseguendo la callback a caricamento completato
-function loadQuadrantsList(callback)
+/*function loadQuadrantsList(callback)
 {
 		$.ajax({
 			type : "GET",
@@ -15,7 +15,7 @@ function loadQuadrantsList(callback)
 			}
 		});
 
-};
+};*/
 
 /*
 * funzione che parsa la stringa contenente la lista totale dei quadranti e ritorna un array di oggetti quadrante
@@ -64,7 +64,7 @@ function parseQuadrantList(list)
 		//	strokeWeight: 1,
 		//	fillColor: "#FF0000",
 		//	fillOpacity: 0.20,
-			map: window.map
+		//	map: window.map
 		});
 		quadrants.push(quadrant);
 	}

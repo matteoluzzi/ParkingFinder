@@ -14,6 +14,8 @@ class ReqType():
 	GLOBAL = "global"
 	SPECIFIC = "quadrante"
 	
+class Path():
 	
+	QUADRANTSLISTPATH = "backend_server/parkings/listaquadranti.txt"	
 	
 	

@@ -2,7 +2,7 @@ function create_connection() {
 	return new WebSocket("ws://ec2-54-68-136-156.us-west-2.compute.amazonaws.com:8000/map");
 }
 
-function on_message(message, quadrants) {
+function on_message(message, quadrants, ws, my_center) {
 
 	var data = JSON.parse(message.data);
 	var type = data['type'];
@@ -10,9 +10,15 @@ function on_message(message, quadrants) {
 		case "overview_response":
 			console.log(data);
 			colorPolygon(data, quadrants);
+			break;
+		case "quadrant_list":
+			console.log(data);
+			handleMap(data['data'], ws, my_center);
+			break;
 		default:
 			console.log(data);
-		//	colorPolygon(data, quadrants);
+
+//			colorPolygon(data, quadrants);
 
 	};
 

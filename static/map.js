@@ -13,6 +13,19 @@ function get_my_position(callback) {
 };
 
 function initialize(my_center) {
+
+	var ws = create_connection();
+
+	var quadrants;
+
+	ws.onmessage = function(event) { on_message(event, quadrants, ws, my_center); }
+	ws.onerror = function(event) { on_error(event); }
+	ws.onclose = function(event) { on_close(event, ws); };
+		
+};
+
+function handleMap(quadrantList, ws, my_center)
+{
 	var element = $("#map")[0];
 	
 	init = true;
@@ -35,77 +48,60 @@ function initialize(my_center) {
 		maxZoom : 18
 	}));
 
+	var currentQuadrants = [];
 
-	loadQuadrantsList(function(quadrantList) {
+	google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
 
+		quadrants = parseQuadrantList(quadrantList);
 		
+		var currentBounds = window.map.getBounds();
+		var currentWindow = getWindowsFromBounds(currentBounds);
 
-		var ws = create_connection();
+		currentQuadrants.push.apply(currentQuadrants, getCurrentQuadrants(currentWindow, quadrants));
 
-		var quadrants;
-
-		ws.onmessage = function(event) { on_message(event, quadrants); }
-		ws.onerror = function(event) { on_error(event); }
-		ws.onclose = function(event) { on_close(event, ws); };
-
-		var currentQuadrants = [];
-
-		google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
-
-			quadrants = parseQuadrantList(quadrantList);
-			
-			var currentBounds = window.map.getBounds();
-			var currentWindow = getWindowsFromBounds(currentBounds);
-
-			currentQuadrants.push.apply(currentQuadrants, getCurrentQuadrants(currentWindow, quadrants));
-
-			console.log(currentQuadrants);
-			if(currentQuadrants.length > 0)
-				sendZoomLevel(ws, currentQuadrants);	
-		});
+		console.log(currentQuadrants);
+		if(currentQuadrants.length > 0)
+			sendZoomLevel(ws, currentQuadrants);	
+	});
 
 /*
-		google.maps.event.addListener(map, 'zoom_changed', function() {
-			
-			sendZoomLevel();
-		});
+	google.maps.event.addListener(map, 'zoom_changed', function() {
+		
+		sendZoomLevel();
+	});
 */
-			
-		google.maps.event.addListener(map, 'idle', function(){
-			
-			if(init) init = false;
-			else
+		
+	google.maps.event.addListener(map, 'idle', function(){
+		
+		if(init) init = false;
+		else
+		{
+			var newBounds = window.map.getBounds();
+			var newWindow = getWindowsFromBounds(newBounds);
+			console.log(newWindow);
+			var newQuadrants = getCurrentQuadrants(newWindow, quadrants);
+
+			var quadrantsToBeQuered = new Array();
+
+			var i = newQuadrants.length;
+
+			while(i--) {
+				if(!contains(currentQuadrants, newQuadrants[i])) 
+					quadrantsToBeQuered.push(newQuadrants[i]);
+			}
+
+			console.log("quadranti correnti: " + currentQuadrants + "\nNuovi quadranti: " + newQuadrants);
+
+
+			console.log("quadranti da interrogare: " + quadrantsToBeQuered);
+
+			if(quadrantsToBeQuered.length > 0)
 			{
-				var newBounds = window.map.getBounds();
-				var newWindow = getWindowsFromBounds(newBounds);
-				console.log(newWindow);
-				var newQuadrants = getCurrentQuadrants(newWindow, quadrants);
-
-				var quadrantsToBeQuered = new Array();
-
-				var i = newQuadrants.length;
-
-				while(i--) {
-					if(!contains(currentQuadrants, newQuadrants[i])) 
-						quadrantsToBeQuered.push(newQuadrants[i]);
-				}
-
-				console.log("quadranti correnti: " + currentQuadrants + "\nNuovi quadranti: " + newQuadrants);
-
-
-				console.log("quadranti da interrogare: " + quadrantsToBeQuered);
-
-				if(quadrantsToBeQuered.length > 0)
-				{
-					currentQuadrants = newQuadrants;
-					sendZoomLevel(ws, quadrantsToBeQuered);
-				}
-					
-
-
-			}		
-		});
-	});	
+				currentQuadrants = newQuadrants;
+				sendZoomLevel(ws, quadrantsToBeQuered);
+			}
+		}		
+	});
 //	var centerControlDiv = document.createElement('div');
 //	var centrerControl = new CenterControl(centerControlDiv, window.map);
 	

@@ -3,7 +3,7 @@
 
 import os, sys, time, json, itertools
 
-from static import Zone as zn, ReqType as rt
+from static import Zone as zn, ReqType as rt, Path as pt
 
 from boto.sqs.message import Message
 import boto.sqs as sqs
@@ -35,18 +35,21 @@ class BaseHandler(tornado.web.RequestHandler):
 class MapHandler(tornado.websocket.WebSocketHandler):
 
 
-	def initialize(self, sqs_conn, sqs_queues, q_list, thread):
+	def initialize(self, sqs_conn, sqs_queues, q_list, thread, quadrantslist):
 
 		self._sqs_conn = sqs_conn
 		self._sqs_send_queues = sqs_queues
 		self._quadrant_list = q_list
 		self._dispatcher = thread
+		self._quadrant_list_string = quadrantslist
 		'''insieme di connessioni al server'''
 		self._connections = set()
 
 	def open(self):
 		print "WebSocket opened!"
 		self._connections.add(self)
+		quadrant_list_msg = json.dumps({"type": "quadrant_list", "res" : -1, "data" : self._quadrant_list_string})
+		self.write_message(quadrant_list_msg)
 
 	@tornado.gen.engine
 	def on_message(self, raw_message):
@@ -112,7 +115,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 				if(id == 1 or id == 2 or id == 3 or id == 4 or id == 5):
 					request = True
 					arguments = ()
-					pool.apply_async(func, args=(self._sqs_send_queues[id], id ,len(sqs_queues_ids), args[0], args[1], args[3], args[4], args[5], args[6]), callback=_callback)
+					pool.apply_async(func, args=(self._sqs_send_queues[id], id ,5, args[0], args[1], args[3], args[4], args[5], args[6]), callback=_callback)
 				else:
 					self.write_message(json.dumps({"type": "error", "res" : -1, "data" : -1, "quadrantID" : id, "percentage": 20}))
 			except KeyError:
@@ -171,13 +174,24 @@ def initialize(sqs_conn):
 
 	dispatcher = DispatcherThread("_SDCC_response")
 	dispatcher.start()
+
+	quadrantslist = openQuadrantsList(pt.QUADRANTSLISTPATH)
+
+	print quadrantslist
+
 		
-	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list, thread=dispatcher))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list, thread=dispatcher, quadrantslist=quadrantslist))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
 	print "ready to serve"
 	tornado.ioloop.IOLoop.instance().start()
 
+
+def openQuadrantsList(path):
+	line = ""
+	with open(path, 'r') as inp:
+		line = inp.readlines()
+	return "".join(line)
 
 def preapareDict(queue_list):
 	res = {}
