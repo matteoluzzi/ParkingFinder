@@ -152,27 +152,27 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 		request = ""
 		if reqType == rt.GLOBAL:
-			request = createOverviewRequest(idReq, "_SDCC_response", q_id)
+			request = createOverviewRequest(idReq, "_APPosto_SDCC_response", q_id)
 			print request
 		elif reqType == rt.SPECIFIC:
-			request = createFullListRequest(idReq, "_SDCC_" + str(q_id), q_id)
+			request = createFullListRequest(idReq, "_APPosto_SDCC_" + str(q_id), q_id)
 		else:
-			request = createBoundedListRequest(idReq, "_SDCC_" + str(q_id), q_id, (neLat, neLon), (swLat, swLon))
+			request = createBoundedListRequest(idReq, "_APPosto_SDCC_" + str(q_id), q_id, (neLat, neLon), (swLat, swLon))
 		
 		return request	
 
 def connect():	
-	return sqs.connect_to_region(zn.ZONE_2, aws_access_key_id = "AKIAITUR2OQ2ZQA3ODQQ", aws_secret_access_key = "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")
+	return sqs.connect_to_region(zn.ZONE_2, aws_access_key_id = "AKIAJRKDJEDV7UJMBRLQ", aws_secret_access_key = "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")
 
 def initialize(sqs_conn):
   	
 	q_list = loader.QuadrantTextFileLoader.load("backend_server/listaquadranti.txt")
 	sqs_queues = {}
 	for i in range(1,10):
-		curr_queues = sqs.get_all_queues(prefix = "_SDCC_" + str(i))  # @UndefinedVariable
+		curr_queues = sqs.get_all_queues(prefix = "APPosto_SDCC_" + str(i))  # @UndefinedVariable
 		sqs_queues.update(preapareDict(curr_queues))
 
-	dispatcher = DispatcherThread("_SDCC_response")
+	dispatcher = DispatcherThread("_APPosto_SDCC_response")
 	dispatcher.start()
 
 	quadrantslist = openQuadrantsList(pt.QUADRANTSLISTPATH)
