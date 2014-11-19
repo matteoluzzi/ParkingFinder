@@ -137,6 +137,35 @@ class ParkingDYDBLoader:
 				counter	=	counter+1
 		#print "parkings updated"
 		
+	def updateFromSensor(self, listab):
+			tr=Table('parking')#da correggere
+			with tr.batch_write() as batch:
+			
+				for item in listab:
+					
+					
+					batch.put_item(data={
+					'idposto': item[0],
+					'extra': item[1],
+					'latitude': item[2],
+					'longitude': item[3],
+					'stato' : item[1]})
+					if(self.cache==True):
+						dictio={'idposto': item[0],
+						'extra': item[1],
+						'latitude': item[2],
+						'longitude': item[3],
+						'stato' : item[1]}
+						self.cacheClient.set(str(item[0]),dictio,time=self.cexpire)
+						dictio={}
+					
+					#park = self.table.get_item(parkid = item[0])
+					#park ['stato']= item[1]
+					#park.save()
+				
+			
+		
+		
 		
 		
 		
