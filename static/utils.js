@@ -68,18 +68,7 @@ function parseQuadrantList(list)
 		});
 		quadrants.push(quadrant);
 	}
-	console.log(quadrants);
 	return quadrants;
-};
-
-//funzione che verifica l'appartenenza di un punto ad un quadrante
-function isInside(quadrant, point) {
-
-	var lat = point.lat;
-	var lon = point.lon;
-
-	return (lat <= quadrant.NW.lat && lat >= quadrant.SW.lat && lon >= quadrant.NW.lon && lon <= quadrant.NE.lon);
-
 };
 
 //funzione che data la finestra corrente sulla mappa, resistuisce quali quadranti sono inclusi in essa
@@ -97,7 +86,6 @@ function getCurrentQuadrants(currentWindow, quadrants) {
 
 	}
 	return result_list;
-
 };
 
 function getQuadrants(point, quadrants)
@@ -145,4 +133,15 @@ function contains(a, obj) {
        }
     }
     return false;
+};
+
+function generateUUID() {
+	var d = new Date().getTime();
+	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+			function(c) {
+				var r = (d + Math.random() * 16) % 16 | 0;
+				d = Math.floor(d / 16);
+				return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+			});
+	return uuid;
 };
