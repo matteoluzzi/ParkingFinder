@@ -14,6 +14,8 @@ class ParkingDYDBLoader:
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=60,queryCacheExpire=30):
 		self.database	=	boto.connect_dynamodb()
+		tablelist	=	self.database.list_tables()
+		print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
 		self.table		=	self.database.get_table(str(myTableName))
 		self.cache		=	enableCache
 		self.cexpire	=	cacheExpireTime
@@ -67,8 +69,9 @@ class ParkingDYDBLoader:
 		batch.add_batch(self.table,idlist)
 		try:
 			res		=	batch.submit()
-			print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses']['posti']['Items']))
-			for item in res['Responses']['posti']['Items']:
+			print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
+			print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
+			for item in res['Responses'][str(self.table.name)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
 				lon		=	item['longitudine']
@@ -120,7 +123,7 @@ class ParkingDYDBLoader:
 					while len(res) >0:
 						print "failed, retry"
 						templist2	=	list()
-						for item in res['posti']['Keys']:
+						for item in res[str(self.table.name)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
 						#raise Exception("Error while inserting in DYDB "+str(len(templist))+" "+str(len(parkingList))+" "+str(len(res['posti']['Keys'])))
@@ -129,7 +132,7 @@ class ParkingDYDBLoader:
 					res = batchQuery(idList[counter*100:],parkingListDict)
 					while len(res) >0:
 						templist2	=	list()
-						for item in res['posti']['Keys']:
+						for item in res[(self.table.name)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
 						print "failed, retry"

@@ -11,16 +11,23 @@ settingsHandler		=	settings.Settings("testimp.txt")
 expiretime			=	int(settingsHandler.settings['cacheexpire'])
 myQuadrantsId		=	settingsHandler.settings['quadrants']
 myQuadrantsRangeStart	=	-1
+cacheUrl		=	-1
 try:
+	cacheUrl		=	str(settingsHandler.settings['cacheurl'])
 	myQuadrantsRangeStart	= settingsHandler.settings['rangeStart']	#if defined range OVERRIDES quadrants setting
 	myQuadrantsRangeEnd	= settingsHandler.settings['rangeEnd']			#end NOT included in range, finishes at rangeEnd-1
 except:
-	pass
-
-
+	print "BackendServer.py: range not present, passing out"
+enablecache	=	False
+if (cacheUrl > -1):
+	print "BackendServer.py: cache url: "+cacheUrl+"---"
+	cacheUrl	=	cacheUrl[:-1]	#special characters at the end of string
+	enablecache	=	True
+else:
+	print "BackendServer.py: cache disabled"
 #initialize the loader from DB and a quadrant list
 
-myDBLoader		= DBloader.ParkingDYDBLoader('_APPosto_posti',True,str("sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211"),expiretime)
+myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,expiretime)
 listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
 #print expiretime
 threadList	=	list()

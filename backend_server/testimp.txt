@@ -3,9 +3,10 @@ prova2#a|b|c
 quadrants#98|147|2
 cacheexpire#90
 region#EMEA
-SQSzone#us-west-2
+SQSzone#eu-west-1
 rangeStart#1
-rangeEnd#6
-awsRegion#us-west-2
+rangeEnd#50
+awsRegion#eu-west-1
 nQuadrants#1267
 notificationFreq#600
+cacheurl#appostocache.ndaqz6.cfg.euw1.cache.amazonaws.com:11211
