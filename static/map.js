@@ -127,7 +127,6 @@ function colorPolygon(data, quadrants)
 
 function setQuadrantColor(quadrant, color)
 {
-	console.log("coloro il quadrante " + quadrant.polygon.id + " con il colore " + color);
 	var polygon = quadrant.polygon;
 	polygon.setOptions({fillColor: color, fillOpacity: 0.20, map: window.map, strokeColor : "#FFFFFF", strokeOpacity : 0});
 	polygon.setEditable(true);

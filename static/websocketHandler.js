@@ -11,13 +11,15 @@ function get_my_position(callback) {
 };
 
 function create_connection(my_center) {
-	var ws = new WebSocket("ws://ec2-54-148-10-29.us-west-2.compute.amazonaws.com:8000/map");
+	var ws = new WebSocket("ws://ec2-54-194-215-24.eu-west-1.compute.amazonaws.com:8000/map");
 
 	var quadrants;
 
 	ws.onmessage = function(event) 
 	{ 
 		var data_obj = JSON.parse(event.data);
+
+		//console.log(data_obj);
 
 		switch (data_obj['type']) {
 
@@ -39,17 +41,16 @@ function create_connection(my_center) {
 function on_message(message, quadrants) {
 
 	var type = message['type'];
-	var data = message['data'];
 
 	switch (type) {
 
 		case "overview_response":
-			console.log(data);
-			colorPolygon(data, quadrants);
+			console.log(message);
+			colorPolygon(message, quadrants);
 			break;
 
 		default:
-			console.log(message);
+			//console.log(message);
 			break;
 	};
 
@@ -58,7 +59,7 @@ function on_message(message, quadrants) {
 
 function on_close(event, ws) {
 	console.log("Websocket chiusa - riconnessione");
-	var center = window.map.getCeter();
+	var center = window.map.getCenter();
 	ws = create_connection(center);
 };
 

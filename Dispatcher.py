@@ -13,7 +13,7 @@ class DispatcherThread(Thread):
 		Thread.__init__(self)
 		self._subscribers = {}
 		self._queues = {}
-		self._sqs_conn = sqs.connect_to_region(zn.ZONE_2, aws_access_key_id = "AKIAITUR2OQ2ZQA3ODQQ", aws_secret_access_key = "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")
+		self._sqs_conn = sqs.connect_to_region(zn.EU_W_1)
 		self._queue = self._sqs_conn.get_queue(queue_name)
 		if self._queue == None:
 			self._queue = self._sqs_conn.create_queue(queue_name)
@@ -48,7 +48,7 @@ class DispatcherThread(Thread):
 
 			for raw_message in raw_messages:
 
-				print "Dispatcher- new message ", raw_message
+				print "Dispatcher - new message ", raw_message
 				message = loads(raw_message.get_body())[0]
 
 				r_id = message['r_id']
@@ -74,7 +74,8 @@ class DispatcherThread(Thread):
 
 				else:
 					print "errore relativo alla richiesta " + r_id
-					#self._queue.delete_message(raw_message)
+					self._queue.delete_message(raw_message)
+					#print "cancello messaggio spurio"
 
 
 

@@ -3,7 +3,7 @@
 
 import os, sys, time, json, itertools
 
-from static import Zone as zn, ReqType as rt, Path as pt
+from static import Zone as zn, ReqType as rt, Path as pt, Queue as qu
 
 from boto.sqs.message import Message
 import boto.sqs as sqs
@@ -83,11 +83,11 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 	def __write_background(self, func, callback, args=(), kwargs={}):
 		'''funzione che lancia la scrittura sulle code'''
 		
-		def _callback(result):
+		def _callback(idReq):
 
 			print "scritto messaggio, in attesa della risposta"
 
-			queue = self._dispatcher.get_message_queue(result)
+			queue = self._dispatcher.get_message_queue(idReq)
 			print queue
 
 			message = queue.get()
@@ -96,12 +96,13 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 				message.pop("last", None)
 				self.write_message(message)
 				print "ultimo messaggio"
-				tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(result))
-				self._dispatcher.delete_message_queue(result)
+				tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(idReq))
+				self._dispatcher.delete_message_queue(idReq)
 
 				
 			else:
 				self.write_message(message)
+
 
 			print "messaggio scritto al client"
 
@@ -109,17 +110,15 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 		sqs_queues_ids	= args[2]
 		pool = kwargs['pool']		
-		queues = set()
 		for id in sqs_queues_ids:
-			try:
-				if(id == 1 or id == 2 or id == 3 or id == 4 or id == 5):
-					request = True
-					arguments = ()
-					pool.apply_async(func, args=(self._sqs_send_queues[id], id ,5, args[0], args[1], args[3], args[4], args[5], args[6]), callback=_callback)
-				else:
-					self.write_message(json.dumps({"type": "error", "res" : -1, "data" : -1, "quadrantID" : id, "percentage": 20}))
-			except KeyError:
-				print "coda " + repr(id) + " non trovata"
+			if id in range(1,101):
+
+				request = True
+				pool.apply_async(func, args=(self._sqs_send_queues[id], id ,100, args[0], args[1], args[3], args[4], args[5], args[6]), callback=_callback)					
+			
+			else:
+				#print "coda " + repr(id) + " non trovata"
+				self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))
 
 		if request == False:
 			tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(json.dumps("{res : -1}")))
@@ -152,32 +151,30 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 		request = ""
 		if reqType == rt.GLOBAL:
-			request = createOverviewRequest(idReq, "_APPosto_SDCC_response", q_id)
+			request = createOverviewRequest(idReq, qu.RESPONSE_QUEUE, q_id)
 			print request
 		elif reqType == rt.SPECIFIC:
-			request = createFullListRequest(idReq, "_APPosto_SDCC_" + str(q_id), q_id)
+			request = createFullListRequest(idReq, qu.PREFIX + str(q_id), q_id)
 		else:
-			request = createBoundedListRequest(idReq, "_APPosto_SDCC_" + str(q_id), q_id, (neLat, neLon), (swLat, swLon))
+			request = createBoundedListRequest(idReq, qu.PREFIX + str(q_id), q_id, (neLat, neLon), (swLat, swLon))
 		
 		return request	
 
 def connect():	
-	return sqs.connect_to_region(zn.ZONE_2, aws_access_key_id = "AKIAJRKDJEDV7UJMBRLQ", aws_secret_access_key = "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")
+	return sqs.connect_to_region(zn.EU_W_1)
 
 def initialize(sqs_conn):
   	
-	q_list = loader.QuadrantTextFileLoader.load("backend_server/listaquadranti.txt")
+	q_list = loader.QuadrantTextFileLoader.load(pt.QUADRANTSLISTPATH)
 	sqs_queues = {}
 	for i in range(1,10):
-		curr_queues = sqs.get_all_queues(prefix = "APPosto_SDCC_" + str(i))  # @UndefinedVariable
+		curr_queues = sqs.get_all_queues(prefix = qu.PREFIX + str(i))  # @UndefinedVariable
 		sqs_queues.update(preapareDict(curr_queues))
 
-	dispatcher = DispatcherThread("_APPosto_SDCC_response")
+	dispatcher = DispatcherThread(qu.RESPONSE_QUEUE)
 	dispatcher.start()
 
 	quadrantslist = openQuadrantsList(pt.QUADRANTSLISTPATH)
-
-	print quadrantslist
 
 		
 	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list, thread=dispatcher, quadrantslist=quadrantslist))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)

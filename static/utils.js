@@ -1,25 +1,3 @@
-//carica la lista dei quadranti in modo asincrono, eseguendo la callback a caricamento completato
-/*function loadQuadrantsList(callback)
-{
-		$.ajax({
-			type : "GET",
-			url : "http://ec2-54-68-136-156.us-west-2.compute.amazonaws.com:8888/backend_server/parkings/listaquadranti.txt",
-			data : null,
-			success : function(response) {
-				callback(response);
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				console.log("errore nel caricare la lista");
-				callback(-1);
-
-			}
-		});
-
-};*/
-
-/*
-* funzione che parsa la stringa contenente la lista totale dei quadranti e ritorna un array di oggetti quadrante
-*/
 function parseQuadrantList(list)
 {
 
@@ -59,12 +37,6 @@ function parseQuadrantList(list)
 		
 			quadrant.polygon = new google.maps.Rectangle({
 			bounds: coordinates,
-		//	strokeColor: "#FF0000",
-		//	strokeOpacity: 0.5,
-		//	strokeWeight: 1,
-		//	fillColor: "#FF0000",
-		//	fillOpacity: 0.20,
-		//	map: window.map
 		});
 		quadrants.push(quadrant);
 	}
@@ -145,3 +117,9 @@ function generateUUID() {
 			});
 	return uuid;
 };
+
+
+function Constants() {
+
+	this.WsURL = "ws://ec2-54-194-215-24.eu-west-1.compute.amazonaws.com:8000/map";
+}
