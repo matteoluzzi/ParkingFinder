@@ -74,8 +74,8 @@ class ParkingDYDBLoader:
 		batch.add_batch(self.table,idlist)
 		try:
 			res		=	batch.submit()
-			print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
-			print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
+			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
+			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.table.name)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
@@ -85,7 +85,7 @@ class ParkingDYDBLoader:
 				if(self.cache==True):
 					self.cacheClient.set(str(idp),item,time=self.cexpire)
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
-				print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
+				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print traceback.format_exc()
 		return res['UnprocessedKeys']
@@ -116,14 +116,14 @@ class ParkingDYDBLoader:
 				idList.append(parkId)
 		if(len(idList)>0):
 			hundreds	=	int(len(idList)/100)+1
-			print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
+			#print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
 			iterations	=	range(hundreds)
 			counter		=	0
 			for item in iterations:
-				print "ParkingDYDBLoader.py: elaboro lista "+str(counter)
+				#print "ParkingDYDBLoader.py: elaboro lista "+str(counter)
 				if counter<=hundreds:	
 					templist	=	idList[counter*100:(((counter+1)*100))]
-					print "ParkingDYDBLoader.py: lunghezza lista da elaborare: "+str(len(templist))
+					#print "ParkingDYDBLoader.py: lunghezza lista da elaborare: "+str(len(templist))
 					res = self.batchQuery(templist,parkingListDict)
 					while len(res) >0:
 						print "failed, retry"
@@ -133,7 +133,7 @@ class ParkingDYDBLoader:
 						res	=	self.batchQuery(templist2,parkingListDict)
 						#raise Exception("Error while inserting in DYDB "+str(len(templist))+" "+str(len(parkingList))+" "+str(len(res['posti']['Keys'])))
 				elif counter==hundreds:
-					print "ultimo batch"
+					#print "ultimo batch"
 					res = batchQuery(idList[counter*100:],parkingListDict)
 					while len(res) >0:
 						templist2	=	list()
