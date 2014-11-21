@@ -128,8 +128,5 @@ function colorPolygon(data, quadrants)
 function setQuadrantColor(quadrant, color)
 {
 	var polygon = quadrant.polygon;
-	polygon.setOptions({fillColor: color, fillOpacity: 0.20, map: window.map, strokeColor : "#FFFFFF", strokeOpacity : 0});
-	polygon.setEditable(true);
-	polygon.setVisible(true);
-	
+	polygon.setOptions({fillColor: color, fillOpacity: 0.20, map: window.map, strokeColor : "#FFFFFF", strokeOpacity : 0, visible : true, editable : false, draggable : false});	
 }

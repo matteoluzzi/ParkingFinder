@@ -37,6 +37,7 @@ function parseQuadrantList(list)
 		
 			quadrant.polygon = new google.maps.Rectangle({
 			bounds: coordinates,
+
 		});
 		quadrants.push(quadrant);
 	}
