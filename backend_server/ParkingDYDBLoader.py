@@ -24,6 +24,11 @@ class ParkingDYDBLoader:
 			urlstring	=	str(myCacheURL)
 			self.cacheClient	=	memcache.Client([urlstring])
 	
+	def setCacheTimeout(self,cacheExp,queryExp):
+		print "ParkinkDYDBLoader: Changing timeouts"
+		self.cexpire	=	cacheExp
+		self.qexpire	=	queryExp		
+	
 	def update(self,aParking):
 		parkingId	=	aParking.getId()
 		if(self.cache==True):

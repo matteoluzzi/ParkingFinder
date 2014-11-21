@@ -2,6 +2,8 @@ prova#stocazzo
 prova2#a|b|c
 quadrants#98|147|2
 cacheexpire#90
+queryexpire#30
+slowstart#600
 region#EMEA
 SQSzone#eu-west-1
 rangeStart#1

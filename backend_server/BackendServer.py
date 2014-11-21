@@ -5,10 +5,23 @@ import QuadrantTextFileLoader as loader
 import Settings as settings
 import threading
 import traceback
+import time
+import random
+
+class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow start
+	def __init__(self,quadrant,time):
+		randomNumber	=	random.randint(0,time)
+		time.sleep(randomNumber)
+		print "Backendserver.py: prefetching"
+		quadrant.getPercentageFreeParkings()
+		return 0
+		
 
 print "starting server"
 settingsHandler		=	settings.Settings("testimp.txt")
 expiretime			=	int(settingsHandler.settings['cacheexpire'])
+queryexpire			=	int(settingsHandler.settings['queryexpire'])
+slowstart			=	int(settingsHandler.settings['slowstart'])		#slowstart duration
 myQuadrantsId		=	settingsHandler.settings['quadrants']
 myQuadrantsRangeStart	=	-1
 cacheUrl		=	-1
@@ -27,7 +40,7 @@ else:
 	print "BackendServer.py: cache disabled"
 #initialize the loader from DB and a quadrant list
 
-myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,expiretime)
+myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,slowstart,slowstart)
 listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
 #print expiretime
 threadList	=	list()
@@ -46,14 +59,18 @@ for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
 	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
 	#print aquadrant.getParkList()
-	myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
+	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
 	try:
 		anHandler	=	qh.QuadrantHandler(aquadrant,settingsHandler,myDBLoader)
 		anHandler.start()
+		fetcher		=	QuadrantPrefetching(aquadrant,slowstart)
+		fetcher.start()
 		threadList.append(anHandler)
 	except: 
 		print "error while starting threads"
 		print traceback.format_exc()
+time.sleep(slowstart)
+myDBLoader.setCacheTimeout(expiretime,queryexpire)
 anHandler.join()
 print "non devo stampare questo messaggio..."
 
