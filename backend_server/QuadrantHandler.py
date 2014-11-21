@@ -13,7 +13,7 @@ from boto.sqs.message import Message
 #request and send back an answer on a queue
 
 class QuadrantHandler(threading.Thread):
-	__quadrant	=	0
+	quadrant	=	0
 	__mySettings	=	0
 	__myLoader		=	0
 	def __init__(self,myQuadrant,mySettingsArg,aLoader):

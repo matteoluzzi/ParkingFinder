@@ -76,6 +76,18 @@ for item in myQuadrantsId:
 		print "error while starting threads"
 		print traceback.format_exc()
 tm.sleep(slowstart)
+while 1:
+	for item in threadList:
+		alive	=	item.isAlive()
+		if alive==False:
+			threadList.remove(item)
+			aQuadrant	=	item.quadrant
+			anHandler	=	qh.QuadrantHandler(aquadrant,settingsHandler,myDBLoader)
+			anHandler.start()
+			threadList.append(anHandler)
+			print "BackendServer: effettuato recovery thread quadrante "+str(aQuadrant.getID())
+	time.sleep(60)
+			
 myDBLoader.setCacheTimeout(expiretime,queryexpire)
 anHandler.join()
 print "non devo stampare questo messaggio..."

@@ -100,7 +100,7 @@ class ParkingDYDBLoader:
 			if (self.cache==True):
 				unposto	= self.cacheClient.get(str(parkId))
 				if not unposto:
-					print "ParkingDYDBLoader.py batch update CACHE MISS"
+					#print "ParkingDYDBLoader.py batch update CACHE MISS"
 					parkingListDict[parkId]=item
 					idList.append(parkId)	
 				else:
@@ -108,7 +108,7 @@ class ParkingDYDBLoader:
 					lon		=	unposto['longitudine']
 					state	=	unposto['stato']
 					extra	=	unposto['extra']
-					print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
+					#print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
 					item.updateStatus(lat,lon,state,extra)
 					 
 			else:
