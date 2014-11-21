@@ -13,7 +13,7 @@ class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow s
 	wtime		=	0
 	def __init__(self,aquadrant,time):
 		threading.Thread.__init__(self)
-		wtime			=	random.randint(0,time)
+		self.wtime			=	random.randint(0,time)
 		self.quadrant	=	aquadrant
 
 	def run(self):
@@ -21,7 +21,21 @@ class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow s
 		print "Backendserver.py: prefetching"
 		self.quadrant.getPercentageFreeParkings()
 		return 0
-		
+
+class EndSlowStart(threading.Thread): #precarica i dati in fase di slow start
+	wtime		=	0
+	myloader	=	0
+	myexpire	=	0
+	myqexpire	=	0			
+	def __init__(self,loader,time,expire,queryexpire):
+		threading.Thread.__init__(self)
+		self.myloader	=	loader
+		self.wtime		=	time
+		self.myexpire		=	expire
+		self.myqexpire		=	queryexpire
+	def run(self):
+		tm.sleep(self.wtime)
+		self.myloader.setCacheTimeout(self.myexpire,self.myqexpire)
 
 print "starting server"
 settingsHandler		=	settings.Settings("testimp.txt")
@@ -75,7 +89,8 @@ for item in myQuadrantsId:
 	except: 
 		print "error while starting threads"
 		print traceback.format_exc()
-tm.sleep(slowstart)
+endSlow	=	EndSlowStart(myDBLoader,slowstart,expiretime,queryexpire)
+endSlow.start()
 while 1:
 	for item in threadList:
 		alive	=	item.isAlive()
@@ -87,8 +102,6 @@ while 1:
 			threadList.append(anHandler)
 			print "BackendServer: effettuato recovery thread quadrante "+str(aQuadrant.getID())
 	time.sleep(60)
-			
-myDBLoader.setCacheTimeout(expiretime,queryexpire)
 anHandler.join()
 print "non devo stampare questo messaggio..."
 
