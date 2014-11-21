@@ -101,7 +101,7 @@ while 1:
 			anHandler.start()
 			threadList.append(anHandler)
 			print "BackendServer: effettuato recovery thread quadrante "+str(aQuadrant.getID())
-	time.sleep(60)
+	tm.sleep(60)
 anHandler.join()
 print "non devo stampare questo messaggio..."
 
