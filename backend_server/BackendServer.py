@@ -5,13 +5,13 @@ import QuadrantTextFileLoader as loader
 import Settings as settings
 import threading
 import traceback
-import time
+import time as tm
 import random
 
 class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow start
 	def __init__(self,quadrant,time):
 		randomNumber	=	random.randint(0,time)
-		time.sleep(randomNumber)
+		tm.sleep(randomNumber)
 		print "Backendserver.py: prefetching"
 		quadrant.getPercentageFreeParkings()
 		return 0
@@ -69,7 +69,7 @@ for item in myQuadrantsId:
 	except: 
 		print "error while starting threads"
 		print traceback.format_exc()
-time.sleep(slowstart)
+tm.sleep(slowstart)
 myDBLoader.setCacheTimeout(expiretime,queryexpire)
 anHandler.join()
 print "non devo stampare questo messaggio..."
