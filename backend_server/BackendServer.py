@@ -12,6 +12,7 @@ class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow s
 	quadrant	=	0
 	wtime		=	0
 	def __init__(self,aquadrant,time):
+		threading.Thread.__init__(self)
 		wtime			=	random.randint(0,time)
 		self.quadrant	=	aquadrant
 
