@@ -9,11 +9,16 @@ import time as tm
 import random
 
 class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow start
-	def __init__(self,quadrant,time):
-		randomNumber	=	random.randint(0,time)
-		tm.sleep(randomNumber)
+	quadrant	=	0
+	wtime		=	0
+	def __init__(self,aquadrant,time):
+		wtime			=	random.randint(0,time)
+		self.quadrant	=	aquadrant
+
+	def run(self):
+		tm.sleep(self.wtime)
 		print "Backendserver.py: prefetching"
-		quadrant.getPercentageFreeParkings()
+		self.quadrant.getPercentageFreeParkings()
 		return 0
 		
 
