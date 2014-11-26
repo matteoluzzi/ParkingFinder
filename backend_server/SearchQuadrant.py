@@ -27,10 +27,13 @@ class SearchQuadrant:
 	#returns the object with a quadrantID
 	def getQuadrantInstance(self,qID):
 		myID	=	str(qID)
-		if self.quadrantsDict[myID]==None:
+		try:
+			if self.quadrantsDict[myID]==None:
+				return -1
+			else:
+				return self.quadrantsList[myID]
+		except:
 			return -1
-		else:
-			return self.quadrantsList[int(qId)]
 		
 	def getQuadrantsForAnArea(self,NW,NE,SW,SE):
 		fakeQuadrant	=	Quadrant(-1,NW,NE,SW,SE)
