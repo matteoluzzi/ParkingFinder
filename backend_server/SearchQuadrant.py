@@ -11,7 +11,7 @@ class SearchQuadrant:
 		self.quadrantsList =	aList
 		for item in aList:
 			quadId	=	item.getID()
-			quadrantsDict[str(quadId)] = item
+			self.quadrantsDict[str(quadId)] = item
 
 	#returns a quadrant for a geographic coordinate
 	def searchQuadrant(self,point):
