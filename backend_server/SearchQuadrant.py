@@ -26,7 +26,8 @@ class SearchQuadrant:
 
 	#returns the object with a quadrantID
 	def getQuadrantInstance(self,qID):
-		if self.quadrantsDict[int(qId)]==None:
+		myID	=	int(qID)
+		if self.quadrantsDict[myID]==None:
 			return -1
 		else:
 			return self.quadrantsList[int(qId)]
