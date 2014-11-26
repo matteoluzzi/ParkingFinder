@@ -43,15 +43,16 @@ class QuadrantHandler(threading.Thread):
 			for item in requests:
 				print "deleting "+str(item)
 				text	=	item.get_body()
-				my_queue.delete_message(item)
+		
 				myrequest =	json.loads(text)
 				aQuadrantID		=	myrequest[0]["quadrant"]
 				requestID		=	myrequest[0]["r_id"]
 				responseQueue	=	myrequest[0]["resp_queue"]
 				currentQuadrant	=	self.quadrants.getQuadrantInstance(int(aQuadrantID))
-				if currentQuadrant==1:
+				if currentQuadrant==-1:
 					print "wrong quadrant request "+str(aQuadrantID)+" quadrant not in list"
 				else:
+					my_queue.delete_message(item)
 					self.myLoader.batchUpdate(currentQuadrant.getParkList())	#update status
 					rtype	=	myrequest[0]["type"]
 					if str(rtype)=="overview":
