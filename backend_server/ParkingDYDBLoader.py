@@ -70,6 +70,7 @@ class ParkingDYDBLoader:
 			
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
+		myIdList		=	idlist
 		batch	=	self.database.new_batch_list()
 		batch.add_batch(self.table,idlist)
 		try:
@@ -88,6 +89,7 @@ class ParkingDYDBLoader:
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print traceback.format_exc()
+			return batchQuery(myIdList,parkingListDict)
 		return res['UnprocessedKeys']
 			
 		

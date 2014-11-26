@@ -34,7 +34,7 @@ class QuadrantHandler(threading.Thread):
 			my_queue = conn.create_queue(str(queueName))
 			if my_queue==None:
 				print "queue creation failed"
-		print my_queue
+		#print my_queue
 		while 1:
 			#print "Working"
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
@@ -43,7 +43,6 @@ class QuadrantHandler(threading.Thread):
 			for item in requests:
 				print "deleting "+str(item)
 				text	=	item.get_body()
-		
 				myrequest =	json.loads(text)
 				aQuadrantID		=	myrequest[0]["quadrant"]
 				requestID		=	myrequest[0]["r_id"]

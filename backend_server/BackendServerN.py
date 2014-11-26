@@ -109,6 +109,7 @@ while endCreation==False:
 print "BackendServer.py no more threads allowed, number of threads created "+str(threadCounter)
 
 while 1>0:
+	print "BackendServer.py checking threads status"
 	for item in threadList:
 		alive	=	item.isAlive()
 		if alive==False:
