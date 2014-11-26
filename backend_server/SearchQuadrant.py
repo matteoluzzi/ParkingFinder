@@ -31,7 +31,7 @@ class SearchQuadrant:
 			if self.quadrantsDict[myID]==None:
 				return -1
 			else:
-				return self.quadrantsList[myID]
+				return self.quadrantsDict[myID]
 		except:
 			return -1
 		
