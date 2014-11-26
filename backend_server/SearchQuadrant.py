@@ -22,13 +22,13 @@ class SearchQuadrant:
 
 	#returns the object with a quadrantID
 	def getQuadrantInstance(self,qID):
-		for item in self.quadrantsList:
-			if item.getID()==int(qID):
-				return item
-		return -1
+		if self.quadrantsList[int(qId)]==None:
+			return -1
+		else:
+			return self.quadrantsList[int(qId)]
 		
 	def getQuadrantsForAnArea(self,NW,NE,SW,SE):
-		fakeQuadrant	=	quadrant.Quadrant(-1,NW,NE,SW,SE)
+		fakeQuadrant	=	Quadrant(-1,NW,NE,SW,SE)
 		resultList		=	list()
 		for item in self.quadrantsList:
 			coord	=	item.getBoundaries()
@@ -37,5 +37,5 @@ class SearchQuadrant:
 			aSW		=	coord['SW']
 			aSE		=	coord['SE']
 			if(fakeQuadrant.inside(aNW) or fakeQuadrant.inside(aNE) or fakeQuadrant.inside(aSW) or fakeQuadrant.inside(aSE)):
-				resultList.append(item)
-		return resultList
+				returnList.append(item)
+		return returnList

@@ -19,7 +19,7 @@ class QuadrantTextFileLoader:
 			newSW		=	quadrantinfo[3].split("|")
 			newSE		=	quadrantinfo[4].split("|")
 			newQuadrant	=	quadrant.Quadrant(newID,newNW,newNE,newSW,newSE,updater)
-			quadrantsList.append(newQuadrant)
+			quadrantsList[int(newID)]=newQuadrant
 			mystring=inputFile.readline()
 			mystring=mystring.split('\n')[0]
 		return quadrantsList
