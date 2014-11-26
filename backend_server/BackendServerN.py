@@ -38,6 +38,7 @@ class EndSlowStart(threading.Thread): #precarica i dati in fase di slow start
 		self.myexpire		=	expire
 		self.myqexpire		=	queryexpire
 	def run(self):
+		print "Backendserver.py: launched slow start watchdog "
 		tm.sleep(self.wtime)
 		self.myloader.setCacheTimeout(self.myexpire,self.myqexpire)
 
@@ -101,12 +102,12 @@ while endCreation==False:
 		anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
 		anHandler.start()
 	except:
-		print "BackendServer.py no more threads allowed, number of threads created "+str(threadCounter)
 		endCreation = True
 		break
 	threadCounter =	threadCounter+1
 	threadList.append(anHandler)
-	
+print "BackendServer.py no more threads allowed, number of threads created "+str(threadCounter)
+
 while 1>0:
 	for item in threadList:
 		alive	=	item.isAlive()
