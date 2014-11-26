@@ -6,8 +6,12 @@ import QuadrantTextFileLoader as loader
 class SearchQuadrant:
 	inputFile	=	0
 	quadrantsList	=	0
+	quadrantsDict	=	{}
 	def __init__(self,aList):	#list of quadrants
 		self.quadrantsList =	aList
+		for item in aList:
+			quadId	=	item.getID()
+			quadrantsDict[str(quadId)] = item
 
 	#returns a quadrant for a geographic coordinate
 	def searchQuadrant(self,point):
@@ -22,7 +26,7 @@ class SearchQuadrant:
 
 	#returns the object with a quadrantID
 	def getQuadrantInstance(self,qID):
-		if self.quadrantsList[int(qId)]==None:
+		if self.quadrantsDict[int(qId)]==None:
 			return -1
 		else:
 			return self.quadrantsList[int(qId)]

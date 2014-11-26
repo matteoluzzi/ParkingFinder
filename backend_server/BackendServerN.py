@@ -115,7 +115,7 @@ while 1>0:
 			anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
 			anHandler.start()
 			threadList.append(anHandler)
-			print "BackendServer: effettuato recovery thread")
+			print "BackendServer: effettuato recovery thread"
 	tm.sleep(60)
 anHandler.join()
 print "non devo stampare questo messaggio..."
