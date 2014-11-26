@@ -23,9 +23,9 @@ class QuadrantHandler(threading.Thread):
 		self.myLoader	=	aLoader
 		
 	def run(self):
-		print "connecting to "+str(self.mySettings.settings['SQSzone'])+"region"
+		#print "connecting to "+str(self.mySettings.settings['SQSzone'])+"region"
 		conn = boto.sqs.connect_to_region(self.mySettings.settings['SQSzone'][:-1])
-		queueName	=	"_APPosto_requests_queue"
+		#queueName	=	"_APPosto_requests_queue"
 		print queueName
 		my_queue = conn.get_queue(queueName)
 		#print "pippo" + str(my_queue)
@@ -38,7 +38,7 @@ class QuadrantHandler(threading.Thread):
 		while 1:
 			#print "Working"
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
-			print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
+			#print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
 			myResponse 	=	""
 			for item in requests:
 				print "deleting "+str(item)
