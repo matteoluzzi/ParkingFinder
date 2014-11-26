@@ -25,7 +25,7 @@ class QuadrantHandler(threading.Thread):
 	def run(self):
 		#print "connecting to "+str(self.mySettings.settings['SQSzone'])+"region"
 		conn = boto.sqs.connect_to_region(self.mySettings.settings['SQSzone'][:-1])
-		#queueName	=	"_APPosto_requests_queue"
+		queueName	=	"_APPosto_requests_queue"
 		print queueName
 		my_queue = conn.get_queue(queueName)
 		#print "pippo" + str(my_queue)

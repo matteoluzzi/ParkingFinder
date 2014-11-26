@@ -104,7 +104,7 @@ while endCreation==False:
 		print "BackendServer.py no more threads allowed, number of threads created "+str(threadCounter)
 		endCreation = True
 		break
-	++threadCounter
+	threadCounter =	threadCounter+1
 	threadList.append(anHandler)
 	
 while 1>0:
