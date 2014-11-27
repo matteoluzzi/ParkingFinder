@@ -10,9 +10,6 @@ import boto
 from boto.sqs.message import Message
 import json
 
-
-myDBLoader		= DBloader.ParkingDYDBLoader('posti',True,str("sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211"),30)
-listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
 imp				=	settings.Settings("testimp.txt")
 print "connecting to "+str(imp.settings['SQSzone'])+"region"
 conn = boto.sqs.connect_to_region(imp.settings['SQSzone'][:-1])
@@ -27,6 +24,19 @@ while my_queue == None:
 		print "queue creation failed"
 	print my_queue
 testrequest	=	jm.createFullListRequest(15,queueName,1)
+
+myfakelist = range(1500)
+contat = 1
+for item in myfakelist:
+		try:
+			destinationQueueName	=	"_SDCC_"+str(contat)
+			contat	=	contat	+	1
+			dest_queue = conn.get_queue(destinationQueueName)
+			dest_queue.delete()
+		except:
+			print "errore"
+return
+		
 destinationQueueName	=	"_SDCC_"+str(1)
 dest_queue = conn.get_queue(destinationQueueName)
 while dest_queue == None:
