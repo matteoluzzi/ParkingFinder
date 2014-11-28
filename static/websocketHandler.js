@@ -10,8 +10,8 @@ function get_my_position(callback) {
 				});			
 };
 
-function create_connection(my_center) {
-	var ws = new WebSocket("ws://ec2-54-148-10-29.us-west-2.compute.amazonaws.com:8000/map");
+function create_connection(my_center, feAddr, fePort) {
+	var ws = new WebSocket("ws://" + feAddr + ":" + fePort + "/map");
 
 	var quadrants;
 
@@ -34,7 +34,7 @@ function create_connection(my_center) {
 		}
 	}
 	ws.onerror = function(event) { on_error(event); }
-	ws.onclose = function(event) { on_close(event, ws); };
+	ws.onclose = function(event) { on_close(event, ws, feAddr, fePort); };
 
 }
 
@@ -57,10 +57,10 @@ function on_message(message, quadrants) {
 	
 };
 
-function on_close(event, ws) {
+function on_close(event, ws, feAddr, fePort) {
 	console.log("Websocket chiusa - riconnessione");
 	var center = window.map.getCenter();
-	ws = create_connection(center);
+	ws = create_connection(center, feAddr, fePort);
 };
 
 function on_error(even) {
