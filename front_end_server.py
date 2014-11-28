@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import os, sys, time, json, itertools
-
-from static import Zone as zn, ReqType as rt, Path as pt, Queue as qu
+import os, sys, time, json, itertools, ConfigParser
 
 from boto.sqs.message import Message
 import boto.sqs as sqs
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './backend_server')))
 from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest # @UnresolvedImport
-import QuadrantTextFileLoader as loader # @UnresolvedImport
-import SearchQuadrant as searcher # @UnresolvedImport
 
 from multiprocessing.pool import Pool, ThreadPool
 from Dispatcher import DispatcherThread
@@ -22,39 +18,39 @@ import tornado.options
 import tornado.web
 import tornado.gen
 import tornado.websocket
-from tornado.options import define, options
-define("port", default=8000, type=int)
-
-tornado.options.parse_command_line(sys.argv)
 
 class BaseHandler(tornado.web.RequestHandler):
+
+	def initialize(self, front_end_address, port):
+
+		self._address = front_end_address
+		self._port = port
 	
 	def get(self):
-		self.render("map.html")
+		self.render("map.html", feAddress=self._address, fePort=self._port)
 		
 class MapHandler(tornado.websocket.WebSocketHandler):
 
 
-	def initialize(self, sqs_conn, sqs_queues, q_list, thread, quadrantslist):
+	def initialize(self, sqs_conn, request_queue, thread, quadrantslist, settings):
 
 		self._sqs_conn = sqs_conn
-		self._sqs_send_queues = sqs_queues
-		self._quadrant_list = q_list
+		self._sqs_request_queue = request_queue
 		self._dispatcher = thread
-		self._quadrant_list_string = quadrantslist
+		self._settings = settings
+		self._quadrants_list = quadrantslist
 		'''insieme di connessioni al server'''
 		self._connections = set()
 
 	def open(self):
 		print "WebSocket opened!"
 		self._connections.add(self)
-		quadrant_list_msg = json.dumps({"type": "quadrant_list", "res" : -1, "data" : self._quadrant_list_string})
+		quadrant_list_msg = json.dumps({"type": "quadrant_list", "data" : self._quadrants_list})
 		self.write_message(quadrant_list_msg)
 
 	@tornado.gen.engine
 	def on_message(self, raw_message):
 
-		print "received message"
 
 		message = json.loads(raw_message)
 		idReq = message['id']
@@ -71,7 +67,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		#ad ogni richiesta instanzio un pool di thread per gestire le chiamate ad sqs
 		pool = ThreadPool(len(q_ids))
 
-		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':pool})
+		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':pool, 'settings':self._settings})
 
 		pool.close()
 
@@ -109,15 +105,20 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		request = False
 
 		sqs_queues_ids	= args[2]
-		pool = kwargs['pool']		
-		for id in sqs_queues_ids:
-			if id in range(1,101):
+		pool = kwargs['pool']
+		settings = kwargs['settings']	
 
-				request = True
-				pool.apply_async(func, args=(self._sqs_send_queues[id], id ,100, args[0], args[1], args[3], args[4], args[5], args[6]), callback=_callback)					
-			
-			else:
-				#print "coda " + repr(id) + " non trovata"
+		for id in sqs_queues_ids:
+			try:
+				if id in range(1,101):
+
+					request = True
+					pool.apply_async(func, args=(self._sqs_request_queue, id ,100, args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=_callback)					
+				
+				else:
+					#print "coda " + repr(id) + " non trovata"
+					self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))
+			except KeyError:
 				self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))
 
 		if request == False:
@@ -126,60 +127,71 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 				
 	
 		
-	def __send_parking_spots_request(self, queue, q_id, pool_size, idReq, zoom_level, neLat, neLon, swLat, swLon):
-
-		print "nella __send_parking_spots_request"
+	def __send_parking_spots_request(self, queue, q_id, pool_size, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
 		 			
+		print "nella sending ...."
+
 		if int(zoom_level) >= 17:
-			req_type = rt.SPECIFIC + zoom_level
-			data = self.__create_request_message(idReq, req_type, q_id, zoom_level, neLat, neLon, swLat, swLon)
+			req_type = settings['specific_req_type'] + zoom_level
+			data = self.__create_request_message(settings, idReq, req_type, q_id, zoom_level, neLat, neLon, swLat, swLon)
 		else:
-			req_type = rt.GLOBAL
-			data = self.__create_request_message(idReq, req_type, q_id , zoom_level=zoom_level)
+			req_type = settings['global_req_type']
+			data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
 
 		self._dispatcher.subscribe(idReq, pool_size)
 
 		msg = Message()
 		msg.set_body(data)	
 		res = queue.write(msg)
+		print "scritto messaggio ", res
 		return idReq
 	
 
 
 	@staticmethod
-	def __create_request_message(idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
+	def __create_request_message(settings, idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
 		
+		print "nella create...."
+
 		request = ""
-		if reqType == rt.GLOBAL:
-			request = createOverviewRequest(idReq, qu.RESPONSE_QUEUE, q_id)
+		if reqType == settings['global_req_type']:
+			request = createOverviewRequest(idReq, settings['response_queue'], q_id)
 			print request
-		elif reqType == rt.SPECIFIC:
-			request = createFullListRequest(idReq, qu.PREFIX + str(q_id), q_id)
+		elif reqType == settings['specific_req_type']:
+			request = createFullListRequest(idReq, settings['response_queue'], q_id)
 		else:
-			request = createBoundedListRequest(idReq, qu.PREFIX + str(q_id), q_id, (neLat, neLon), (swLat, swLon))
+			request = createBoundedListRequest(idReq, settings['response_queue'], q_id, (neLat, neLon), (swLat, swLon))
+
+		print request
 		
 		return request	
 
-def connect():	
-	return sqs.connect_to_region(zn.EU_W_1)
+def connect(zone):	
+	return sqs.connect_to_region(zone)
 
-def initialize(sqs_conn):
+def initialize(sqs_conn, settings):
   	
-	q_list = loader.QuadrantTextFileLoader.load(pt.QUADRANTSLISTPATH)
 	sqs_queues = {}
-	for i in range(1,10):
-		curr_queues = sqs.get_all_queues(prefix = qu.PREFIX + str(i))  # @UndefinedVariable
-		sqs_queues.update(preapareDict(curr_queues))
+	# for i in range(1,10):
+	# 	curr_queues = sqs.get_all_queues(prefix = settings['prefix'] + str(i))  # @UndefinedVariable
+	# 	sqs_queues.update(preapareDict(curr_queues))
+	# print sqs_queues
 
-	dispatcher = DispatcherThread(qu.RESPONSE_QUEUE)
+	request_queue = sqs.get_queue(settings['request_queue'])
+
+	print sqs.get_all_queues()
+
+	print request_queue
+
+	dispatcher = DispatcherThread(settings['response_queue'])
 	dispatcher.start()
 
-	quadrantslist = openQuadrantsList(pt.QUADRANTSLISTPATH)
+	quadrantslist = openQuadrantsList(settings['quadrants_list_path'])
 
 		
-	app = tornado.web.Application([(r'/', BaseHandler), (r'/map', MapHandler, dict(sqs_conn=sqs, sqs_queues=sqs_queues, q_list=q_list, thread=dispatcher, quadrantslist=quadrantslist))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), (r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, thread=dispatcher, quadrantslist=quadrantslist, settings=settings))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
-	http_server.listen(options.port)
+	http_server.listen(settings['port'])
 	print "ready to serve"
 	tornado.ioloop.IOLoop.instance().start()
 
@@ -199,8 +211,15 @@ def preapareDict(queue_list):
 
 if __name__ == "__main__":
 	print "initializing..."
-	sqs = connect()
-	initialize(sqs)	
+
+	config = ConfigParser.ConfigParser()
+	config.read("FrontEndSettings.ini")
+	settings = config.defaults()
+
+
+
+	sqs = connect(settings['zone'])
+	initialize(sqs, settings)	
 
 
 
