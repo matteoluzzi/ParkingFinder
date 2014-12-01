@@ -89,7 +89,7 @@ class ParkingDYDBLoader:
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print traceback.format_exc()
-			return batchQuery(myIdList,parkingListDict)
+			return this.batchQuery(myIdList,parkingListDict)
 		return res['UnprocessedKeys']
 			
 		
