@@ -50,7 +50,7 @@ function on_message(message, quadrants) {
 			break;
 
 		default:
-			//console.log(message);
+			//displayParkingSpot(message);
 			break;
 	};
 
