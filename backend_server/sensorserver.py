@@ -89,7 +89,7 @@ def batch():
 					break
 			
 			global myLoader
-			myLoader=ParkingDYDBLoader.ParkingDYDBLoader('parking')
+			myLoader=ParkingDYDBLoader.ParkingDYDBLoader('APPosto_posti')
 			
 			myLoader.updateFromSensor(listab)
 			#batch........
