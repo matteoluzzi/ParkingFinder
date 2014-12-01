@@ -11,12 +11,14 @@ class ParkingDYDBLoader:
 	__cacheClient	=	0
 	__cexpire		=	0
 	__qexpire		=	0
+	__tablename     =   0 #da aggiungere
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=60,queryCacheExpire=30):
 		self.database	=	boto.connect_dynamodb()
 		tablelist	=	self.database.list_tables()
 		print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
 		self.table		=	self.database.get_table(str(myTableName))
+		self.tablename	=	myTableName#da aggiungere
 		self.cache		=	enableCache
 		self.cexpire	=	cacheExpireTime
 		self.qexpire	=	queryCacheExpire
@@ -148,23 +150,23 @@ class ParkingDYDBLoader:
 		#print "parkings updated"
 		
 	def updateFromSensor(self, listab):
-			tr=Table('parking')#da correggere
+			tr=Table(self.myTableName)#da correggere
 			with tr.batch_write() as batch:
-			
+	
 				for item in listab:
 					
 					
 					batch.put_item(data={
 					'idposto': item[0],
 					'extra': item[1],
-					'latitude': item[2],
-					'longitude': item[3],
+					'latitudine': item[2],
+					'longitudine': item[3],
 					'stato' : item[1]})
 					if(self.cache==True):
 						dictio={'idposto': item[0],
 						'extra': item[1],
-						'latitude': item[2],
-						'longitude': item[3],
+						'latitudine': item[2],
+						'longitudine': item[3],
 						'stato' : item[1]}
 						self.cacheClient.set(str(item[0]),dictio,time=self.cexpire)
 						dictio={}

@@ -61,6 +61,17 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
 
 class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
 	pass
+def cleanduplicates(listab):
+	i=0
+	j=0
+	for i in range(len(listab)):
+		tempid=listab[i][0]
+		for j in range (i,len(listab)):
+			if (tempid==listab[j][0]) & (i!=j):
+				del listab[j]
+				print "deleted"
+				return 0
+	return 1
 
 def batch():
 	while True:
@@ -71,6 +82,12 @@ def batch():
 			numoperations=0
 			print "event numero elementi"
 			print len(listab)
+			while(True):
+				ret=cleanduplicates(listab)
+				print ret
+				if ret==1:
+					break
+			
 			global myLoader
 			myLoader=ParkingDYDBLoader.ParkingDYDBLoader('parking')
 			
