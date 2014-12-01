@@ -32,7 +32,7 @@ while dest_queue == None:
 		print "queue creation failed"
 print "destination queue "+str(dest_queue)
 while (aCount<500):
-	testrequest	=	jm.createFullListRequest(15,queueName,int((aCount%50)+1))
+	testrequest	=	jm.createOverviewRequest(15,queueName,int((aCount%50)+1))
 	m = Message()
 	m.set_body(str(testrequest))
 	dest_queue.write(m)
