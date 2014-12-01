@@ -150,7 +150,7 @@ class ParkingDYDBLoader:
 		#print "parkings updated"
 		
 	def updateFromSensor(self, listab):
-			tr=Table(self.myTableName)#da correggere
+			tr=Table("APPosto_posti")#da correggere
 			with tr.batch_write() as batch:
 	
 				for item in listab:
