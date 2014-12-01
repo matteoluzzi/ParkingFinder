@@ -31,7 +31,7 @@ while dest_queue == None:
 	if dest_queue==None:
 		print "queue creation failed"
 print "destination queue "+str(dest_queue)
-while (aCount<5000):
+while (aCount<500):
 	testrequest	=	jm.createFullListRequest(15,queueName,int((aCount%50)+1))
 	m = Message()
 	m.set_body(str(testrequest))
