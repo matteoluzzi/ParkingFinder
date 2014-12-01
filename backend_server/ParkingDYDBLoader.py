@@ -77,7 +77,7 @@ class ParkingDYDBLoader:
 		batch.add_batch(self.table,idlist)
 		try:
 			res		=	batch.submit()
-			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
+			print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.table.name)]['Items']:
 				idp	=	item['idposto']
