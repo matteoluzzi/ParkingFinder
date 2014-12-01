@@ -110,6 +110,7 @@ print "BackendServer.py no more threads allowed, number of threads created "+str
 
 while 1>0:
 	print "BackendServer.py checking threads status"
+	try:
 	for item in threadList:
 		alive	=	item.isAlive()
 		if alive==False:
@@ -119,6 +120,9 @@ while 1>0:
 			threadList.append(anHandler)
 			print "BackendServer: effettuato recovery thread"
 	tm.sleep(60)
+	except:
+		print traceback.format_exc()
+		print "BackendServer.py: errore in check threads"
 anHandler.join()
 print "non devo stampare questo messaggio..."
 
