@@ -97,7 +97,8 @@ except:
 	print traceback.format_exc()
 endCreation = False
 threadCounter = 0
-while endCreation==False:
+#while endCreation==False:
+while threadCounter<400:
 	try:
 		anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
 		anHandler.start()
