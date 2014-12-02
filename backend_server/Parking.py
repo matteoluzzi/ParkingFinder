@@ -46,3 +46,14 @@ class Parking:
 	def getDictionary(self):
 		data			=	{"id":self.parkid , "lat":self.latitude , "lon":self.longitude, "state":self.status, "extra":self.extra}
 		return data	
+	
+	def loadFromJson(self,aString,aLoader):
+		myDict	=	json.loads(aString)
+		self.parkid		=	int(myDict["id"])
+		self.latitude	=	float(myDict["lat"])
+		self.longitude	=	float(myDict["lon"])
+		self.status		=	str(myDict["state"])
+		self.extra		=	str(myDict["extra"])
+		self.parkingUpdater=aLoader
+		
+		

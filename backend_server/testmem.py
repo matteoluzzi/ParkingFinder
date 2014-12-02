@@ -1,5 +1,5 @@
-import ParkingDYDBLoader as DBloader
-import QuadrantHandlerN as qh
+#import ParkingDYDBLoader as DBloader
+#import QuadrantHandlerN as qh
 import SearchQuadrant as searchquadrant
 import QuadrantTextFileLoader as loader
 import Settings as settings
@@ -7,6 +7,7 @@ import threading
 import traceback
 import time as tm
 import random
+import pickle
 
 class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow start
 	quadrantlist	=	0
@@ -65,8 +66,8 @@ else:
 	print "BackendServer.py: cache disabled"
 #initialize the loader from DB and a quadrant list
 
-myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,slowstart,slowstart)
-listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
+#myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,slowstart,slowstart)
+listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',0))
 #print expiretime
 threadList	=	list()
 if (myQuadrantsRangeStart >-1):
@@ -86,50 +87,10 @@ print "Backendserver.py: loading quadrants instances"
 for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
 	print "Backendserver.py: loading quadrant instance "+str(int(item))
-	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
+	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",0)
 	#print aquadrant.getParkList()
 	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
-try:
-	#anHandler	=	qh.QuadrantHandler(aquadrant,settingsHandler,myDBLoader)
-	#anHandler.start()
-	endSlow	=	EndSlowStart(myDBLoader,slowstart,expiretime,queryexpire)
-	endSlow.start()
-	fetcher		=	QuadrantPrefetching(listaQuadranti,myQuadrantsId,int(0))
-	fetcher.start()
-except: 
-	print "BackendServer.py error while starting threads"
-	print traceback.format_exc()
-endCreation = False
-threadCounter = 0
-while endCreation==False:
-#while threadCounter<400:
-	try:
-		anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
-		anHandler.start()
-	except:
-		endCreation = True
-		break
-	threadCounter =	threadCounter+1
-	threadList.append(anHandler)
-print "BackendServer.py no more threads allowed, number of threads created "+str(threadCounter)
-
+string = pickle.dumps(myQuadrantsId)
+a=9
 while 1>0:
-	print "BackendServer.py checking threads status"
-	try:
-		for item in threadList:
-			alive	=	item.isAlive()
-			if alive==False:
-				threadList.remove(item)
-				anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
-				anHandler.start()
-				threadList.append(anHandler)
-				print "BackendServer: effettuato recovery thread"
-		tm.sleep(60)
-	except:
-		print traceback.format_exc()
-		print "BackendServer.py: errore in check threads"
-anHandler.join()
-print "non devo stampare questo messaggio..."
-
-	
-
+ a=a+1

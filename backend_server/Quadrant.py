@@ -1,5 +1,7 @@
 #this class models the entity "quadrant", each quadrant has an ID and is bounded by 4 coordinates and a parklist
 import copy
+import json
+import Parking as pk
 
 class Quadrant:
 	__qid	=	0
@@ -19,15 +21,17 @@ class Quadrant:
 		self.updater	=	myupdater
 		self.parklist	=	list()
 
-	def changeParkList(self,aList):
-		self.parklist	=	aList
+	#def changeParkList(self,aList):
+	#	self.parklist	=	aList
 
 	def addToParkList(self,anItem):
 		if self.parklist==0:
 			self.parklist = list()
 		coordinates = [anItem.getLatitude(),anItem.getLongitude()]
 		if self.inside(coordinates):
-			self.parklist.append(anItem)
+			parkDict	=	anItem.getDictionary()
+			myString	=	json.dumps(parkDict)
+			self.parklist.append(myString)
 		else:
 			raise Exception("wrong inserting")
 
@@ -40,7 +44,12 @@ class Quadrant:
 		return len(self.parklist)
 		
 	def getParkList(self):
-		return self.parklist
+		aList	=	list()
+		for item in self.parklist:
+			aPark	=	pk.Parking(0)
+			aPark.loadFromJson(item,updater)
+			self.aList.append(aPark)
+		return aList
 	
 	def getPercentageFreeParkings(self):
 		self.updater.batchUpdate(self.parklist)
@@ -49,14 +58,15 @@ class Quadrant:
 			print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)
 			return cacheRis
 		free	=	0
-		print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings()) 
-		for item in self.parklist:
+		print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings())
+		parkingList	=	self.getParkList() 
+		for item in parkingList:
 			state	=	item.getStatus()
 			#print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)
 			if str(state)=="E":
 				free	=	free+1
 		if int(self.getNumberOfParkings())==0:
-			return 100
+			return 0
 		perc	=	(free/len(self.parklist))*100
 		self.updater.setUtilizationPercentage(self,perc)
 		return perc
@@ -98,7 +108,8 @@ class Quadrant:
 		q2			=	Quadrant(-1,[maxlat,centerlon],self.NE,[centerlat,centerlon],[centerlat,maxlon])
 		q3			=	Quadrant(-1,[centerlat,minlon],[centerlat,centerlon],self.SW,[minlat,centerlon])
 		q4			=	Quadrant(-1,[centerlat,centerlon],[centerlat,maxlon],[minlat,centerlon],self.SE)
-		for item in self.parklist:
+		parkingList	=	self.getParkList() 
+		for item in parkingList:
 			coordinates = [item.getLatitude(),item.getLongitude()]
 			if q1.inside(coordinates):
 				q1.addToParkList(item)
