@@ -47,7 +47,7 @@ class Quadrant:
 		aList	=	list()
 		for item in self.parklist:
 			aPark	=	pk.Parking(0)
-			aPark.loadFromJson(item,updater)
+			aPark.loadFromJson(item,self.updater)
 			self.aList.append(aPark)
 		return aList
 	
