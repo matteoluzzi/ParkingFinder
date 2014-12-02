@@ -59,7 +59,7 @@ class Quadrant:
 		free	=	0
 		print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings())
 		parkingList	=	self.getParkList() 
-		self.updater.batchUpdate(self.parklist)
+		self.updater.batchUpdate(parkingList)
 		for item in parkingList:
 			state	=	item.getStatus()
 			#print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)
