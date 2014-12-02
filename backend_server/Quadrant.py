@@ -52,7 +52,6 @@ class Quadrant:
 		return aList
 	
 	def getPercentageFreeParkings(self):
-		self.updater.batchUpdate(self.parklist)
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
 		if (int(cacheRis)>-1):
 			print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)
@@ -60,6 +59,7 @@ class Quadrant:
 		free	=	0
 		print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings())
 		parkingList	=	self.getParkList() 
+		self.updater.batchUpdate(self.parklist)
 		for item in parkingList:
 			state	=	item.getStatus()
 			#print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)
