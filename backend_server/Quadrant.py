@@ -46,9 +46,9 @@ class Quadrant:
 	def getParkList(self):
 		aList	=	list()
 		for item in self.parklist:
-			aPark	=	pk.Parking(0)
+			aPark	=	pk.Parking(0) #nuovo parking con id fasullo verra aggiornato dopo
 			aPark.loadFromJson(item,self.updater)
-			self.aList.append(aPark)
+			aList.append(aPark)
 		return aList
 	
 	def getPercentageFreeParkings(self):
