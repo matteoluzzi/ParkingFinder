@@ -77,7 +77,7 @@ class ParkingDYDBLoader:
 		batch.add_batch(self.table,idlist)
 		try:
 			res		=	batch.submit()
-			print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
+			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.table.name)]['Items']:
 				idp	=	item['idposto']
@@ -90,7 +90,7 @@ class ParkingDYDBLoader:
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
-			print "ParkingDYDBLoader.py: error while reading DB"
+			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
 			print traceback.format_exc()
 			return myIdList 	#se qualcosa va storto faccio fare nuova elaborazione completa 
 		return res['UnprocessedKeys']
