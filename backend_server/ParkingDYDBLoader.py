@@ -141,11 +141,11 @@ class ParkingDYDBLoader:
 					#print "ultimo batch"
 					res = batchQuery(idList[counter*100:],parkingListDict)
 					while len(res) >0:
+						print "failed, retry"
 						templist2	=	list()
 						for item in res[(self.table.name)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
-						print "failed, retry"
 						#raise Exception("Error while inserting in DYDB"+str(len(res))+" "+str(len(parkingList)))
 				counter	=	counter+1
 		#print "parkings updated"

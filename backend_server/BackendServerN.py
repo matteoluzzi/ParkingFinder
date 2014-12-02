@@ -76,12 +76,16 @@ if (myQuadrantsRangeStart >-1):
 	myCounter	=	st
 	fakelist	=	range(end-st)
 	myQuadrantsId	=	list()
+	print "Backendserver.py: loading quadrants list"
 	for fakeitem in fakelist:
 		myQuadrantsId.append(myCounter)
 		myCounter=myCounter+1
+	print "Backendserver.py: quadrants list loaded"
 	
+print "Backendserver.py: loading quadrants instances"
 for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
+	print "Backendserver.py: loading quadrant instance "str(int(item))
 	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
 	#print aquadrant.getParkList()
 	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
