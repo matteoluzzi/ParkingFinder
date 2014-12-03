@@ -11,4 +11,4 @@ rangeEnd#1200
 awsRegion#eu-west-1
 nQuadrants#1267
 notificationFreq#600
-cacheurl#appostocache.ndaqz6.cfg.euw1.cache.amazonaws.com:11211
+cacheurl#appostocache2.ndaqz6.cfg.euw1.cache.amazonaws.com:11211
