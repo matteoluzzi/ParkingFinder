@@ -50,6 +50,8 @@ class QuadrantHandler(threading.Thread):
 					aQuadrantID		=	myrequest[0]["quadrant"]
 					requestID		=	myrequest[0]["r_id"]
 					responseQueue	=	myrequest[0]["resp_queue"]
+					myTime	=	float(tm.time()) - float(startTime)
+					print "QuadrantHandler.py: obtanining quadrant in "+str(myTime)+" seconds"
 					currentQuadrant	=	self.quadrants.getQuadrantInstance(int(aQuadrantID))
 					if currentQuadrant==-1:
 						print "wrong quadrant request "+str(aQuadrantID)+" quadrant not in list"
@@ -57,6 +59,8 @@ class QuadrantHandler(threading.Thread):
 						my_queue.delete_message(item)
 						rtype	=	myrequest[0]["type"]
 						if str(rtype)=="overview":
+							myTime	=	float(tm.time()) - float(startTime)
+							print "QuadrantHandler.py: start query in "+str(myTime)+" seconds"
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
 							myTime	=	float(tm.time()) - float(startTime)
 							print "QuadrantHandler.py: had result in "+str(myTime)+" seconds"
