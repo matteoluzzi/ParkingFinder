@@ -55,7 +55,6 @@ class QuadrantHandler(threading.Thread):
 						print "wrong quadrant request "+str(aQuadrantID)+" quadrant not in list"
 					else:
 						my_queue.delete_message(item)
-						self.myLoader.batchUpdate(currentQuadrant.getParkList())	#update status
 						rtype	=	myrequest[0]["type"]
 						if str(rtype)=="overview":
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
