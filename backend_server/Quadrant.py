@@ -57,7 +57,7 @@ class Quadrant:
 			return 0
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
 		if (int(cacheRis)>-1):
-			#print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)
+			#rint "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)
 			return cacheRis
 		else:
 			free	=	0

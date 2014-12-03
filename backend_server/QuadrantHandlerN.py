@@ -17,11 +17,13 @@ class QuadrantHandler(threading.Thread):
 	quadrants	=	0
 	__mySettings	=	0
 	__myLoader		=	0
-	def __init__(self,myQuadrantManager,mySettingsArg,aLoader):
+	threadID		=	-1
+	def __init__(self,myQuadrantManager,mySettingsArg,aLoader,thId):
 		threading.Thread.__init__(self)
 		self.quadrants	=	myQuadrantManager
 		self.mySettings	=	mySettingsArg
 		self.myLoader	=	aLoader
+		self.threadID	=	thId
 		
 	def run(self):
 		#print "connecting to "+str(self.mySettings.settings['SQSzone'])+"region"
@@ -51,7 +53,7 @@ class QuadrantHandler(threading.Thread):
 					requestID		=	myrequest[0]["r_id"]
 					responseQueue	=	myrequest[0]["resp_queue"]
 					myTime	=	float(tm.time()) - float(startTime)
-					print "QuadrantHandler.py: obtanining quadrant in "+str(myTime)+" seconds"
+					print "QuadrantHandler.py: "+str(self.threadID)+" obtanining quadrant in "+str(myTime)+" seconds"
 					currentQuadrant	=	self.quadrants.getQuadrantInstance(int(aQuadrantID))
 					if currentQuadrant==-1:
 						print "wrong quadrant request "+str(aQuadrantID)+" quadrant not in list"
@@ -60,10 +62,10 @@ class QuadrantHandler(threading.Thread):
 						rtype	=	myrequest[0]["type"]
 						if str(rtype)=="overview":
 							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: start query in "+str(myTime)+" seconds"
+							print "QuadrantHandler.py: "+str(self.threadID)+" start query in "+str(myTime)+" seconds"
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
 							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: had result in "+str(myTime)+" seconds"
+							print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(myTime)+" seconds"
 							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
 							#print "Serving an overview request"
 							myResponse	=	jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID())
@@ -94,7 +96,7 @@ class QuadrantHandler(threading.Thread):
 						#CODICE DA TESTARE!!! (dovrebbe funzionare
 						if myResponse:
 							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: before connecting in "+str(myTime)+" seconds"
+							print "QuadrantHandler.py: "+str(self.threadID)+" before connecting in "+str(myTime)+" seconds"
 							my_resp_queue = conn.get_queue(str(responseQueue))
 							#print "Response queue" + str(my_queue)
 							while not my_resp_queue:
@@ -105,10 +107,10 @@ class QuadrantHandler(threading.Thread):
 							m = Message()
 							m.set_body(str(myResponse))
 							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: going to send in "+str(myTime)+" seconds"
+							print "QuadrantHandler.py: "+str(self.threadID)+" going to send in "+str(myTime)+" seconds"
 							my_resp_queue.write(m)
 							startTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: request served in "+str(startTime)+" seconds"
+							print "QuadrantHandler.py: "+str(self.threadID)+" request served in "+str(startTime)+" seconds"
 						else:
 							print "QuadrantHandler.py: error on request processing"
 				except:
