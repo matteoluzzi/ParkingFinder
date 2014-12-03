@@ -2,6 +2,7 @@
 import copy
 import json
 import Parking as pk
+import gc
 
 class Quadrant:
 	__qid	=	0
@@ -70,6 +71,7 @@ class Quadrant:
 		perc	=	(free/len(self.parklist))*100
 		self.updater.setUtilizationPercentage(self,perc)
 		del parkingList
+		gc.collect()
 		return perc
 		
 		
