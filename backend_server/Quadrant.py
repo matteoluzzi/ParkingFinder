@@ -3,6 +3,7 @@ import copy
 import json
 import Parking as pk
 import gc
+import time as tm
 
 class Quadrant:
 	__qid	=	0
@@ -55,9 +56,11 @@ class Quadrant:
 	def getPercentageFreeParkings(self):
 		if int(self.getNumberOfParkings())==0:
 			return 0
+		startTime	=	float(tm.time())
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
+		myTime	=	float(tm.time()) - float(startTime)
 		if (int(cacheRis)>-1):
-			#rint "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)
+			print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)+" cache time access "+str(myTime)
 			return cacheRis
 		else:
 			free	=	0
