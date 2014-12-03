@@ -69,6 +69,9 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			self.cacheClient.set("Q_"+str(quadrantID),perc,time=self.qexpire)
+				while (float(self.cacheClient.get("Q_"+str(quadrantID)))!=float(perc)):
+					print "ParkingDYDBLoader.py write on cache failed, retry"
+					self.cacheClient.set("Q_"+str(quadrantID),perc,time=self.qexpire)
 			
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
