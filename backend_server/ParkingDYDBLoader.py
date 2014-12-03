@@ -39,8 +39,8 @@ class ParkingDYDBLoader:
 			try:
 				unposto	= self.table.get_item(aParking.getId())
 				#print "CACHE MISS"
-				if(self.cache==True):
-					self.cacheClient.set(str(aParking.getId()),unposto,time=self.cexpire)
+				#if(self.cache==True):
+				#	self.cacheClient.set(str(aParking.getId()),unposto,time=self.cexpire)
 			except Exception:
 				print "error with DYNAMO DB"
 				return -1
@@ -85,8 +85,8 @@ class ParkingDYDBLoader:
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-				if(self.cache==True):
-					self.cacheClient.set(str(idp),item,time=self.cexpire)
+				#if(self.cache==True):
+				#	self.cacheClient.set(str(idp),item,time=self.cexpire)
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
