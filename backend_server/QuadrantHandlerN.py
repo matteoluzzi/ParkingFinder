@@ -59,6 +59,8 @@ class QuadrantHandler(threading.Thread):
 						rtype	=	myrequest[0]["type"]
 						if str(rtype)=="overview":
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
+							myTime	=	float(tm.time()) - float(startTime)
+							print "QuadrantHandler.py: had result in "+str(myTime)+" seconds"
 							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
 							#print "Serving an overview request"
 							myResponse	=	jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID())
@@ -88,6 +90,8 @@ class QuadrantHandler(threading.Thread):
 							raise Exception("Unknown type request")
 						#CODICE DA TESTARE!!! (dovrebbe funzionare
 						if myResponse:
+							myTime	=	float(tm.time()) - float(startTime)
+							print "QuadrantHandler.py: before connecting in "+str(myTime)+" seconds"
 							my_resp_queue = conn.get_queue(str(responseQueue))
 							#print "Response queue" + str(my_queue)
 							while not my_resp_queue:
@@ -97,6 +101,8 @@ class QuadrantHandler(threading.Thread):
 								print "queue creation failed"
 							m = Message()
 							m.set_body(str(myResponse))
+							myTime	=	float(tm.time()) - float(startTime)
+							print "QuadrantHandler.py: going to send in "+str(myTime)+" seconds"
 							my_resp_queue.write(m)
 							startTime	=	float(tm.time()) - float(startTime)
 							print "QuadrantHandler.py: request served in "+str(startTime)+" seconds"
