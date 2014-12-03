@@ -72,6 +72,7 @@ class Quadrant:
 		self.updater.setUtilizationPercentage(self,perc)
 		del parkingList
 		gc.collect()
+		print "PORCACCIODIO "+str(parkingList)
 		return perc
 		
 		
