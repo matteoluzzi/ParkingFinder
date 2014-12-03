@@ -7,7 +7,7 @@ slowstart#600
 region#EMEA
 SQSzone#eu-west-1
 rangeStart#1
-rangeEnd#1200
+rangeEnd#180
 awsRegion#eu-west-1
 nQuadrants#1267
 notificationFreq#600

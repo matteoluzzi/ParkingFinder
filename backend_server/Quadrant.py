@@ -65,6 +65,7 @@ class Quadrant:
 		else:
 			free	=	0
 			#print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings())
+			print "Quadrant.py CACHE MISS"
 			parkingList	=	self.getParkList() 
 			self.updater.batchUpdate(parkingList)
 			for item in parkingList:
