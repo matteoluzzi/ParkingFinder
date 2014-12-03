@@ -42,7 +42,7 @@ class QuadrantHandler(threading.Thread):
 			myResponse 	=	""
 			for item in requests:
 				try:
-					print "deleting "+str(item)
+					#print "deleting "+str(item)
 					text	=	item.get_body()
 					myrequest =	json.loads(text)
 					aQuadrantID		=	myrequest[0]["quadrant"]
@@ -57,10 +57,10 @@ class QuadrantHandler(threading.Thread):
 						rtype	=	myrequest[0]["type"]
 						if str(rtype)=="overview":
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
-							print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
-							print "Serving an overview request"
+							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
+							#print "Serving an overview request"
 							myResponse	=	jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID())
-							print "Overview JSON response "+str(myResponse)
+							#print "Overview JSON response "+str(myResponse)
 						elif str(rtype)=="full_list":
 							tempList	=	list()
 							myParkList	=	currentQuadrant.getParkList()
@@ -87,7 +87,7 @@ class QuadrantHandler(threading.Thread):
 						#CODICE DA TESTARE!!! (dovrebbe funzionare
 						if myResponse:
 							my_resp_queue = conn.get_queue(str(responseQueue))
-							print "Response queue" + str(my_queue)
+							#print "Response queue" + str(my_queue)
 							while not my_resp_queue:
 								#print "creating SQS queue "+queueName
 								my_resp_queue = conn.create_queue(str(responseQueue))

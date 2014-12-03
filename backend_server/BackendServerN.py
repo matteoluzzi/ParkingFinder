@@ -102,7 +102,7 @@ except:
 endCreation = False
 threadCounter = 0
 #while endCreation==False:
-while threadCounter<400:
+while threadCounter<100:
 	try:
 		anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
 		anHandler.start()
