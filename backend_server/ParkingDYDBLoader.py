@@ -44,8 +44,10 @@ class ParkingDYDBLoader:
 			try:
 				unposto	= self.table.get_item(aParking.getId())
 				#print "CACHE MISS"
-				#if(self.cache==True):
-				#	self.cacheClient.set(str(aParking.getId()),unposto,time=self.cexpire)
+				if(self.cache==True):
+					self.myLock.acquire()
+					self.cacheClient.set(str(aParking.getId()),unposto,time=int(self.cexpire))
+					self.myLock.release()
 			except Exception:
 				print "error with DYNAMO DB"
 				return -1
@@ -97,8 +99,10 @@ class ParkingDYDBLoader:
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-				#if(self.cache==True):
-				#	self.cacheClient.set(str(idp),item,time=self.cexpire)
+				if(self.cache==True):
+					self.myLock.acquire()
+					self.cacheClient.set(str(idp),item,time=int(self.cexpire))
+					self.myLock.release()
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
@@ -115,7 +119,9 @@ class ParkingDYDBLoader:
 		for item in parkingList:
 			parkId	=	item.getId()
 			if (self.cache==True):
+				self.myLock.acquire()
 				unposto	= self.cacheClient.get(str(parkId))
+				self.myLock.release()
 				if not unposto:
 					#print "ParkingDYDBLoader.py batch update CACHE MISS"
 					parkingListDict[parkId]=item
