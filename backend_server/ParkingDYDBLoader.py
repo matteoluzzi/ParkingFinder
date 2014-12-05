@@ -13,7 +13,7 @@ class ParkingDYDBLoader:
 	__cexpire		=	0
 	__qexpire		=	0
 	__tablename     =   0 #da aggiungere
-	__myLock		=	threading.Lock()
+	__myLock		=	0
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
 		self.database	=	boto.connect_dynamodb()
@@ -24,6 +24,7 @@ class ParkingDYDBLoader:
 		self.cache		=	enableCache
 		self.cexpire	=	cacheExpireTime
 		self.qexpire	=	queryCacheExpire
+		self.myLock		=	threading.Lock()
 		if (enableCache==True):	#sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211
 			urlstring	=	str(myCacheURL)
 			self.cacheClient	=	memcache.Client([urlstring])
