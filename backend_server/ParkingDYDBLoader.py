@@ -75,7 +75,7 @@ class ParkingDYDBLoader:
 		if (self.cache==True):
 			try:
 				res	=	self.cache2Client.setValue(str(quadrantID),perc,int(self.qexpire))
-				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res) 
+				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
 			
