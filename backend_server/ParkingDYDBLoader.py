@@ -37,7 +37,9 @@ class ParkingDYDBLoader:
 	def update(self,aParking):
 		parkingId	=	aParking.getId()
 		if(self.cache==True):
+			self.myLock.acquire()
 			unposto		=	self.cacheClient.get(str(parkingId))
+			self.myLock.release()
 		if(not unposto):	#if I have cache miss retreive from DYDB
 			try:
 				unposto	= self.table.get_item(aParking.getId())
