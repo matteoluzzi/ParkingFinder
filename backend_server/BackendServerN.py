@@ -52,7 +52,7 @@ myQuadrantsRangeStart	=	-1
 cacheUrl		=	-1
 try:
 	cacheUrl		=	str(settingsHandler.settings['cacheurl'])
-	cache2Url		=	str(settingsHandler.settings['cacheurl'])
+	cache2Url		=	str(settingsHandler.settings['cache2url'])
 	myQuadrantsRangeStart	= settingsHandler.settings['rangeStart']	#if defined range OVERRIDES quadrants setting
 	myQuadrantsRangeEnd	= settingsHandler.settings['rangeEnd']			#end NOT included in range, finishes at rangeEnd-1
 except:
