@@ -3,6 +3,7 @@ from boto.dynamodb2.table import Table
 import Parking as parking
 import memcache
 import traceback
+import threading
 
 class ParkingDYDBLoader:
 	__table			=	0
@@ -12,6 +13,7 @@ class ParkingDYDBLoader:
 	__cexpire		=	0
 	__qexpire		=	0
 	__tablename     =   0 #da aggiungere
+	__myLock		=	threading.Lock()
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
 		self.database	=	boto.connect_dynamodb()
@@ -59,7 +61,9 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
+			self.myLock.acquire()
 			unastat	=	self.cacheClient.get("Q_"+str(quadrantID))
+			self.myLock.release()
 			if not unastat:
 				return -1
 			return unastat
@@ -68,10 +72,12 @@ class ParkingDYDBLoader:
 	def setUtilizationPercentage(self,aQuadrant,perc):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			self.cacheClient.set("Q_"+str(quadrantID),perc,time=int(self.qexpire))
-			while not(self.cacheClient.get("Q_"+str(quadrantID))):
-				print "ParkingDYDBLoader.py write on cache failed, retry"
+			try:
+				self.myLock.acquire()
 				self.cacheClient.set("Q_"+str(quadrantID),perc,time=int(self.qexpire))
+				self.myLock.release()
+			except:
+				print "ParkingDYDBLoader.py: failed to set values"
 			
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
