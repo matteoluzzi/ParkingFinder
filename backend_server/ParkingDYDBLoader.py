@@ -67,6 +67,8 @@ class ParkingDYDBLoader:
 			if not unastat:
 				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				return -1
+			if unastat==101:	#test, probabilmente a memcached non piace lo 0
+				unastat = 0
 			print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
 			return unastat
 		return -1
@@ -75,6 +77,8 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
+				if perc==0:
+					perc=101	#test, probabilmente a memcached non piace lo 0
 				res	=	self.cache2Client.setValue(str(quadrantID),perc,int(self.qexpire))
 				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
 			except:
