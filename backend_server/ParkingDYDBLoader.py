@@ -62,6 +62,7 @@ class ParkingDYDBLoader:
 		if (self.cache==True):
 			unastat	=	self.cacheClient.getValue("Q_"+str(quadrantID))
 			if not unastat:
+				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				return -1
 			return unastat
 		return -1
@@ -70,7 +71,8 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
-				self.cacheClient.setValue("Q_"+str(quadrantID),perc,int(self.qexpire))
+				res	=	self.cacheClient.setValue("Q_"+str(quadrantID),perc,int(self.qexpire))
+				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
 			
