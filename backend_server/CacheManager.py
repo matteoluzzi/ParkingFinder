@@ -36,29 +36,6 @@ class CacheManager:
 	eWrite          =       0
 
 	def __init__(self,cacheURL,aTimeout):
-			self.client             =       memcache.Client([str(cacheURL)])
-			self.lock               =       threading.Lock()
-			self.myTimeout  =       int(aTimeout)
-
-	def setValue(self,aKey,aValue):
-			self.lock.acquire()
-			res     =       self.client.set(str(aKey),aValue,time=self.myTimeout)
-			self.lock.release()
-
-	def getValue(self,aKey):
-	def run(self):
-			#print "scrivo"
-			self.mycache.setValue("Q_"+str(self.thid),str(self.thid))
-			return 0
-
-class CacheManager:
-	client          =       0
-	lock            =       0
-	myTimeout       =       0
-	nRead           =       0
-	eWrite          =       0
-
-	def __init__(self,cacheURL,aTimeout):
 		self.client             =       memcache.Client([str(cacheURL)])
 		self.lock               =       threading.Lock()
 		self.myTimeout  =       int(aTimeout)
