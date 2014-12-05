@@ -9,12 +9,13 @@ class ParkingDYDBLoader:
 	__database		=	0
 	__cache			=	0
 	__cacheClient	=	0
+	__cache2Client	=	0
 	__cexpire		=	0
 	__qexpire		=	0
 	__tablename     =   0 #da aggiungere
 
 	
-	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
+	def __init__(self,myTableName,enableCache=False,myCacheURL=0,percentageCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
 		self.database	=	boto.connect_dynamodb()
 		tablelist	=	self.database.list_tables()
 		print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
@@ -25,7 +26,9 @@ class ParkingDYDBLoader:
 		self.qexpire	=	queryCacheExpire
 		if (enableCache==True):	#sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211
 			urlstring	=	str(myCacheURL)
-			self.cacheClient	=	cm.CacheManager(myCacheURL,queryCacheExpire) #timeout verra passato a chiamata di funzione
+			self.cacheClient	=	cm.CacheManager(myCacheURL,cacheExpireTime) #timeout verra passato a chiamata di funzione
+			urlstring	=	str(percentageCacheURL)
+			self.cache2Client	=	cm.CacheManager(myCacheURL,queryCacheExpire) #timeout verra passato a chiamata di funzione
 	
 	def setCacheTimeout(self,cacheExp,queryExp):
 		print "ParkinkDYDBLoader: Changing timeouts"
@@ -60,7 +63,7 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			unastat	=	self.cacheClient.getValue("Q_"+str(quadrantID))
+			unastat	=	self.cache2Client.getValue("Q_"+str(quadrantID))
 			if not unastat:
 				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				return -1
@@ -71,7 +74,7 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
-				res	=	self.cacheClient.setValue("Q_"+str(quadrantID),perc,int(self.qexpire))
+				res	=	self.cache2Client.setValue("Q_"+str(quadrantID),perc,int(self.qexpire))
 				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"

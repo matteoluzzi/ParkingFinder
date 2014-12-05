@@ -52,6 +52,7 @@ myQuadrantsRangeStart	=	-1
 cacheUrl		=	-1
 try:
 	cacheUrl		=	str(settingsHandler.settings['cacheurl'])
+	cache2Url		=	str(settingsHandler.settings['cacheurl'])
 	myQuadrantsRangeStart	= settingsHandler.settings['rangeStart']	#if defined range OVERRIDES quadrants setting
 	myQuadrantsRangeEnd	= settingsHandler.settings['rangeEnd']			#end NOT included in range, finishes at rangeEnd-1
 except:
@@ -60,12 +61,13 @@ enablecache	=	False
 if (cacheUrl > -1):
 	print "BackendServer.py: cache url: "+cacheUrl+"---"
 	cacheUrl	=	cacheUrl[:-1]	#special characters at the end of string
+	cache2Url	=	cache2Url[:-1]	#special characters at the end of string
 	enablecache	=	True
 else:
 	print "BackendServer.py: cache disabled"
 #initialize the loader from DB and a quadrant list
 
-myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,slowstart,slowstart)
+myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,cache2Url,slowstart,slowstart)
 listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
 #print expiretime
 threadList	=	list()
