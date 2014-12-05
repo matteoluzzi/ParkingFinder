@@ -63,7 +63,7 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			unastat	=	self.cache2Client.getValue(int(quadrantID))
+			unastat	=	self.cache2Client.getValue(str(quadrantID))
 			if not unastat:
 				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				return -1
@@ -74,7 +74,7 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
-				res	=	self.cache2Client.setValue(int(quadrantID),perc,int(self.qexpire))
+				res	=	self.cache2Client.setValue(str(quadrantID),perc,int(self.qexpire))
 				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"

@@ -62,6 +62,8 @@ if (cacheUrl > -1):
 	print "BackendServer.py: cache url: "+cacheUrl+"---"
 	cacheUrl	=	cacheUrl[:-1]	#special characters at the end of string
 	cache2Url	=	cache2Url[:-1]	#special characters at the end of string
+	print "BackendServer.py cache posti "+str(cacheUrl)
+	print "BackendServer.py cache posti "+str(cache2Url)
 	enablecache	=	True
 else:
 	print "BackendServer.py: cache disabled"
