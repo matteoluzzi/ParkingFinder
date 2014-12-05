@@ -28,7 +28,7 @@ class ParkingDYDBLoader:
 			urlstring	=	str(myCacheURL)
 			self.cacheClient	=	cm.CacheManager(myCacheURL,cacheExpireTime) #timeout verra passato a chiamata di funzione
 			urlstring	=	str(percentageCacheURL)
-			self.cache2Client	=	cm.CacheManager(myCacheURL,queryCacheExpire) #timeout verra passato a chiamata di funzione
+			self.cache2Client	=	cm.CacheManager(percentageCacheURL,queryCacheExpire) #timeout verra passato a chiamata di funzione
 	
 	def setCacheTimeout(self,cacheExp,queryExp):
 		print "ParkinkDYDBLoader: Changing timeouts"
@@ -63,7 +63,7 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			unastat	=	self.cache2Client.getValue("Q_"+str(quadrantID))
+			unastat	=	self.cache2Client.getValue(int(quadrantID))
 			if not unastat:
 				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				return -1
@@ -74,7 +74,7 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
-				res	=	self.cache2Client.setValue("Q_"+str(quadrantID),perc,int(self.qexpire))
+				res	=	self.cache2Client.setValue(int(quadrantID),perc,int(self.qexpire))
 				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"

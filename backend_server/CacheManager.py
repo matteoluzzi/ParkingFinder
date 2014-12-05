@@ -47,6 +47,7 @@ class CacheManager:
 		self.lock.acquire()
 		res     =       self.client.set(str(aKey),aValue,time=aTimeout)
 		self.lock.release()
+		return res
 
 	def getValue(self,aKey):
 		self.lock.acquire()
