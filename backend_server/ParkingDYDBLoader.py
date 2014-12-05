@@ -3,8 +3,7 @@ from boto.dynamodb2.table import Table
 import Parking as parking
 import memcache
 import traceback
-import threading
-
+import CacheManager as cm
 class ParkingDYDBLoader:
 	__table			=	0
 	__database		=	0
@@ -13,7 +12,7 @@ class ParkingDYDBLoader:
 	__cexpire		=	0
 	__qexpire		=	0
 	__tablename     =   0 #da aggiungere
-	__myLock		=	0
+
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
 		self.database	=	boto.connect_dynamodb()
@@ -24,10 +23,9 @@ class ParkingDYDBLoader:
 		self.cache		=	enableCache
 		self.cexpire	=	cacheExpireTime
 		self.qexpire	=	queryCacheExpire
-		self.myLock		=	threading.Lock()
 		if (enableCache==True):	#sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211
 			urlstring	=	str(myCacheURL)
-			self.cacheClient	=	memcache.Client([urlstring])
+			self.cacheClient	=	cm.CacheManager(myCacheURL,queryCacheExpire) #timeout verra passato a chiamata di funzione
 	
 	def setCacheTimeout(self,cacheExp,queryExp):
 		print "ParkinkDYDBLoader: Changing timeouts"
@@ -37,17 +35,13 @@ class ParkingDYDBLoader:
 	def update(self,aParking):
 		parkingId	=	aParking.getId()
 		if(self.cache==True):
-			self.myLock.acquire()
-			unposto		=	self.cacheClient.get(str(parkingId))
-			self.myLock.release()
+			unposto		=	self.cacheClient.getValue(str(parkingId))
 		if(not unposto):	#if I have cache miss retreive from DYDB
 			try:
 				unposto	= self.table.get_item(aParking.getId())
 				#print "CACHE MISS"
 				if(self.cache==True):
-					self.myLock.acquire()
-					#self.cacheClient.set(str(aParking.getId()),unposto,time=int(self.cexpire))
-					self.myLock.release()
+					self.cacheClient.setValue(str(aParking.getId()),unposto,int(self.cexpire))
 			except Exception:
 				print "error with DYNAMO DB"
 				return -1
@@ -66,9 +60,7 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			self.myLock.acquire()
-			unastat	=	self.cacheClient.get("Q_"+str(quadrantID))
-			self.myLock.release()
+			unastat	=	self.cacheClient.getValue("Q_"+str(quadrantID)))
 			if not unastat:
 				return -1
 			return unastat
@@ -78,9 +70,7 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
-				self.myLock.acquire()
-				self.cacheClient.set("Q_"+str(quadrantID),perc,time=int(self.qexpire))
-				self.myLock.release()
+				self.cacheClient.setValue("Q_"+str(quadrantID),perc,int(self.qexpire))
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
 			
@@ -100,9 +90,7 @@ class ParkingDYDBLoader:
 				state	=	item['stato']
 				extra	=	item['extra']
 				if(self.cache==True):
-					self.myLock.acquire()
-					#self.cacheClient.set(str(idp),item,time=int(self.cexpire))
-					self.myLock.release()
+					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
@@ -119,9 +107,7 @@ class ParkingDYDBLoader:
 		for item in parkingList:
 			parkId	=	item.getId()
 			if (self.cache==True):
-				self.myLock.acquire()
-				unposto	= self.cacheClient.get(str(parkId))
-				self.myLock.release()
+				unposto	= self.cacheClient.getValue(str(parkId))
 				if not unposto:
 					#print "ParkingDYDBLoader.py batch update CACHE MISS"
 					parkingListDict[parkId]=item
@@ -187,7 +173,7 @@ class ParkingDYDBLoader:
 						'latitudine': item[2],
 						'longitudine': item[3],
 						'stato' : item[1]}
-						self.cacheClient.set(str(item[0]),dictio,time=self.cexpire)
+						self.cacheClient.setValue(str(item[0]),dictio,time=self.cexpire)
 						dictio={}
 					
 					#park = self.table.get_item(parkid = item[0])
