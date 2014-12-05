@@ -67,6 +67,7 @@ class ParkingDYDBLoader:
 			if not unastat:
 				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				return -1
+			print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
 			return unastat
 		return -1
 		
