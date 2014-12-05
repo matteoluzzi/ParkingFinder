@@ -46,7 +46,7 @@ class ParkingDYDBLoader:
 				#print "CACHE MISS"
 				if(self.cache==True):
 					self.myLock.acquire()
-					self.cacheClient.set(str(aParking.getId()),unposto,time=int(self.cexpire))
+					#self.cacheClient.set(str(aParking.getId()),unposto,time=int(self.cexpire))
 					self.myLock.release()
 			except Exception:
 				print "error with DYNAMO DB"
@@ -101,7 +101,7 @@ class ParkingDYDBLoader:
 				extra	=	item['extra']
 				if(self.cache==True):
 					self.myLock.acquire()
-					self.cacheClient.set(str(idp),item,time=int(self.cexpire))
+					#self.cacheClient.set(str(idp),item,time=int(self.cexpire))
 					self.myLock.release()
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
