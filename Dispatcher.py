@@ -2,18 +2,17 @@ from threading import Thread
 
 from boto.sqs.message import Message
 import boto.sqs as sqs
-from static import Zone as zn
 from json import loads, dumps
 from Queue import Queue
 
 class DispatcherThread(Thread):
 
-	def __init__(self, queue_name):
+	def __init__(self, queue_name, zone):
 		
 		Thread.__init__(self)
 		self._subscribers = {}
 		self._queues = {}
-		self._sqs_conn = sqs.connect_to_region(zn.EU_W_1)
+		self._sqs_conn = sqs.connect_to_region(zone)
 		self._queue = self._sqs_conn.get_queue(queue_name)
 		if self._queue == None:
 			self._queue = self._sqs_conn.create_queue(queue_name)
@@ -48,7 +47,7 @@ class DispatcherThread(Thread):
 
 			for raw_message in raw_messages:
 
-				print "Dispatcher - new message ", raw_message
+				print "Dispatcher - new message ", raw_message.get_body()
 				message = loads(raw_message.get_body())[0]
 
 				r_id = message['r_id']
@@ -69,6 +68,7 @@ class DispatcherThread(Thread):
 						print "Ultimo messaggio"
 						message["last"] = True
 					queue.put(message)
+					print "messaggio messo in coda"
 
 					self._queue.delete_message(raw_message)
 

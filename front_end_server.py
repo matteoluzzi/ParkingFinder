@@ -32,7 +32,7 @@ class BaseHandler(tornado.web.RequestHandler):
 class MapHandler(tornado.websocket.WebSocketHandler):
 
 
-	def initialize(self, sqs_conn, request_queue, thread, quadrantslist, settings):
+	def initialize(self, sqs_conn, request_queue, thread, quadrantslist, pool, settings):
 
 		self._sqs_conn = sqs_conn
 		self._sqs_request_queue = request_queue
@@ -41,6 +41,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		self._quadrants_list = quadrantslist
 		'''insieme di connessioni al server'''
 		self._connections = set()
+		self._pool = pool
 
 	def open(self):
 		print "WebSocket opened!"
@@ -65,11 +66,11 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		print q_ids
 
 		#ad ogni richiesta instanzio un pool di thread per gestire le chiamate ad sqs
-		pool = ThreadPool(len(q_ids))
+		#pool = ThreadPool(100)
 
-		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':pool, 'settings':self._settings})
+		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
 
-		pool.close()
+		#pool.close()
 
 	def on_close(self):
 		print "WebSocket closed!"
@@ -81,7 +82,6 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 		def _callback(idReq):
 
-			print "scritto messaggio, in attesa della risposta"
 
 			queue = self._dispatcher.get_message_queue(idReq)
 			print queue
@@ -110,14 +110,11 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 		for id in sqs_queues_ids:
 			try:
-				if id in range(1,101):
+				if id in range(1,51):
 
 					request = True
-					pool.apply_async(func, args=(self._sqs_request_queue, id ,100, args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=_callback)					
-				
-				else:
-					#print "coda " + repr(id) + " non trovata"
-					self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))
+					pool.apply_async(func, args=(self._sqs_request_queue, id ,50, args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=_callback)					
+
 			except KeyError:
 				self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))
 
@@ -131,7 +128,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		 			
 		print "nella sending ...."
 
-		if int(zoom_level) >= 17:
+		if int(zoom_level) >= 20:
 			req_type = settings['specific_req_type'] + zoom_level
 			data = self.__create_request_message(settings, idReq, req_type, q_id, zoom_level, neLat, neLon, swLat, swLon)
 		else:
@@ -143,7 +140,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		msg = Message()
 		msg.set_body(data)	
 		res = queue.write(msg)
-		print "scritto messaggio ", res
+		print "scritto messaggio ", res.get_body()
 		return idReq
 	
 
@@ -156,13 +153,10 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		request = ""
 		if reqType == settings['global_req_type']:
 			request = createOverviewRequest(idReq, settings['response_queue'], q_id)
-			print request
 		elif reqType == settings['specific_req_type']:
 			request = createFullListRequest(idReq, settings['response_queue'], q_id)
 		else:
 			request = createBoundedListRequest(idReq, settings['response_queue'], q_id, (neLat, neLon), (swLat, swLon))
-
-		print request
 		
 		return request	
 
@@ -179,17 +173,17 @@ def initialize(sqs_conn, settings):
 
 	request_queue = sqs.get_queue(settings['request_queue'])
 
-	print sqs.get_all_queues()
-
 	print request_queue
 
-	dispatcher = DispatcherThread(settings['response_queue'])
+	dispatcher = DispatcherThread(settings['response_queue'], settings['zone'])
 	dispatcher.start()
 
 	quadrantslist = openQuadrantsList(settings['quadrants_list_path'])
 
+	pool = ThreadPool(int(settings['pool_size']))
+
 		
-	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), (r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, thread=dispatcher, quadrantslist=quadrantslist, settings=settings))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), (r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, thread=dispatcher, quadrantslist=quadrantslist, pool=pool, settings=settings))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(settings['port'])
 	print "ready to serve"
