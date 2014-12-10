@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './ba
 from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest # @UnresolvedImport
 
 from multiprocessing.pool import Pool, ThreadPool
-from Dispatcher import DispatcherThread
+from DispatcherBroker import DispatcherBroker
 
 import tornado.httpserver
 import tornado.ioloop
@@ -32,11 +32,11 @@ class BaseHandler(tornado.web.RequestHandler):
 class MapHandler(tornado.websocket.WebSocketHandler):
 
 
-	def initialize(self, sqs_conn, request_queue, thread, quadrantslist, pool, settings):
+	def initialize(self, sqs_conn, request_queue, dispatcher, quadrantslist, pool, settings):
 
 		self._sqs_conn = sqs_conn
 		self._sqs_request_queue = request_queue
-		self._dispatcher = thread
+		self._dispatcher = dispatcher
 		self._settings = settings
 		self._quadrants_list = quadrantslist
 		'''insieme di connessioni al server'''
@@ -80,27 +80,29 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 	def __write_background(self, func, callback, args=(), kwargs={}):
 		'''funzione che lancia la scrittura sulle code'''
 		
-		def _callback(idReq):
+		# def _callback(idReq):
 
 
-			queue = self._dispatcher.get_message_queue(idReq)
-			print queue
+		# 	queue = self._dispatcher.get_message_queue(idReq)
 
-			message = queue.get()
-			print "message: " + repr(message)
-			if message.has_key("last"):
-				message.pop("last", None)
-				self.write_message(message)
-				print "ultimo messaggio"
-				tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(idReq))
-				self._dispatcher.delete_message_queue(idReq)
+		# 	print "waiting on ", queue
+		# 	print queue
+
+		# 	message = queue.get()
+		# 	print "message: " + repr(message)
+		# 	if message.has_key("last"):
+		# 		message.pop("last", None)
+		# 		self.write_message(message)
+		# 		print "ultimo messaggio"
+		# 		tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(idReq))
+		# 		self._dispatcher.delete_message_queue(idReq)
 
 				
-			else:
-				self.write_message(message)
+		# 	else:
+		# 		self.write_message(message)
 
 
-			print "messaggio scritto al client"
+		# 	print "messaggio scritto al client"
 
 		request = False
 
@@ -110,10 +112,10 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 		for id in sqs_queues_ids:
 			try:
-				if id in range(1,51):
+	#			if id in range(1,21):
 
-					request = True
-					pool.apply_async(func, args=(self._sqs_request_queue, id ,50, args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=_callback)					
+				request = True
+				pool.apply_async(func, args=(self._sqs_request_queue, id ,len(sqs_queues_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings))					
 
 			except KeyError:
 				self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))
@@ -124,9 +126,9 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 				
 	
 		
-	def __send_parking_spots_request(self, queue, q_id, pool_size, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
+	def __send_parking_spots_request(self, queue, q_id, req_size, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
 		 			
-		print "nella sending ...."
+	#	print "nella sending ...."
 
 		if int(zoom_level) >= 20:
 			req_type = settings['specific_req_type'] + zoom_level
@@ -135,13 +137,30 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			req_type = settings['global_req_type']
 			data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
 
-		self._dispatcher.subscribe(idReq, pool_size)
+		self._dispatcher.subscribe(idReq, req_size)
 
 		msg = Message()
 		msg.set_body(data)	
 		res = queue.write(msg)
-		print "scritto messaggio ", res.get_body()
-		return idReq
+	#	print "scritto messaggio ", res.get_body()
+		
+		queue = self._dispatcher.get_message_queue(idReq)
+
+		print queue
+
+		message = queue.get()
+		print "message: " + repr(message)
+		if message.has_key("last"):
+			message.pop("last", None)
+			self.write_message(message)
+			print "ultimo messaggio"
+			self._dispatcher.delete_queue(idReq)
+			tornado.ioloop.IOLoop.instance().add_callback()			
+		else:
+			self.write_message(message)
+
+
+#		print "messaggio scritto al client"
 	
 
 
@@ -175,15 +194,14 @@ def initialize(sqs_conn, settings):
 
 	print request_queue
 
-	dispatcher = DispatcherThread(settings['response_queue'], settings['zone'])
-	dispatcher.start()
+	dispatcher = DispatcherBroker(int(settings['dispatcher_threads']), settings['response_queue'], settings['zone'])
 
 	quadrantslist = openQuadrantsList(settings['quadrants_list_path'])
 
 	pool = ThreadPool(int(settings['pool_size']))
 
 		
-	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), (r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, thread=dispatcher, quadrantslist=quadrantslist, pool=pool, settings=settings))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), (r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, dispatcher=dispatcher, quadrantslist=quadrantslist, pool=pool, settings=settings))], template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(settings['port'])
 	print "ready to serve"
