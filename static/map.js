@@ -39,7 +39,7 @@ function displayMap(quadrants, ws, my_center)
 					quadrantsToBeQuered.push(newQuadrants[i]);
 			}
 
-			console.log("quadranti correnti: " + currentQuadrants + "\nNuovi quadranti: " + newQuadrants);
+		//	console.log("quadranti correnti: " + currentQuadrants + "\nNuovi quadranti: " + newQuadrants);
 
 
 			console.log("quadranti da interrogare: " + quadrantsToBeQuered);
@@ -58,31 +58,17 @@ function displayMap(quadrants, ws, my_center)
 	//window.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
 };
 
-
-
-function CenterControl(div, map) 
+function centerMap(center)
 {
+	window.map.setCenter(center);
+	window.map.setZoom(16);
+	var marker = new google.maps.Marker({
+		map : window.map,
+		position : center,
+		visible : true
+	});
+}
 
-	var controlUI = document.createElement('div');
-	controlUI.style.backgroundColor = 'white';
-	controlUI.style.borderStyle = 'solid';
-	controlUI.style.borderWidth = '2px';
-	controlUI.style.cursor = 'pointer';
-	controlUI.style.textAlign = 'center';
-	controlUI.title = 'Click to set the map to Home';
-	div.appendChild(controlUI);
-
-	
-	var controlText = document.createElement('div');
-	controlText.style.fontFamily = 'Arial,sans-serif';
-	controlText.style.fontSize = '12px';
-	controlText.style.paddingLeft = '4px';
-	controlText.style.paddingRight = '4px';
-	controlText.innerHTML = '<b>My position</b>';
-	controlUI.appendChild(controlText);
-
-	google.maps.event.addDomListener(controlUI, 'click', get_my_position());
-};
 
 function sendMapMessage(ws, quadrants) 
 {

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{{ static_url("map.css") }}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&sensor=false"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript" src="{{ static_url("map.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("utils.js") }}"></script>
@@ -37,8 +37,22 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
-                <div id="left-column">
-                    <h3>Container laterale per interazione con l'utente</h3>
+                <div id="left-column"> 
+                    <div class="well">
+                        <h3>Pannello utente</h3>
+                        <p>
+                            <input class='form-control' id='search_address' placeholder='Inserisici un indirizzo' type='text' />
+                        </p>
+                        <p>
+                            <button type='button' id='search_button' class="btn btn-primary btn-lg">
+                                Cerca
+                            </button>
+                            <button type='button' id='reset_button' class='btn btn-default btn-lg'>
+                                Reset
+                            </button>
+                        </p>
+                    </div>
+
                 </div>
             </div>
             <div class="col-md-8">
@@ -58,6 +72,22 @@
         
           $('#map').css('height', (h - offsetTop));
         }).resize();
+
+        var autocomplete = new google.maps.places.Autocomplete($('#search_address')[0]);
+
+        $('#search_button').click(function()
+        {
+            var place = autocomplete.getPlace();
+            centerMap(place.geometry.location);
+        });
+
+        $('#reset_button').click(function()
+        {
+            $('#search_address').val('');
+            get_my_position(function(center) {
+                centerMap(center);
+            });
+        });
         
                  
         </script>
