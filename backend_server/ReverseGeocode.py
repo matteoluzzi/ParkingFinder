@@ -1,3 +1,5 @@
+#NON FUNZIONA SU AWS, SI PUO RIMUOVERE
+
 import urllib
 from xml.etree import ElementTree as ET
 

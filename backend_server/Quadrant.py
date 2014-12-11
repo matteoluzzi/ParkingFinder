@@ -102,6 +102,18 @@ class Quadrant:
 		retVal['SW']	=	copy.deepcopy(self.SW)
 		retVal['SE']	=	copy.deepcopy(self.SE)
 		return retVal
+	
+	def getCenter(self):
+		minlon		=	float(self.NW[1])
+		maxlon		=	float(self.SE[1])
+		minlat		=	float(self.SE[0])
+		maxlat		=	float(self.NW[0])
+		centerlat	=	minlat + ((maxlat-minlat)/2)
+		centerlon	=	minlon + ((maxlon-minlon)/2)
+		result		=	dict()
+		result['lat']	=	centerlat
+		result['lon']	=	centerlon
+		return result 
 		
 	def getSplitted(self,obsize): #return list of 4 quarters of quadrant
 		minlon		=	float(self.NW[1])
