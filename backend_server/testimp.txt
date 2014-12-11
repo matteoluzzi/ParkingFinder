@@ -13,3 +13,4 @@ nQuadrants#1267
 notificationFreq#600
 cacheurl#appostocache2.ndaqz6.cfg.euw1.cache.amazonaws.com:11211
 cache2url#apposto2.ndaqz6.cfg.euw1.cache.amazonaws.com:11211
+
