@@ -5,34 +5,86 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{{ static_url("map.css") }}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&sensor=false"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript" src="{{ static_url("map.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("utils.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("websocketHandler.js") }}"></script>
+         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+            <!--[if lt IE 9]>
+              <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+            <![endif]-->
 
         <title>APP-OSTO</title>
     </head>
     <body>
-        <div class='navbar navbar-default navbar-static-top'>
-          <div class='container-fluid'>
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class='navbar-brand' href='index.html'>APP-osto</a>
+        <nav class='navbar navbar-inverse navbar-static-top' role='navigation'>
+            <div class='container-fluid'>
+
+                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                  <a class='navbar-brand' href='index.html'>APP-osto</a>
+                </div>
+
+                <div class="navbar-collapse collapse" id='navbar-menu' >
+                  <ul class='nav navbar-nav navbar-left'>
+                    <li><a href='/'>Mappa</a></li>
+                  </ul>
+                  <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown" id="menuLogin">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin">
+                            Registrati
+                        <b class="caret"></b>    
+                        </a>
+                            <div class="dropdown-menu" style="padding:17px;width:400px;">
+                              <form class="form" id="formRegistration" method='post' action='/register'> 
+                                <fieldset class='textbox' style="padding:10px">
+                                    <div id="legend">
+                                      <legend class="">Inserisci i tuoi dati</legend>
+                                    </div>
+                                    <input class="form-control" style="margin-top: 8px" type="text" placeholder="Username" />  
+                                    <input class="form-control" style="margin-top: 8px" type="text" placeholder="Email" />
+                                    <div class='row'>
+                                        <div class="col-md-6">
+                                            <input class="form-control" style="margin-top: 8px" type="password" placeholder="Passsword" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input class="form-control" style="margin-top: 8px" type="password" placeholder="Conferma password" />      
+                                        </div>
+                                    </div>
+                                    <input style="margin-top: 8px" class="btn btn-primary btn-lg btn-block" name="register" type="submit" value="Registrami" />
+                                </fieldset>
+                              </form>
+                            </div>
+                    </li>
+                    <li class="dropdown" id="menuLogin">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin">
+                            Login
+                        <b class="caret"></b>    
+                        </a>
+                            <div class="dropdown-menu" style="padding:17px;width: 300px;">
+                              <form class="form" id="formLogin" method='post' action='/login'> 
+                                <fieldset class='textbox' style="padding:10px">
+                                    <div id="legend">
+                                      <legend class="">Login</legend>
+                                    </div>
+                                   <input class='form-control' style="margin-top: 8px" type="text" placeholder="Username" />
+                                   <input class='form-control'style="margin-top: 8px" type="password" placeholder="Passsword" />
+                                   <input style="margin-top: 8px" class="btn btn-primary btn-lg btn-block" name="commit" type="submit" value="Log In" />
+                                </fieldset>
+                              </form>
+                            </div>
+                    </li>
+                  </ul>
+                </div><!--/.nav-collapse -->
             </div>
-            <div class="navbar-collapse collapse">
-              <ul class="nav navbar-nav navbar-right">
-                <li class='active'><a href="/">Map</a></li>
-                <li><a href="#">Login</a></li>
-                <li><a href="#">About</a></li>
-              </ul>
-            </div><!--/.nav-collapse -->
-          </div>
-        </div>
+        </nav>
 
         <div class="container-fluid">
             <div class="row">
