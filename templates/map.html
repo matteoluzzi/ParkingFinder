@@ -42,20 +42,20 @@
                             Registrati
                         <b class="caret"></b>    
                         </a>
-                            <div class="dropdown-menu" style="padding:17px;width:400px;">
+                            <div class="dropdown-menu" style="padding:17px;width:400px;" id="signup-div">
                               <form class="form" id="formRegistration" method='post' action='/register'> 
                                 <fieldset class='textbox' style="padding:10px">
                                     <div id="legend">
                                       <legend class="">Inserisci i tuoi dati</legend>
                                     </div>
-                                    <input class="form-control" style="margin-top: 8px" type="text" placeholder="Username" />  
-                                    <input class="form-control" style="margin-top: 8px" type="text" placeholder="Email" />
+                                    <input class="form-control" style="margin-top: 8px" type="text" name="username" id="username" placeholder="Username" required/>  
+                                    <input class="form-control" style="margin-top: 8px" type="email" name="email" id="email" placeholder="Email" required/>
                                     <div class='row'>
                                         <div class="col-md-6">
-                                            <input class="form-control" style="margin-top: 8px" type="password" placeholder="Passsword" />
+                                            <input class="form-control" style="margin-top: 8px" name="password" id="password" type="password" placeholder="Passsword" onchange="validatePasswords()" required/>
                                         </div>
                                         <div class="col-md-6">
-                                            <input class="form-control" style="margin-top: 8px" type="password" placeholder="Conferma password" />      
+                                            <input class="form-control" style="margin-top: 8px" name="confirmPassword" id="confirmPassword" type="password" placeholder="Conferma password" onchange="validatePasswords()" required/>    
                                         </div>
                                     </div>
                                     <input style="margin-top: 8px" class="btn btn-primary btn-lg btn-block" name="register" type="submit" value="Registrami" />
@@ -112,9 +112,10 @@
             </div> 
             </div>                  
         </div> <!-- end container-fluid -->
-         
+
         <script type="text/javascript">
         get_my_position(function(center) {
+            console.log("here");
         	$("document").ready(function() {create_connection(center, "{{feAddress}}", "{{fePort}}")});
         });
 
@@ -140,8 +141,23 @@
                 centerMap(center);
             });
         });
-        
-                 
+
+        function validatePasswords()
+        {
+
+            var password = $('#password').val();
+            var conf_password = $('#confirmPassword').val();
+            if(password!=conf_password)
+                document.getElementById("confirmPassword").setCustomValidity("Le password non sono uguali");
+            else
+                document.getElementById("confirmPassword").setCustomValidity("");
+        };            
         </script>
+        {% if signup != None %}
+            <script type="text/javascript"> 
+                alert("{{signup}}");
+            </script>
+        {% end %}
+
     </body>
 </html>
