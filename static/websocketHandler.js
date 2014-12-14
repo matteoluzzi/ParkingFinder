@@ -50,7 +50,8 @@ function on_message(message, quadrants) {
 			break;
 
 		default:
-			//displayParkingSpot(message);
+			console.log(message);
+			displayParkingSpots(message);
 			break;
 	};
 

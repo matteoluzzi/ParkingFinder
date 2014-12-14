@@ -35,7 +35,7 @@ function displayMap(quadrants, ws, my_center)
 			var i = newQuadrants.length;
 
 			while(i--) {
-				if(!contains(currentQuadrants, newQuadrants[i])) 
+				if(!contains(currentQuadrants, newQuadrants[i]) || window.map.getZoom() > 17) 
 					quadrantsToBeQuered.push(newQuadrants[i]);
 			}
 
@@ -119,5 +119,17 @@ function setQuadrantColor(quadrant, color)
 
 function displayParkingSpots(data)
 {
-	
+	var parkingsArray = data.parkings;
+	var i = parkingsArray.length;
+//	console.log(parkingsArray);
+	while(i--)
+	{
+		var coordinates = new google.maps.LatLng(parseFloat(parkingsArray[i].lat), parseFloat(parkingsArray[i].lon));
+		console.log(coordinates);
+		var marker = new google.maps.Marker({
+			map : window.map,
+			position : coordinates,
+			visible : true
+	});
+	}
 }
