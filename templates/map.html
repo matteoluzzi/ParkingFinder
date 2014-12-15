@@ -115,7 +115,6 @@
 
         <script type="text/javascript">
         get_my_position(function(center) {
-            console.log("here");
         	$("document").ready(function() {create_connection(center, "{{feAddress}}", "{{fePort}}")});
         });
 
@@ -156,6 +155,9 @@
         {% if signup != None %}
             <script type="text/javascript"> 
                 alert("{{signup}}");
+                get_my_position(function(center) {
+                create_connection(center, "{{feAddress}}", "{{fePort}}");
+        });
             </script>
         {% end %}
 
