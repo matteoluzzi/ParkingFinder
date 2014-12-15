@@ -6,6 +6,7 @@ from bcrypt import hashpw, gensalt
 
 from boto.sqs.message import Message
 import boto.sqs as sqs
+from boto.dynamodb2.table import Table
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './backend_server')))
 from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest # @UnresolvedImport
@@ -29,14 +30,15 @@ class BaseHandler(tornado.web.RequestHandler):
 		self._port = port
 	
 	def get(self):
-		self.render("map.html", feAddress=self._address, fePort=self._port, signup=None)
+		self.render("map.html", feAddress=self._address, fePort=self._port, signup=None, login=None, error=None)
 
 class RegisterHandler(tornado.web.RequestHandler):
 
-	def initialize(self, front_end_address, port):
+	def initialize(self, front_end_address, port, table):
 
 		self._address = front_end_address
 		self._port = port
+		self._table = table
 
 	@tornado.web.asynchronous
 	def post(self):
@@ -49,29 +51,35 @@ class RegisterHandler(tornado.web.RequestHandler):
 		#Thread incaricato di gesitire la scrittura sul db
 		pool = ThreadPool(processes=1)
 
-	
+		print self._table
+
 		pool.apply_async(self.__checkDuplicates, args=(username, email, password), callback=self.__onfinish)
 
 	def __checkDuplicates(self, username, email, password):
 
+		print "dentro checkduplicates"
 		signup = "Utente registrato con successo! Effettuare il login per accedere"
 
-		#manca controllo su database del nome utente e password
-		#se entrambi i controlli vanno a buon fine allora posso registrare l'utente sul db
-		#setta error se c'è un errore
+		try: #cerca eventuali duplicati
+			duplicate = self._table.get_item(user_email=email)
+			signup = "Email già registrata, scegline un altra o accedi"
+			print "here"
+			return (signup, "duplilcate")
 
-		encrypted_password = hashpw(password, gensalt())
 
-		#salva le info sul db
-
-		return (encrypted_password, signup)
-
+		except: #non ci sono duplicati
+			print "assdasdasdas"
+			encrypted_password = hashpw(password, gensalt())
+			self._table.put_item(data={'user_email':email, 'user_username':username, 'user_password':password})
+			print "ok"
+			return (signup, None)
 
 	def __onfinish(self, args):
 
-		print "entrypted password---------->" + args[0]
-		self.render("map.html", feAddress=self._address, fePort=self._port, signup=args[1]) #nella render è presente self.finish()
-		#self.redirect("/")
+		if args[1] == None:
+			self.render("map.html", feAddress=self._address, fePort=self._port, signup=args[0], login=None, error=args[1]) #nella render è presente self.finish()
+		else:
+			self.render("map.html", feAddress=self._address, fePort=self._port, signup=args[0], login=None, error=args[1])
 
 		
 class MapHandler(tornado.websocket.WebSocketHandler):
@@ -206,23 +214,14 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 		return request	
 
-def connect(zone):	
-	return sqs.connect_to_region(zone)
+def connect(zone, table_name):	
+	return sqs.connect_to_region(zone), Table(table_name)
 
-def initialize(sqs_conn, settings):
+def initialize(sqs_conn, user_table, settings):
   	
 	sqs_queues = {}
-	# for i in range(1,10):
-	# 	curr_queues = sqs.get_all_queues(prefix = settings['prefix'] + str(i))  # @UndefinedVariable
-	# 	sqs_queues.update(preapareDict(curr_queues))
-	# print sqs_queues
-
 	request_queue = sqs.get_queue(settings['request_queue'])
-
-	print request_queue
-
 	dispatcher = DispatcherBroker(int(settings['dispatcher_threads']), settings['response_queue'], settings['zone'])
-
 	quadrantslist = openQuadrantsList(settings['quadrants_list_path'])
 
 	pool = ThreadPool(int(settings['pool_size']))
@@ -230,7 +229,7 @@ def initialize(sqs_conn, settings):
 		
 	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), 
 		(r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, dispatcher=dispatcher, quadrantslist=quadrantslist, pool=pool, settings=settings)),
-		(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port']))], 
+		(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'], table=user_table))], 
 		template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(settings['port'])
@@ -258,10 +257,8 @@ if __name__ == "__main__":
 	config.read("FrontEndSettings.ini")
 	settings = config.defaults()
 
-
-
-	sqs = connect(settings['zone'])
-	initialize(sqs, settings)	
+	sqs, dynamo_table = connect(settings['zone'], settings['user_table'])
+	initialize(sqs, dynamo_table,  settings)	
 
 
 

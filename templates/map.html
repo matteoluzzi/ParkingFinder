@@ -74,8 +74,8 @@
                                     <div id="legend">
                                       <legend class="">Login</legend>
                                     </div>
-                                   <input class='form-control' style="margin-top: 8px" type="text" placeholder="Username" />
-                                   <input class='form-control'style="margin-top: 8px" type="password" placeholder="Passsword" />
+                                   <input class='form-control' style="margin-top: 8px" type="text" placeholder="Username" required />
+                                   <input class='form-control'style="margin-top: 8px" type="password" placeholder="Passsword" required />
                                    <input style="margin-top: 8px" class="btn btn-primary btn-lg btn-block" name="commit" type="submit" value="Log In" />
                                 </fieldset>
                               </form>
@@ -152,13 +152,20 @@
                 document.getElementById("confirmPassword").setCustomValidity("");
         };            
         </script>
-        {% if signup != None %}
+        {% if signup != None or signup == "" %}
+            
             <script type="text/javascript"> 
-                alert("{{signup}}");
+                $('#navLogin').click();
+                var div = $('<div class="form-control" style="margin-top: 8px;border:none" />');
+                div.text("{{signup}}");
+                $('#formRegistration').append(div);
                 get_my_position(function(center) {
                 create_connection(center, "{{feAddress}}", "{{fePort}}");
+                {% set  globals()['signup'] = "" %}
         });
             </script>
+            
+        }
         {% end %}
 
     </body>
