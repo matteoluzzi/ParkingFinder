@@ -20,9 +20,19 @@ import tornado.options
 import tornado.web
 import tornado.gen
 import tornado.websocket
-from tornado.escape import xhtml_escape, xhtml_unescape
+from tornado.escape import xhtml_escape, xhtml_unescape, json_encode, json_decode
 
-class BaseHandler(tornado.web.RequestHandler):
+class MyHandler(tornado.web.RequestHandler):
+
+	def set_flash_message(self, key, message):
+		self.set_secure_cookie('flash_msg_%s' % key, message)
+	
+	def get_flash_message(self, key):
+		val = self.get_secure_cookie('flash_msg_%s' % key)
+		self.clear_cookie('flash_msg_%s' % key)
+		return val
+
+class BaseHandler(MyHandler):
 
 	def initialize(self, front_end_address, port):
 
@@ -30,15 +40,31 @@ class BaseHandler(tornado.web.RequestHandler):
 		self._port = port
 	
 	def get(self):
-		self.render("map.html", feAddress=self._address, fePort=self._port, signup=None, login=None, error=None)
 
-class RegisterHandler(tornado.web.RequestHandler):
+		login_msg = self.get_flash_message("login_msg")
+		register_msg = self.get_flash_message("register_msg")
+		if login_msg != None:
+			self.render("map.html", feAddress=self._address, fePort=self._port, signup=None, login=login_msg)
+		elif register_msg != None:
+			self.render("map.html", feAddress=self._address, fePort=self._port, signup=register_msg, login=None)
+		else:
+			self.render("map.html", feAddress=self._address, fePort=self._port, signup=None, login=None)
+
+	def get_current_user(self):
+
+		return self.get_secure_cookie("username")
+
+class RegisterHandler(MyHandler):
 
 	def initialize(self, front_end_address, port, table):
 
 		self._address = front_end_address
 		self._port = port
 		self._table = table
+
+	def get(self):
+
+		self.redirect("/")
 
 	@tornado.web.asynchronous
 	def post(self):
@@ -50,40 +76,85 @@ class RegisterHandler(tornado.web.RequestHandler):
 
 		#Thread incaricato di gesitire la scrittura sul db
 		pool = ThreadPool(processes=1)
-
-		print self._table
-
 		pool.apply_async(self.__checkDuplicates, args=(username, email, password), callback=self.__onfinish)
+		pool.close()
 
 	def __checkDuplicates(self, username, email, password):
 
-		print "dentro checkduplicates"
 		signup = "Utente registrato con successo! Effettuare il login per accedere"
-
 		try: #cerca eventuali duplicati
 			duplicate = self._table.get_item(user_email=email)
 			signup = "Email già registrata, scegline un altra o accedi"
-			print "here"
-			return (signup, "duplilcate")
-
-
+			self.set_flash_message("register_msg", signup)
+			return
 		except: #non ci sono duplicati
-			print "assdasdasdas"
 			encrypted_password = hashpw(password, gensalt())
-			self._table.put_item(data={'user_email':email, 'user_username':username, 'user_password':password})
-			print "ok"
-			return (signup, None)
+			self._table.put_item(data={'user_email':email, 'user_username':username, 'user_password':encrypted_password})
+			return
 
-	def __onfinish(self, args):
+	def __onfinish(self, result):
 
-		if args[1] == None:
-			self.render("map.html", feAddress=self._address, fePort=self._port, signup=args[0], login=None, error=args[1]) #nella render è presente self.finish()
-		else:
-			self.render("map.html", feAddress=self._address, fePort=self._port, signup=args[0], login=None, error=args[1])
+		self.redirect("/")
 
-		
+class LoginHandler(MyHandler):
+
+	def initialize(self, table):
+
+		self._table = table
+
+	def get(self):
+
+		self.redirect("/")
+
+	@tornado.web.asynchronous
+	def post(self):
+
+		email = xhtml_escape(self.get_argument("email"))
+		password = xhtml_escape(self.get_argument("password"))
+
+		pool = ThreadPool(processes=1)
+		pool.apply_async(self.__checkLogin, args=(email, password), callback=self.__onfinish)
+		pool.close()
+
+	def __checkLogin(self, email, password):
+
+		print "nel check login"
+		login_err = None
+		try:
+			user = self._table.get_item(user_email=email) #prendi l'utente salvato sul db
+			passw = user.get('user_password')
+			if hashpw(password, passw) == passw: #se le password coincidono autentica l'utente con un cookie
+				self.set_secure_cookie("username", user.get('user_username'))
+				self.set_flash_message("login_msg", "")
+				return
+			else:
+				login_err = "Nome o password errati, riprovare"
+				self.set_flash_message("login_msg", login_err)
+				return
+		except:
+			login_err = "Nome o password errati, riprovare"
+			self.set_flash_message("login_msg", login_err)
+			return
+
+	def __onfinish(self, result):
+
+			self.redirect("/")
+
+class LogoutHandler(MyHandler):
+
+	def get(self):
+
+		self.clear_cookie("username")
+		self.redirect("/")
+
+	def post(self):
+
+		self.redirect("/")
+
+
+
+
 class MapHandler(tornado.websocket.WebSocketHandler):
-
 
 	def initialize(self, sqs_conn, request_queue, dispatcher, quadrantslist, pool, settings):
 
@@ -229,8 +300,13 @@ def initialize(sqs_conn, user_table, settings):
 		
 	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), 
 		(r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, dispatcher=dispatcher, quadrantslist=quadrantslist, pool=pool, settings=settings)),
-		(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'], table=user_table))], 
-		template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,)
+		(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'], table=user_table)),
+		(r'/login', LoginHandler, dict(table=user_table)),
+		(r'/logout', LogoutHandler)], 
+		template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,
+		xsrf_cookies=True,
+		cookie_secret="l/4VqtnPR3Wv08iW5cX9UR+t7Prkekxuq82yjZn5eDc=")
+
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(settings['port'])
 	print "ready to serve"
@@ -259,6 +335,4 @@ if __name__ == "__main__":
 
 	sqs, dynamo_table = connect(settings['zone'], settings['user_table'])
 	initialize(sqs, dynamo_table,  settings)	
-
-
 
