@@ -22,6 +22,8 @@ import tornado.gen
 import tornado.websocket
 from tornado.escape import xhtml_escape, xhtml_unescape, json_encode, json_decode
 
+'''Handler generico dal quale ereditano tutti gli altri handlers che nesessitano di comunicare tramite cookies'''
+
 class MyHandler(tornado.web.RequestHandler):
 
 	def set_flash_message(self, key, message):
@@ -31,6 +33,8 @@ class MyHandler(tornado.web.RequestHandler):
 		val = self.get_secure_cookie('flash_msg_%s' % key)
 		self.clear_cookie('flash_msg_%s' % key)
 		return val
+
+'''Handler principale responsabile di renderizzare l'home page del sito'''
 
 class BaseHandler(MyHandler):
 
@@ -53,6 +57,8 @@ class BaseHandler(MyHandler):
 	def get_current_user(self):
 
 		return self.get_secure_cookie("username")
+
+'''Handler per gestire la registrazione di un utente al sito'''
 
 class RegisterHandler(MyHandler):
 
@@ -89,12 +95,15 @@ class RegisterHandler(MyHandler):
 			return
 		except: #non ci sono duplicati
 			encrypted_password = hashpw(password, gensalt())
+			self.set_flash_message("register_msg", signup)
 			self._table.put_item(data={'user_email':email, 'user_username':username, 'user_password':encrypted_password})
 			return
 
 	def __onfinish(self, result):
 
 		self.redirect("/")
+
+'''Handler per gestire il login di un utente, la sessione viene mantenuta tramite un cookie settato sul browser'''
 
 class LoginHandler(MyHandler):
 
@@ -118,7 +127,6 @@ class LoginHandler(MyHandler):
 
 	def __checkLogin(self, email, password):
 
-		print "nel check login"
 		login_err = None
 		try:
 			user = self._table.get_item(user_email=email) #prendi l'utente salvato sul db
@@ -140,6 +148,8 @@ class LoginHandler(MyHandler):
 
 			self.redirect("/")
 
+'''Handler per la gestione del logout, cancella il cookie settato'''
+
 class LogoutHandler(MyHandler):
 
 	def get(self):
@@ -151,8 +161,7 @@ class LogoutHandler(MyHandler):
 
 		self.redirect("/")
 
-
-
+'''Handler per la gestione delle richieste riguardanti la mappa, lo scambio di messaggi req/resp avviene su una websocket'''
 
 class MapHandler(tornado.websocket.WebSocketHandler):
 
@@ -167,6 +176,10 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		self._connections = set()
 		self._pool = pool
 
+	def check_origin(self, origin):
+
+		return True
+		
 	def open(self):
 		print "WebSocket opened!"
 		self._connections.add(self)
@@ -284,6 +297,9 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			request = createBoundedListRequest(idReq, settings['response_queue'], q_id, (neLat, neLon), (swLat, swLon))
 		
 		return request	
+
+
+'''Funzioni accessorie per l'instaurazione della connessione con i servizi di amazon (sqs e dynamoDB) e per la configurazione dell'applicazione web'''
 
 def connect(zone, table_name):	
 	return sqs.connect_to_region(zone), Table(table_name)
