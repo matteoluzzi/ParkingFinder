@@ -168,8 +168,8 @@
                 var div = $('<div class="form-control" style="margin-top: 8px;border:none" />');
                 div.text("{{signup}}");
                 $('#formRegistration').append(div);
-                get_my_position(function(center) {
-                create_connection(center, "{{feAddress}}", "{{fePort}}");
+                //get_my_position(function(center) {
+                //create_connection(center, "{{feAddress}}", "{{fePort}}");
                 {% set  globals()['signup'] = "" %}
         });
             </script>
@@ -181,8 +181,8 @@
                 var div = $('<div class="form-control" style="margin-top: 8px;border:none" />');
                 div.text("{{login}}");
                 $('#formLogin').append(div);
-                get_my_position(function(center) {
-                create_connection(center, "{{feAddress}}", "{{fePort}}");
+                //get_my_position(function(center) {
+                //create_connection(center, "{{feAddress}}", "{{fePort}}");
                 {% set  globals()['login'] = "" %}
         });
             </script>
