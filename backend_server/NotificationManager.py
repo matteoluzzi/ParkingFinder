@@ -11,14 +11,12 @@ import time
 #main code creates a thread for each quandrant managed, if the % of the
 #occupation crosses a threshold sends a notification to the right queue
 
-class NotificationManager(threading.Thread):
+class NotificationManager():
 	__myQuadrantID	=	0
-	__frequency		=	0
 	__queueName		=	0
 	__mysqsZone		=	0
 	
 	def __init__(self,anId,freq,sqsZone):
-		threading.Thread.__init__(self)
 		self.myQuadrantID	=	anId			#quadrante da gestire
 		self.frequency		=	freq			#frequenza di polling
 		myRegion			=	str(sqsZone)	#regione SQS
@@ -101,10 +99,19 @@ st			=	int(myQuadrantsRangeStart)
 end			=	int(myQuadrantsRangeEnd)
 myCounter	=	st
 fakelist	=	range(end-st)
+notifList	=	dict()
 for item in fakelist:
 	print "creating threads"
 	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ)
-	aNotManager.start()
-	print "thread started"
+	notifList[str(myCounter)]	=	myCounter
 	myCounter	=	myCounter+1
-aNotManager.join()
+while(1>0):
+	myCounter	=	st
+	for item in fakelist:
+		print "checking status"
+		aNotManager	=	notifList[str(myCounter)]
+		aNotManager.updateStatus()
+		myCounter	=	myCounter+1
+	time.sleep(float(self.frequency))
+	
+

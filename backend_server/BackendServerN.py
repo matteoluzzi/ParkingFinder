@@ -90,27 +90,7 @@ print "Backendserver.py: loading quadrants instances"
 for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
 	print "Backendserver.py: loading quadrant instance "+str(int(item))
-	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
-	
-	#cancellazione code vecchie
-	destinationQueueName	=	"_APPosto_SDCC_"+str(self.myQuadrantID)
-	dest_queue = conn.get_queue(destinationQueueName)
-	while dest_queue == None:
-		dest_queue = conn.create_queue(str(destinationQueueName))
-		if dest_queue==None:
-			print "queue creation failed"
-		conn.delete_queue(dest_queue)
-		
-	destinationQueueName	=	"_APPosto_SDCC_NOTIFICATION"+str(self.myQuadrantID)
-	dest_queue = conn.get_queue(destinationQueueName)
-	while dest_queue == None:
-		dest_queue = conn.create_queue(str(destinationQueueName))
-		if dest_queue==None:
-			print "queue creation failed"
-		conn.delete_queue(dest_queue)
-	
-	
-	
+	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)	
 	#print aquadrant.getParkList()
 	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
 try:
