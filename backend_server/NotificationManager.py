@@ -35,7 +35,7 @@ class NotificationPoller (threading.Thread):
 			currentID	=	int(self.rStart)
 			for item in fakelist:
 				aRequestId				=	int(time.time())
-				JsonRequest				=	jm.createOverviewRequest(aRequestId,"_APPosto_SDCC_notification_poller",self.currentID)
+				JsonRequest				=	jm.createOverviewRequest(aRequestId,"_APPosto_SDCC_notification_poller",currentID)
 				destinationQueueName	=	"_APPosto_requests_queue"
 				dest_queue = conn.get_queue(destinationQueueName)
 				while dest_queue == None:
@@ -47,7 +47,7 @@ class NotificationPoller (threading.Thread):
 				dest_queue.write(m)
 			duration	=	time.time()-now
 			print "NotificationManager: finito round richieste polling in "+str(duration)
-			slack	=	int(frequency)-int(duration)
+			slack	=	int(self.frequency)-int(duration)
 			if slack>0:
 				print "NotificationManager: prossimo polling tra almeno "+str(slack)+" secondi"
 				time.sleep(float(slack))	
@@ -86,7 +86,7 @@ class ResponseManager(threading.Thread):
 				responseID	=	int(response[0]["r_id"])
 				my_queue.delete_message(item)
 				print "NotificationManager.py: fetched response "+str(response_id)
-				newPercentage	=	double(response[0]["percentage"])
+				newPercentage	=	int(response[0]["percentage"])
 				manager = self.managerDict[str(quadrant_id)]
 				manager.manageEvent(newPercentage)
 				print "NotificationManager.py: dispatched to "+str(manager)
