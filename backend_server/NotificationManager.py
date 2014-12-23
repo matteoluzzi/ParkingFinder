@@ -7,6 +7,7 @@ import threading
 import json
 import JSONManager as jm
 import time
+import NotificationServer as ns
 
 class NotificationPoller (threading.Thread):
 	__frequency		=	0
@@ -147,6 +148,9 @@ poller		=	NotificationPoller(int(notificationFreq),notifList,st,end,SQSZ)
 poller.start()
 rManager	=	ResponseManager(notifList,SQSZ)
 rManager.start()
+testmio	=	ns.NotificationServer()
+testmio.start()
+testmio.join()
 poller.join()
 
 
