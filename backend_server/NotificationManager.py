@@ -124,6 +124,7 @@ class NotificationManager():
 			m = Message()
 			m.set_body(str(notifPayload))
 			notifQueue.write(m)
+			self.prevStatus	=	newPercentage
 		
 settingsHandler		=	settings.Settings("testimp.txt")
 try:
