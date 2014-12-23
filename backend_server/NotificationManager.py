@@ -19,7 +19,9 @@ class NotificationPoller (threading.Thread):
 		threading.Thread.__init__(self)
 		self.frequency		=	frequency			#frequenza di polling
 		self.managerDict	=	aDict
-		self.mysqsZone			=	sqsZ
+		self.mysqsZone		=	sqsZ
+		self.rStart			=	rangeStart
+		self.rEnd			=	rangeEnd	
 	
 	def run(self):
 		#per ogni quadrante genera le richieste di overview ogni freqtime
@@ -27,7 +29,7 @@ class NotificationPoller (threading.Thread):
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
-		fakelist	=	range(int(self.rStart)-int(self.rStart))
+		fakelist	=	range(int(self.rEnd)-int(self.rStart))
 		while True:
 			now	=	time.time()
 			currentID	=	int(self.rStart)
@@ -96,8 +98,7 @@ class NotificationManager():
 	__prevStatus	=	0
 	def __init__(self,anId,freq,sqsZone):
 		self.myQuadrantID	=	anId			#quadrante da gestire
-		myRegion			=	str(sqsZone)	#regione SQS
-		self.mysqsZone		=	myRegion[:-1] 	#mistero... backspace in fondo a stringa
+		self.mysqsZone		=	str(sqsZone)	#mistero... backspace in fondo a stringa
 	
 	def manageEvent(self,newPercentage):
 		print "connecting to SQS service in zone "+str(self.mysqsZone)
@@ -129,7 +130,8 @@ try:
 	myQuadrantsRangeStart	= 	settingsHandler.settings['rangeStart']	
 	myQuadrantsRangeEnd		=	settingsHandler.settings['rangeEnd']		
 	notificationFreq		=	settingsHandler.settings['notificationFreq']
-	SQSZ					=	settingsHandler.settings['SQSzone']
+	SQSZ					=	settingsHandler.settings['SQSzone']#mistero... backspace in fondo a stringa
+	SQSZ					=	str(SQSZ)[:-1]
 except:
 	print "error while loading settings"
 	
