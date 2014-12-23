@@ -140,7 +140,7 @@ fakelist	=	range(end-st)
 notifList	=	dict()
 for item in fakelist:
 	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ)
-	notifList[str(myCounter)]	=	myCounter
+	notifList[str(myCounter)]	=	aNotManager
 	myCounter	=	myCounter+1
 poller		=	NotificationPoller(int(notificationFreq),notifList,st,end,SQSZ)
 poller.start()
