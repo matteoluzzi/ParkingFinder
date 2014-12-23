@@ -45,6 +45,7 @@ class NotificationPoller (threading.Thread):
 				m = Message()
 				m.set_body(str(JsonRequest))
 				dest_queue.write(m)
+				currentID	=	currentID+1
 			duration	=	time.time()-now
 			print "NotificationManager: finito round richieste polling in "+str(duration)
 			slack	=	int(self.frequency)-int(duration)
@@ -77,7 +78,7 @@ class ResponseManager(threading.Thread):
 		while(1>0):
 			#preleva i messaggi ed effettua il dispatch al manager corretto
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
-			print "NotificationManager.py: queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
+			#print "NotificationManager.py: queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
 			for item in requests:
 				text		=	item.get_body()
 				response	=	json.loads(text)
@@ -85,7 +86,7 @@ class ResponseManager(threading.Thread):
 				quadrant_id	=	int(response[0]["quadrantID"])
 				responseID	=	int(response[0]["r_id"])
 				my_queue.delete_message(item)
-				print "NotificationManager.py: fetched response "+str(response_id)
+				#print "NotificationManager.py: fetched response "+str(response_id)
 				newPercentage	=	int(response[0]["percentage"])
 				manager = self.managerDict[str(quadrant_id)]
 				manager.manageEvent(newPercentage)
@@ -99,7 +100,7 @@ class NotificationManager():
 	def __init__(self,anId,freq,sqsZone):
 		self.myQuadrantID	=	anId			#quadrante da gestire
 		self.mysqsZone		=	str(sqsZone)	#mistero... backspace in fondo a stringa
-	
+		self.prevStatus		=	0
 	def manageEvent(self,newPercentage):
 		print "connecting to SQS service in zone "+str(self.mysqsZone)
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
@@ -111,16 +112,13 @@ class NotificationManager():
 			if notifQueue==None:
 				print "queue creation failed"
 		send	=	False
-		if prevStatus>50:
-			if newPercentage<=50:
-				send	=	True
-		elif prevStatus>25:
-			if newPercentage<=25:
-				send	=	True
-		elif newPercentage>5:
-				send	=	True
+		delta	=	self.prevStatus	-	newPercentage
+		if delta<0:
+			delta=-delta
+		if delta>10:
+			send	=	True
 		if send==True:
-			notifPayload	=	jm.sendNotificationForQuadrant(response[0]["quadrantID"],"New parkings available in quadrant "+str(response[0]["quadrantID"]),"The available parkings are now "+str(newPercentage))
+			notifPayload	=	jm.sendNotificationForQuadrant(self.myQuadrantID,"New parkings available in quadrant "+str(self.myQuadrantID),"The available parkings are now "+str(newPercentage)+"%")
 			m = Message()
 			m.set_body(str(notifPayload))
 			notifQueue.write(m)
