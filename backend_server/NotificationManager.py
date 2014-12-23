@@ -106,9 +106,9 @@ class NotificationManager():
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
-		notifQueue	=	conn.get_queue("notificationQueue")
+		notifQueue	=	conn.get_queue("_APPosto_notificationQueue")
 		while notifQueue == None:
-			notifQueue = conn.create_queue("notificationQueue")
+			notifQueue = conn.create_queue("_APPosto_notificationQueue")
 			if notifQueue==None:
 				print "NotificationManager.py: queue creation failed"
 		send	=	False
