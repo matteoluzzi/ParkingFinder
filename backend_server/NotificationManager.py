@@ -102,21 +102,22 @@ class NotificationManager():
 		self.mysqsZone		=	str(sqsZone)	#mistero... backspace in fondo a stringa
 		self.prevStatus		=	0
 	def manageEvent(self,newPercentage):
-		print "connecting to SQS service in zone "+str(self.mysqsZone)
+		#print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
-			print "error while connecting at"+self.mysqsZone+"zone"
+			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
 		notifQueue	=	conn.get_queue("notificationQueue")
 		while notifQueue == None:
 			notifQueue = conn.create_queue("notificationQueue")
 			if notifQueue==None:
-				print "queue creation failed"
+				print "NotificationManager.py: queue creation failed"
 		send	=	False
 		delta	=	self.prevStatus	-	newPercentage
 		if delta<0:
 			delta=-delta
 		if delta>10:
 			send	=	True
+		print "NotificationManager.py: delta on quadrant "+str(self.myQuadrantID)+" "+str(delta)
 		if send==True:
 			notifPayload	=	jm.sendNotificationForQuadrant(self.myQuadrantID,"New parkings available in quadrant "+str(self.myQuadrantID),"The available parkings are now "+str(newPercentage)+"%")
 			m = Message()
