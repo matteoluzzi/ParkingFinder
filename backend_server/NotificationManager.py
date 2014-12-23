@@ -146,10 +146,10 @@ for item in fakelist:
 	myCounter	=	myCounter+1
 poller		=	NotificationPoller(int(notificationFreq),notifList,st,end,SQSZ)
 poller.start()
-rManager	=	ResponseManager(notifList,SQSZ)
-rManager.start()
 testmio	=	ns.NotificationServer()
 testmio.start()
+rManager	=	ResponseManager(notifList,SQSZ)
+rManager.start()
 testmio.join()
 poller.join()
 
