@@ -9,6 +9,23 @@ import JSONManager as jm
 import time
 import NotificationServer as ns
 
+def getQuadrantZoneList(myfilename):
+		inputFile 	= open(myfilename, 'r')
+		mystring=inputFile.readline()
+		mystring=mystring.split('\n')[0]
+		myId	=	1
+		mydict	=	dict()
+		while ((mystring!="")and(mystring!="\0")):
+			quadrantinfo = mystring.split("\t")
+			name		=	quadrantinfo[1]
+			#print "estratto "+str(name)
+			mydict[str(myId)]	=	name
+			myId	=	myId+1
+			mystring=inputFile.readline()
+			mystring=mystring.split('\n')[0]
+		#print mydict
+		return mydict
+		
 class NotificationPoller (threading.Thread):
 	__frequency		=	0
 	__managerDict	=	0
@@ -98,10 +115,13 @@ class NotificationManager():
 	__queueName		=	0
 	__mysqsZone		=	0
 	__prevStatus	=	0
-	def __init__(self,anId,freq,sqsZone):
+	__namesList		=	0
+	def __init__(self,anId,freq,sqsZone,nList):
 		self.myQuadrantID	=	anId			#quadrante da gestire
 		self.mysqsZone		=	str(sqsZone)	#mistero... backspace in fondo a stringa
 		self.prevStatus		=	0
+		self.namesList		=	nList
+		
 	def manageEvent(self,newPercentage):
 		#print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
@@ -118,9 +138,9 @@ class NotificationManager():
 			delta=-delta
 		if delta>10:
 			send	=	True
-		print "NotificationManager.py: delta on quadrant "+str(self.myQuadrantID)+" "+str(delta)
+		print "NotificationManager.py: delta on quadrant "+str(self.namesList[str(self.myQuadrantID)])+" "+str(self.myQuadrantID)+" "+str(delta)
 		if send==True:
-			notifPayload	=	jm.sendNotificationForQuadrant(self.myQuadrantID,"New parkings available in quadrant "+str(self.myQuadrantID),"The available parkings are now "+str(newPercentage)+"%")
+			notifPayload	=	jm.sendNotificationForQuadrant(self.myQuadrantID,"New parkings available in quadrant "+str(self.namesList[str(self.myQuadrantID)]),"The available parkings are now "+str(newPercentage)+"%")
 			m = Message()
 			m.set_body(str(notifPayload))
 			notifQueue.write(m)
@@ -135,14 +155,15 @@ try:
 	SQSZ					=	str(SQSZ)[:-1]
 except:
 	print "error while loading settings"
-	
+
+names		=	getQuadrantZoneList("names.txt")
 st			=	int(myQuadrantsRangeStart)
 end			=	int(myQuadrantsRangeEnd)
 myCounter	=	st
 fakelist	=	range(end-st)
 notifList	=	dict()
 for item in fakelist:
-	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ)
+	aNotManager	=	NotificationManager(myCounter,notificationFreq,SQSZ,names)
 	notifList[str(myCounter)]	=	aNotManager
 	myCounter	=	myCounter+1
 poller		=	NotificationPoller(int(notificationFreq),notifList,st,end,SQSZ)
