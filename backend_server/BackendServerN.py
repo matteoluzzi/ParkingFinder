@@ -90,7 +90,7 @@ print "Backendserver.py: loading quadrants instances"
 for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
 	print "Backendserver.py: loading quadrant instance "+str(int(item))
-	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
+	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)	
 	#print aquadrant.getParkList()
 	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
 try:

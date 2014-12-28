@@ -75,9 +75,6 @@ class NotificationServer(threading.Thread):
 		#print mytopic
 		self.snsConnection.subscribe(mytopic,"email",address)
 		
-testmio	=	NotificationServer()
-testmio.start()
-testmio.join()
 #testq	=	quad.Quadrant(25,0,0,0,0)
 #testmio.mailSubscribe(testq.getID(),"paride.casulli@gmail.com")
 	

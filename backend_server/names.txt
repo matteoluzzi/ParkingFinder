@@ -1,0 +1,1267 @@
+1	Post Code 00054
+2	Suburb Ostia Antica
+3	Suburb Stagni di Ostia
+4	Suburb Madonnetta
+5	Suburb Malafede
+6	Suburb Malafede
+7	Suburb Castel di Decima
+8	Suburb Vallerano
+9	Suburb Castel di Leva
+10	Suburb Castel di Leva
+11	City District Municipio Roma IX
+12	Suburb Santa Maria delle Mole
+13	Suburb Frattocchie
+14	Post Code 00040
+15	Post Code 00046
+16	Post Code 00046
+17	Post Code 00054
+18	Post Code 00119
+19	Suburb Ponte Galeria
+20	Suburb Ponte Galeria
+21	Post Code 00126
+22	Post Code 00126
+23	Suburb Ponte Galeria
+24	Suburb Ponte Galeria
+25	Suburb Ponte Galeria
+26	Suburb Ponte Galeria
+27	Suburb Bagnoletto
+28	Suburb Dragona
+29	Suburb Dragona
+30	Suburb Dragona
+31	Suburb Dragona
+32	Suburb Dragoncello
+33	Suburb Acilia Nord
+34	Suburb Dragoncello
+35	Suburb Acilia Nord
+36	Suburb Dragoncello
+37	Suburb Acilia Nord
+38	Suburb Acilia Nord
+39	Suburb Acilia Nord
+40	Suburb Acilia Nord
+41	Suburb Acilia Sud
+42	Suburb Centro Giano
+43	Suburb Vitinia
+44	Suburb Centro Giano
+45	Suburb Casal Bernocchi
+46	Suburb Acilia Sud
+47	Suburb Casal Bernocchi
+48	Suburb Casal Bernocchi
+49	Suburb Casal Bernocchi
+50	Suburb Casal Bernocchi
+51	Suburb Casal Bernocchi
+52	Suburb Vitinia
+53	Suburb Mezzocammino
+54	Suburb Mezzocammino
+55	Suburb Mezzocammino
+56	Suburb Mezzocammino
+57	Suburb Vitinia
+58	Suburb Vitinia
+59	Suburb Casal Bernocchi
+60	Suburb Vitinia
+61	Suburb Vitinia
+62	Suburb Mezzocammino
+63	Suburb Vitinia
+64	Suburb Tor de' Cenci
+65	Suburb Mezzocammino
+66	Suburb Torrino
+67	Suburb Mezzocammino
+68	Suburb Tor de' Cenci
+69	Suburb Torrino
+70	Suburb Torrino
+71	Suburb Tor de' Cenci
+72	Suburb Vallerano
+73	Suburb Tor de' Cenci
+74	Suburb Tor de' Cenci
+75	Suburb Tor de' Cenci
+76	Suburb Tor de' Cenci
+77	Suburb Tor de' Cenci
+78	Suburb Valleranello
+79	Suburb Tor de' Cenci
+80	Suburb Vallerano
+81	Suburb Fonte Ostiense
+82	Suburb Fonte Ostiense
+83	Suburb Fonte Ostiense
+84	Suburb Vallerano
+85	Suburb Fonte Ostiense
+86	Suburb Valleranello
+87	Suburb Valleranello
+88	Suburb Vallerano
+89	Suburb Valleranello
+90	Suburb Vallerano
+91	Suburb Vallerano
+92	Suburb Vallerano
+93	Suburb Vallerano
+94	Suburb Giuliano-Dalmata
+95	Suburb Cecchignola
+96	Suburb Fonte Ostiense
+97	Suburb Cecchignola
+98	Suburb Cecchignola
+99	Suburb Castel di Leva
+100	Suburb Castel di Leva
+101	Suburb Cecchignola
+102	Suburb Torricola
+103	Suburb Cecchignola
+104	Suburb Cecchignola
+105	Suburb Torricola
+106	Suburb Castel di Leva
+107	Suburb Castel di Leva
+108	Suburb Torricola
+109	Suburb Torricola
+110	Suburb Torricola
+111	Suburb Torricola
+112	Suburb Morena
+113	Post Code 00043
+114	Post Code 00043
+115	Post Code 00043
+116	Post Code 00043
+117	Post Code 00043
+118	Post Code 00043
+119	Post Code 00118
+120	Suburb Vermicino
+121	Post Code 00043
+122	Post Code 00118
+123	Suburb Vermicino
+124	Post Code 00047
+125	Post Code 00047
+126	Post Code 00047
+127	Post Code 00047
+128	Post Code 00047
+129	Post Code 00046
+130	Post Code 00046
+131	Post Code 00044
+132	Post Code 00054
+133	City District Municipio Roma XI
+134	Suburb Ponte Galeria
+135	Suburb Ponte Galeria
+136	Suburb Ponte Galeria
+137	Suburb Ponte Galeria
+138	Post Code 00119
+139	Suburb Ponte Galeria
+140	Suburb Ponte Galeria
+141	Suburb Ponte Galeria
+142	Suburb Ponte Galeria
+143	Suburb Ponte Galeria
+144	Suburb Ponte Galeria
+145	Suburb Ponte Galeria
+146	Suburb Ponte Galeria
+147	Suburb Ponte Galeria
+148	Suburb Ponte Galeria
+149	Suburb Ponte Galeria
+150	Suburb Ponte Galeria
+151	Suburb Magliana Vecchia
+152	Suburb Magliana Vecchia
+153	Suburb Magliana Vecchia
+154	Suburb Magliana Vecchia
+155	Suburb Magliana Vecchia
+156	Suburb Magliana Vecchia
+157	Suburb Magliana Vecchia
+158	Suburb Magliana Vecchia
+159	Suburb Magliana Vecchia
+160	Suburb Magliana Vecchia
+161	Suburb Magliana Vecchia
+162	Suburb Trullo
+163	Suburb Trullo
+164	Suburb Magliana Vecchia
+165	Suburb Tor di Valle
+166	Suburb Magliana Vecchia
+167	Suburb Magliana Vecchia
+168	Suburb Magliana Vecchia
+169	Suburb Magliana Vecchia
+170	Post Code 00148
+171	Suburb Tor di Valle
+172	Suburb Magliana Vecchia
+173	Suburb Mezzocammino
+174	Suburb Trullo
+175	Suburb Trullo
+176	Post Code 00148
+177	Suburb Trullo
+178	Suburb Portuense
+179	Suburb EUR
+180	Suburb Torrino
+181	Suburb EUR
+182	Suburb Tor di Valle
+183	Suburb Torrino
+184	Suburb Tor di Valle
+185	Suburb Torrino
+186	Suburb Torrino
+187	Suburb EUR
+188	Suburb Torrino
+189	Suburb Torrino
+190	Suburb EUR
+191	Suburb EUR
+192	Suburb EUR
+193	Suburb EUR
+194	Suburb EUR
+195	Suburb EUR
+196	Suburb EUR
+197	Suburb EUR
+198	Suburb EUR
+199	Suburb EUR
+200	Suburb EUR
+201	Suburb EUR
+202	Suburb EUR
+203	Suburb EUR
+204	Suburb EUR
+205	Suburb EUR
+206	Suburb EUR
+207	Suburb EUR
+208	Suburb EUR
+209	Post Code 00143
+210	Suburb Ardeatino
+211	Suburb EUR
+212	Suburb EUR
+213	Suburb EUR
+214	Suburb EUR
+215	Suburb Ardeatino
+216	Suburb EUR
+217	Suburb EUR
+218	Suburb EUR
+219	Suburb EUR
+220	Suburb EUR
+221	Suburb Fonte Ostiense
+222	Suburb Fonte Ostiense
+223	Suburb EUR
+224	Suburb Giuliano-Dalmata
+225	Suburb Fonte Ostiense
+226	Suburb Fonte Ostiense
+227	Suburb Ardeatino
+228	Suburb Ardeatino
+229	Suburb Ardeatino
+230	Post Code 00142
+231	Suburb Ardeatino
+232	Suburb Ardeatino
+233	Suburb Ardeatino
+234	Suburb Ardeatino
+235	Suburb Giuliano-Dalmata
+236	Suburb Giuliano-Dalmata
+237	Suburb Giuliano-Dalmata
+238	Suburb Giuliano-Dalmata
+239	Suburb Giuliano-Dalmata
+240	Suburb Cecchignola
+241	Suburb Cecchignola
+242	Suburb Cecchignola
+243	Suburb Ardeatino
+244	Post Code 00178
+245	Suburb Torricola
+246	Suburb Torricola
+247	Suburb Appio Claudio
+248	Suburb Appio Claudio
+249	Post Code 00178
+250	Suburb Capannelle
+251	Suburb Capannelle
+252	Suburb Torricola
+253	Suburb Capannelle
+254	Suburb Gregna di Sant'Andrea
+255	Suburb Gregna di Sant'Andrea
+256	Suburb Gregna di Sant'Andrea
+257	Suburb Capannelle
+258	Suburb Tor di Mezzavia
+259	Suburb Gregna di Sant'Andrea
+260	Suburb Tor di Mezzavia
+261	Suburb Tor di Mezzavia
+262	Suburb Tor di Mezzavia
+263	Suburb Tor di Mezzavia
+264	Suburb Tor di Mezzavia
+265	Suburb Tor di Mezzavia
+266	Suburb Tor di Mezzavia
+267	Suburb Morena
+268	Post Code 00043
+269	Suburb Morena
+270	Suburb Tor di Mezzavia
+271	Suburb Morena
+272	Suburb Morena
+273	Suburb Ponte Linari
+274	Suburb Ponte Linari
+275	Suburb Ponte Linari
+276	Suburb Ponte Linari
+277	Suburb Ponte Linari
+278	Suburb Ponte Linari
+279	Suburb Ponte Linari
+280	Post Code 00118
+281	Suburb Morena
+282	Suburb Ponte Linari
+283	Suburb Morena
+284	Suburb Vermicino
+285	Suburb Spinoretico
+286	Post Code 00118
+287	Suburb Vermicino
+288	Suburb Colle Maria
+289	Suburb Spinoretico
+290	Suburb Colle Pizzuto
+291	Post Code 00118
+292	Suburb Colle Pizzuto
+293	Suburb Prataporci
+294	Post Code 00044
+295	City District Municipio Roma XII
+296	City District Municipio Roma XII
+297	Suburb Massimina
+298	Suburb Massimina
+299	City District Municipio Roma XI
+300	Suburb Massimina
+301	Suburb Massimina
+302	Suburb Massimina
+303	Suburb Ponte Galeria
+304	Suburb Ponte Galeria
+305	Suburb La Pisana
+306	Suburb La Pisana
+307	Suburb La Pisana
+308	Suburb La Pisana
+309	Suburb La Pisana
+310	Suburb Magliana Vecchia
+311	Suburb Magliana Vecchia
+312	Suburb La Pisana
+313	Post Code 00163
+314	Post Code 00151
+315	Suburb Casetta Mattei
+316	Suburb Casetta Mattei
+317	Suburb Casetta Mattei
+318	Suburb Casetta Mattei
+319	Suburb Trullo
+320	Suburb Casetta Mattei
+321	Suburb Trullo
+322	Suburb Gianicolense
+323	Suburb Gianicolense
+324	Suburb Casetta Mattei
+325	Suburb Gianicolense
+326	Suburb Gianicolense
+327	Suburb Gianicolense
+328	Post Code 00100
+329	Suburb Portuense
+330	Suburb Trullo
+331	Suburb Trullo
+332	Suburb Trullo
+333	Suburb Trullo
+334	Suburb Portuense
+335	Suburb Portuense
+336	Suburb Portuense
+337	Suburb Portuense
+338	Suburb Portuense
+339	Post Code 00146
+340	Post Code 00146
+341	Suburb Portuense
+342	Post Code 00146
+343	Suburb Ostiense
+344	Suburb Ostiense
+345	Suburb Ostiense
+346	Suburb Ostiense
+347	Suburb Ostiense
+348	Suburb Ostiense
+349	Suburb Ostiense
+350	Suburb Ostiense
+351	Suburb Ostiense
+352	Suburb Ostiense
+353	Suburb Ostiense
+354	Suburb Ostiense
+355	Suburb Portuense
+356	Suburb Ostiense
+357	Suburb EUR
+358	Suburb EUR
+359	Suburb Ostiense
+360	Suburb Ostiense
+361	Suburb Ostiense
+362	Suburb Ostiense
+363	Suburb Ostiense
+364	Suburb Ostiense
+365	Suburb Ostiense
+366	Suburb Ostiense
+367	Suburb EUR
+368	Suburb Ostiense
+369	Suburb EUR
+370	Suburb EUR
+371	Suburb Ostiense
+372	Suburb Ostiense
+373	Suburb Ostiense
+374	Suburb Ostiense
+375	Suburb Ostiense
+376	Suburb Ardeatino
+377	Suburb Ostiense
+378	Suburb Ostiense
+379	Suburb Ostiense
+380	Suburb Ostiense
+381	Suburb Ardeatino
+382	Post Code 00179
+383	Post Code 00179
+384	Suburb Ardeatino
+385	Suburb Ardeatino
+386	Suburb Ardeatino
+387	Suburb Ardeatino
+388	Suburb Ardeatino
+389	Suburb Ardeatino
+390	Suburb Ardeatino
+391	Suburb Ardeatino
+392	Suburb Ardeatino
+393	Suburb Ardeatino
+394	Post Code 00179
+395	Suburb Tuscolano
+396	Suburb Ardeatino
+397	Post Code 00174
+398	Suburb Tuscolano
+399	Post Code 00174
+400	Suburb Tuscolano
+401	Suburb Quadraro
+402	Suburb Ardeatino
+403	Post Code 00174
+404	Suburb Ardeatino
+405	Post Code 00174
+406	Post Code 00174
+407	Post Code 00174
+408	Post Code 00174
+409	Suburb Appio-Pignatelli
+410	Post Code 00174
+411	Suburb Don Bosco
+412	Suburb Quadraro
+413	Suburb Don Bosco
+414	Post Code 00175
+415	Suburb Torre Maura
+416	Suburb Don Bosco
+417	Suburb Don Bosco
+418	Suburb Don Bosco
+419	Suburb Don Bosco
+420	Suburb Don Bosco
+421	Suburb Quadraro
+422	Suburb Don Bosco
+423	Suburb Appio Claudio
+424	Suburb Appio Claudio
+425	Suburb Don Bosco
+426	Suburb Don Bosco
+427	Suburb Appio Claudio
+428	Suburb Capannelle
+429	Suburb Torre Maura
+430	Suburb Torre Maura
+431	Post Code 00173
+432	Suburb Torre Maura
+433	Suburb Torre Maura
+434	Suburb Torre Angela
+435	Suburb Torre Spaccata
+436	Suburb Torrenova
+437	Post Code 00173
+438	Post Code 00173
+439	Suburb Capannelle
+440	Suburb Tor di Mezzavia
+441	Suburb Capannelle
+442	Suburb Tor di Mezzavia
+443	Suburb Tor di Mezzavia
+444	Post Code 00173
+445	Suburb Torre Maura
+446	Suburb Tor di Mezzavia
+447	Suburb Tor di Mezzavia
+448	Suburb Torre Maura
+449	Suburb Torrenova
+450	Suburb Tor di Mezzavia
+451	Suburb Torrenova
+452	Suburb Tor di Mezzavia
+453	Suburb Tor di Mezzavia
+454	Suburb Torre Angela
+455	Suburb Torre Angela
+456	Suburb Torrenova
+457	Suburb Torrenova
+458	Suburb Torrenova
+459	Suburb Torrenova
+460	Suburb Torrenova
+461	Suburb Torre Gaia
+462	Suburb Tor Bella Monaca
+463	Suburb Torrenova
+464	Suburb Torre Gaia
+465	Suburb Torrenova
+466	Suburb Torrenova
+467	Suburb Ponte Linari
+468	Suburb Ponte Linari
+469	Suburb Torre Gaia
+470	Suburb Torre Gaia
+471	Suburb Torrenova
+472	Suburb Torrenova
+473	Suburb Tor Bella Monaca
+474	Suburb Tor Bella Monaca
+475	Suburb Torre Gaia
+476	Suburb Zona Industriale Villa Verde
+477	Suburb Zona Industriale Villa Verde
+478	Suburb Zona Industriale Villa Verde
+479	Suburb Zona Industriale Villa Verde
+480	Suburb Finocchio
+481	Suburb Finocchio
+482	Post Code 2378
+483	City District Municipio Roma XII
+484	City District Municipio Roma XIII
+485	Suburb Casalotti
+486	Suburb Massimina
+487	Suburb Massimina
+488	City District Municipio Roma XIII
+489	Suburb Casalotti
+490	Suburb Massimina
+491	Suburb Massimina
+492	Suburb Massimina
+493	Suburb Massimina
+494	Suburb Massimina
+495	Suburb Massimina
+496	Suburb Massimina
+497	Suburb Massimina
+498	Suburb Montespaccato
+499	Suburb Montespaccato
+500	Suburb Montespaccato
+501	Suburb Montespaccato
+502	Suburb Montespaccato
+503	Suburb Montespaccato
+504	Suburb Montespaccato
+505	Suburb Montespaccato
+506	Suburb Massimina
+507	Suburb La Pisana
+508	Suburb La Pisana
+509	Suburb La Pisana
+510	Suburb La Pisana
+511	Suburb La Pisana
+512	Suburb La Pisana
+513	Suburb La Pisana
+514	Suburb Montespaccato
+515	Suburb Montespaccato
+516	Suburb Montespaccato
+517	Suburb Aurelio
+518	Suburb Aurelio
+519	Suburb Aurelio
+520	Suburb Aurelio
+521	Suburb Aurelio
+522	Suburb La Pisana
+523	Suburb Gianicolense
+524	Suburb Gianicolense
+525	Post Code 00163
+526	Suburb Gianicolense
+527	Suburb Aurelio
+528	Suburb Aurelio
+529	Post Code 00167
+530	Post Code 00165
+531	Suburb Aurelio
+532	Post Code Roma
+533	Post Code 00165
+534	Suburb Aurelio
+535	Suburb Gianicolense
+536	Suburb Gianicolense
+537	Suburb Gianicolense
+538	Suburb Gianicolense
+539	Suburb Gianicolense
+540	Suburb Gianicolense
+541	Suburb Gianicolense
+542	Suburb Gianicolense
+543	Suburb Trastevere
+544	Suburb Regola
+545	Suburb Trastevere
+546	Suburb Trastevere
+547	Suburb Parione
+548	Suburb Parione
+549	Suburb Regola
+550	Suburb Regola
+551	Suburb Trastevere
+552	Suburb Trastevere
+553	Suburb Regola
+554	Suburb Trastevere
+555	Suburb Trastevere
+556	Suburb Sant'Eustachio
+557	Suburb Pigna
+558	Suburb Sant'Angelo
+559	Suburb Sant'Angelo
+560	Suburb Trevi
+561	Suburb Trevi
+562	Suburb Campitelli
+563	Suburb Campitelli
+564	Suburb Sant'Angelo
+565	Suburb Sant'Angelo
+566	Suburb Trastevere
+567	Suburb Ripa
+568	Suburb Campitelli
+569	Suburb Campitelli
+570	Suburb Campitelli
+571	Suburb Campitelli
+572	Suburb Gianicolense
+573	Suburb Trastevere
+574	Suburb Gianicolense
+575	Post Code 00152
+576	Post Code 00153
+577	Post Code 00152
+578	Suburb Testaccio
+579	Suburb Ripa
+580	Suburb Ripa
+581	Suburb Testaccio
+582	Suburb Ripa
+583	Suburb San Saba
+584	Suburb Testaccio
+585	Post Code 00154
+586	Post Code 00154
+587	Post Code 00154
+588	Suburb San Saba
+589	Suburb San Saba
+590	Post Code 00154
+591	Post Code 00154
+592	Suburb Trevi
+593	Suburb Sallustiano
+594	Suburb Campitelli
+595	Suburb Esquilino
+596	Suburb Esquilino
+597	Suburb Esquilino
+598	Suburb Esquilino
+599	Suburb Esquilino
+600	Suburb Celio
+601	Suburb Celio
+602	Suburb Celio
+603	Suburb Celio
+604	Suburb Esquilino
+605	Suburb Esquilino
+606	Suburb Celio
+607	Suburb Esquilino
+608	Suburb Esquilino
+609	Suburb Tiburtino
+610	Suburb Esquilino
+611	Suburb Esquilino
+612	Suburb Esquilino
+613	Suburb Esquilino
+614	Suburb Esquilino
+615	Suburb Prenestino-Labicano
+616	Suburb Esquilino
+617	Suburb Appio-Latino
+618	Suburb Celio
+619	Suburb Celio
+620	Suburb San Saba
+621	Suburb Celio
+622	Post Code Roma
+623	Suburb San Saba
+624	Suburb Celio
+625	Suburb Appio-Latino
+626	Suburb Appio-Latino
+627	Suburb Appio-Latino
+628	Suburb Appio-Latino
+629	Suburb Tiburtino
+630	Post Code 00159
+631	Suburb Prenestino-Labicano
+632	Suburb Prenestino-Labicano
+633	Suburb Appio-Latino
+634	Post Code 00182
+635	Suburb Prenestino-Labicano
+636	Suburb Prenestino-Labicano
+637	Suburb Prenestino-Labicano
+638	Suburb Prenestino-Labicano
+639	Suburb Collatino
+640	Post Code 00177
+641	Suburb Prenestino-Labicano
+642	Suburb Prenestino-Labicano
+643	Suburb Prenestino-Labicano
+644	Suburb Prenestino-Labicano
+645	Suburb Prenestino-Labicano
+646	Suburb Appio-Latino
+647	Suburb Appio-Latino
+648	Suburb Appio-Latino
+649	Suburb Appio-Latino
+650	Suburb Tuscolano
+651	Suburb Appio-Latino
+652	Suburb Appio-Latino
+653	Suburb Appio-Latino
+654	Suburb Appio-Latino
+655	Suburb Tuscolano
+656	Suburb Tuscolano
+657	Suburb Tuscolano
+658	Suburb Tuscolano
+659	Post Code 00176
+660	Suburb Prenestino-Labicano
+661	Suburb Tuscolano
+662	Post Code 00176
+663	Post Code 00177
+664	Post Code 00177
+665	Suburb Prenestino-Labicano
+666	Suburb Alessandrino
+667	Suburb Alessandrino
+668	Suburb Alessandrino
+669	Suburb Prenestino-Centocelle
+670	Suburb Alessandrino
+671	Suburb Prenestino-Labicano
+672	Suburb Prenestino-Centocelle
+673	Post Code 00172
+674	Post Code 00172
+675	Suburb Prenestino-Centocelle
+676	Suburb Alessandrino
+677	Suburb Alessandrino
+678	Suburb Alessandrino
+679	Suburb Alessandrino
+680	Suburb Tor Sapienza
+681	Suburb Alessandrino
+682	Suburb Torre Spaccata
+683	Suburb Tor Sapienza
+684	Suburb Tor Sapienza
+685	Suburb Torre Spaccata
+686	Suburb Torre Spaccata
+687	Suburb Alessandrino
+688	Suburb Alessandrino
+689	Suburb Alessandrino
+690	Suburb Torre Spaccata
+691	Suburb Torre Spaccata
+692	Suburb Torre Spaccata
+693	Post Code 00169
+694	Suburb Torre Spaccata
+695	Suburb Tor Sapienza
+696	Suburb Acqua Vergine
+697	Suburb Torre Spaccata
+698	Suburb Acqua Vergine
+699	Suburb Acqua Vergine
+700	Suburb Torre Angela
+701	Suburb Torre Angela
+702	Suburb Torre Angela
+703	Suburb Torre Angela
+704	Suburb Torre Angela
+705	Suburb Valle Fiorita
+706	Suburb Torre Angela
+707	Suburb Valle Fiorita
+708	Suburb Valle Fiorita
+709	Suburb Colle del Sole
+710	Post Code 00132
+711	Post Code 2378
+712	City District Municipio Roma XIII
+713	City District Municipio Roma XIII
+714	Suburb Casalotti
+715	City District Municipio Roma XIII
+716	Suburb Casalotti
+717	Suburb Casalotti
+718	Suburb Casalotti
+719	Suburb Casalotti
+720	Suburb Casalotti
+721	Suburb Casalotti
+722	Suburb Casalotti
+723	Suburb Casalotti
+724	Suburb Casalotti
+725	Suburb Casalotti
+726	Suburb Casalotti
+727	Suburb Casalotti
+728	Suburb Casalotti
+729	Suburb Ottavia
+730	Suburb Montespaccato
+731	Post Code 00166
+732	Suburb Casalotti
+733	Suburb Montespaccato
+734	Suburb Montespaccato
+735	Suburb Montespaccato
+736	Suburb Montespaccato
+737	Suburb Montespaccato
+738	Suburb Montespaccato
+739	Suburb Montespaccato
+740	Suburb Ottavia
+741	Suburb Primavalle
+742	Suburb Montespaccato
+743	Suburb Primavalle
+744	Suburb Primavalle
+745	Suburb Primavalle
+746	Suburb Primavalle
+747	Suburb Trionfale
+748	Suburb Primavalle
+749	Suburb Primavalle
+750	Suburb Montespaccato
+751	Suburb Montespaccato
+752	Suburb Primavalle
+753	Suburb Trionfale
+754	Suburb Aurelio
+755	Suburb Aurelio
+756	Suburb Trionfale
+757	Suburb Trionfale
+758	Suburb Trionfale
+759	Suburb Trionfale
+760	Post Code 00195
+761	Post Code 00195
+762	Suburb Trionfale
+763	Post Code 00195
+764	Post Code 00195
+765	Suburb Prati
+766	Suburb Prati
+767	Suburb Trionfale
+768	Suburb Trionfale
+769	Suburb Aurelio
+770	Suburb Aurelio
+771	Suburb Borgo
+772	Suburb Borgo
+773	Suburb Prati
+774	Suburb Borgo
+775	Suburb Prati
+776	Suburb Borgo
+777	Post Code 00120
+778	Post Code 00120
+779	Post Code 00120
+780	Post Code 00120
+781	Suburb Borgo
+782	Post Code 00120
+783	Post Code 00120
+784	Suburb Flaminio
+785	Suburb Flaminio
+786	Suburb Flaminio
+787	Suburb Flaminio
+788	Suburb Flaminio
+789	Post Code 00195
+790	Post Code 00195
+791	Suburb Prati
+792	Suburb Prati
+793	Post Code 00196
+794	Suburb Parioli
+795	Suburb Parioli
+796	Suburb Parioli
+797	Suburb Pinciano
+798	Suburb Prati
+799	Suburb Prati
+800	Suburb Prati
+801	Suburb Prati
+802	Suburb Prati
+803	Post Code 00196
+804	Suburb Campo Marzio
+805	Suburb Campo Marzio
+806	Suburb Borgo
+807	Suburb Prati
+808	Suburb Borgo
+809	Suburb Borgo
+810	Suburb Campo Marzio
+811	Suburb Campo Marzio
+812	Suburb Parione
+813	Suburb Ponte
+814	Post Code 00196
+815	Post Code 00197
+816	Suburb Campo Marzio
+817	Suburb Campo Marzio
+818	Suburb Pinciano
+819	Suburb Pinciano
+820	Post Code 00197
+821	Suburb Ludovisi
+822	Suburb Campo Marzio
+823	Suburb Colonna
+824	Suburb Colonna
+825	Suburb Colonna
+826	Suburb Trevi
+827	Suburb Ludovisi
+828	Suburb Trevi
+829	Suburb Trevi
+830	Suburb Parioli
+831	Suburb Trieste
+832	Suburb Pinciano
+833	Suburb Salario
+834	Suburb Pinciano
+835	Suburb Salario
+836	Suburb Salario
+837	Suburb Trieste
+838	Suburb Trieste
+839	Suburb Trieste
+840	Suburb Trieste
+841	Suburb Salario
+842	Suburb Nomentano
+843	Suburb Nomentano
+844	Suburb Pinciano
+845	Suburb Salario
+846	Suburb Salario
+847	Suburb Salario
+848	Suburb Salario
+849	Suburb Ludovisi
+850	Suburb Sallustiano
+851	Suburb Sallustiano
+852	Suburb Sallustiano
+853	Suburb Castro Pretorio
+854	Suburb Castro Pretorio
+855	Suburb Castro Pretorio
+856	Suburb Castro Pretorio
+857	Suburb Salario
+858	Suburb Nomentano
+859	Suburb Salario
+860	Suburb Nomentano
+861	Suburb Nomentano
+862	Suburb Nomentano
+863	Suburb Nomentano
+864	Suburb Nomentano
+865	Post Code 00185
+866	Suburb Nomentano
+867	Suburb Tiburtino
+868	Suburb Tiburtino
+869	Suburb Tiburtino
+870	Suburb Trieste
+871	Suburb Pietralata
+872	Suburb Nomentano
+873	Suburb Pietralata
+874	Suburb Pietralata
+875	Suburb Pietralata
+876	Suburb Pietralata
+877	Suburb Pietralata
+878	Suburb Nomentano
+879	Suburb Nomentano
+880	Suburb Nomentano
+881	Suburb Tiburtino
+882	Suburb Nomentano
+883	Suburb Pietralata
+884	Suburb Tiburtino
+885	Post Code 00162
+886	Suburb Tiburtino
+887	Suburb Tiburtino
+888	Suburb Tiburtino
+889	Suburb Tiburtino
+890	Suburb Tiburtino
+891	Suburb Tiburtino
+892	Suburb Tiburtino
+893	Post Code 00159
+894	Suburb Pietralata
+895	Suburb Pietralata
+896	Suburb Collatino
+897	Suburb Collatino
+898	Suburb Pietralata
+899	Suburb Ponte Mammolo
+900	Suburb Pietralata
+901	Suburb Pietralata
+902	Suburb Pietralata
+903	Suburb Pietralata
+904	Suburb Pietralata
+905	Suburb Ponte Mammolo
+906	Suburb Tor Cervara
+907	Suburb Ponte Mammolo
+908	Suburb Tor Cervara
+909	Suburb Collatino
+910	Suburb Tor Cervara
+911	Suburb Tor Cervara
+912	Suburb Collatino
+913	Suburb Collatino
+914	Suburb Collatino
+915	Suburb Collatino
+916	Suburb Collatino
+917	Suburb Collatino
+918	Suburb Collatino
+919	Suburb Collatino
+920	Suburb Tor Cervara
+921	Suburb Collatino
+922	Suburb Collatino
+923	Suburb Tor Cervara
+924	Suburb Tor Cervara
+925	Suburb Tor Cervara
+926	Suburb Tor Cervara
+927	Post Code 00115
+928	Suburb Tor Cervara
+929	Suburb Tor Sapienza
+930	Suburb Tor Sapienza
+931	Suburb Tor Sapienza
+932	Suburb Tor Sapienza
+933	Suburb Tor Sapienza
+934	Suburb Tor Sapienza
+935	Suburb Tor Sapienza
+936	Suburb Settecamini
+937	Suburb Settecamini
+938	Suburb La Rustica
+939	Post Code 00115
+940	Suburb Settecamini
+941	Suburb Settecamini
+942	Suburb Settecamini
+943	Suburb Acqua Vergine
+944	Suburb La Rustica
+945	Suburb Tor Sapienza
+946	Suburb La Rustica
+947	Suburb Acqua Vergine
+948	Suburb Acqua Vergine
+949	Suburb Ponte di Nona
+950	Suburb Lunghezza
+951	Suburb Valle di Castiglione
+952	Post Code 2378
+953	Road Via dell'Arrone
+954	Suburb Selva Nera
+955	Suburb Selva Nera
+956	Suburb Selva Nera
+957	Suburb Selva Nera
+958	Suburb Selva Nera
+959	Suburb Selva Nera
+960	Suburb Selva Nera
+961	Suburb Selva Nera
+962	Suburb Selva Nera
+963	Suburb Ottavia
+964	Suburb Selva Nera
+965	Suburb Selva Nera
+966	Suburb Ottavia
+967	Suburb Ottavia
+968	Suburb Ottavia
+969	Suburb Ottavia
+970	Suburb Selva Nera
+971	Suburb Selva Nera
+972	Suburb Selva Nera
+973	Suburb Selva Nera
+974	Suburb Ottavia
+975	Suburb Ottavia
+976	Suburb Ottavia
+977	Suburb Ottavia
+978	Suburb Ottavia
+979	Suburb Ottavia
+980	Suburb Ottavia
+981	Suburb Ottavia
+982	Suburb Ottavia
+983	Suburb Ottavia
+984	Suburb Ottavia
+985	Suburb Trionfale
+986	Suburb Primavalle
+987	Suburb Primavalle
+988	Suburb Trionfale
+989	Suburb Primavalle
+990	Suburb Trionfale
+991	Suburb Tomba di Nerone
+992	Suburb Tomba di Nerone
+993	Suburb Tor di Quinto
+994	Suburb Della Vittoria
+995	Suburb Della Vittoria
+996	Suburb Trionfale
+997	Suburb Trionfale
+998	Suburb Trionfale
+999	Suburb Trionfale
+1000	Suburb Della Vittoria
+1001	Suburb Della Vittoria
+1002	Suburb Della Vittoria
+1003	Suburb Della Vittoria
+1004	Suburb Tor di Quinto
+1005	Suburb Tor di Quinto
+1006	Suburb Tor di Quinto
+1007	Suburb Tor di Quinto
+1008	Suburb Tor di Quinto
+1009	Suburb Tor di Quinto
+1010	Suburb Tor di Quinto
+1011	Suburb Tor di Quinto
+1012	Suburb Tor di Quinto
+1013	Suburb Tor di Quinto
+1014	Suburb Della Vittoria
+1015	Suburb Della Vittoria
+1016	Suburb Della Vittoria
+1017	Suburb Flaminio
+1018	Suburb Flaminio
+1019	Suburb Flaminio
+1020	Suburb Flaminio
+1021	Suburb Flaminio
+1022	Suburb Tor di Quinto
+1023	Suburb Tor di Quinto
+1024	Suburb Parioli
+1025	Suburb Parioli
+1026	Suburb Val Melaina
+1027	Suburb Val Melaina
+1028	Suburb Val Melaina
+1029	Suburb Val Melaina
+1030	Suburb Val Melaina
+1031	Suburb Parioli
+1032	Suburb Parioli
+1033	Suburb Parioli
+1034	Suburb Trieste
+1035	Suburb Val Melaina
+1036	Suburb Monte Sacro
+1037	Suburb Trieste
+1038	Suburb Trieste
+1039	Suburb Val Melaina
+1040	Suburb Val Melaina
+1041	Suburb Val Melaina
+1042	Suburb Monte Sacro
+1043	Suburb Monte Sacro Alto
+1044	Suburb Monte Sacro Alto
+1045	Suburb Monte Sacro
+1046	Suburb Monte Sacro Alto
+1047	Suburb Monte Sacro
+1048	Suburb Monte Sacro
+1049	Suburb Monte Sacro
+1050	Suburb Monte Sacro
+1051	Suburb Trieste
+1052	Suburb Monte Sacro
+1053	Suburb Monte Sacro
+1054	Suburb Monte Sacro
+1055	Suburb Monte Sacro Alto
+1056	Suburb Monte Sacro
+1057	Suburb Pietralata
+1058	Suburb Casal Boccone
+1059	Suburb Casal Boccone
+1060	Suburb Monte Sacro Alto
+1061	Suburb Monte Sacro Alto
+1062	Suburb San Basilio
+1063	Suburb Monte Sacro Alto
+1064	Suburb Ponte Mammolo
+1065	Suburb Ponte Mammolo
+1066	Suburb Ponte Mammolo
+1067	Suburb Ponte Mammolo
+1068	Suburb San Basilio
+1069	Suburb Ponte Mammolo
+1070	Suburb Ponte Mammolo
+1071	Suburb San Basilio
+1072	Suburb San Basilio
+1073	Suburb San Basilio
+1074	Suburb San Basilio
+1075	Suburb San Basilio
+1076	Suburb San Basilio
+1077	Suburb San Basilio
+1078	Suburb Settecamini
+1079	Suburb San Basilio
+1080	Suburb San Basilio
+1081	Suburb Tor Cervara
+1082	Suburb Tor Cervara
+1083	Suburb San Basilio
+1084	Suburb San Basilio
+1085	Suburb Tor Cervara
+1086	Suburb Settecamini
+1087	Suburb Settecamini
+1088	Post Code 00115
+1089	Suburb Settecamini
+1090	Suburb Settecamini
+1091	Suburb Settecamini
+1092	Suburb Settecamini
+1093	Suburb Settecamini
+1094	Suburb Settecamini
+1095	Suburb Settecamini
+1096	Suburb Settecamini
+1097	Suburb Setteville Nord
+1098	Suburb Marco Simone
+1099	Suburb Case Rosse
+1100	Post Code 00115
+1101	Suburb Marco Simone
+1102	Post Code 00012
+1103	Suburb Tragliatella
+1104	City District Municipio Roma XIV
+1105	City District Municipio Roma XIV
+1106	Post Code 00123
+1107	Suburb Selva Nera
+1108	Suburb Selva Nera
+1109	Suburb Selva Nera
+1110	Suburb Selva Nera
+1111	Suburb Ottavia
+1112	Suburb Selva Nera
+1113	Suburb Ottavia
+1114	Suburb La Storta
+1115	Suburb Tomba di Nerone
+1116	Suburb Ottavia
+1117	Suburb Tomba di Nerone
+1118	Suburb Tomba di Nerone
+1119	Suburb Ottavia
+1120	Suburb Tomba di Nerone
+1121	Suburb Ottavia
+1122	Suburb Ottavia
+1123	Suburb Tomba di Nerone
+1124	Suburb Tomba di Nerone
+1125	Suburb Tomba di Nerone
+1126	Suburb Tomba di Nerone
+1127	Suburb Tomba di Nerone
+1128	Suburb Ottavia
+1129	Suburb Tomba di Nerone
+1130	Suburb Tomba di Nerone
+1131	Suburb Tomba di Nerone
+1132	Suburb Tomba di Nerone
+1133	Suburb Tomba di Nerone
+1134	Suburb Grottarossa
+1135	Suburb Labaro
+1136	Suburb Tomba di Nerone
+1137	Suburb Grottarossa
+1138	Suburb Labaro
+1139	Suburb Grottarossa
+1140	Suburb Grottarossa
+1141	Suburb Grottarossa
+1142	Suburb Tor di Quinto
+1143	Suburb Grottarossa
+1144	Suburb Grottarossa
+1145	Suburb Tor di Quinto
+1146	Suburb Grottarossa
+1147	Suburb Labaro
+1148	Suburb Labaro
+1149	Suburb Grottarossa
+1150	Suburb Grottarossa
+1151	Suburb Castel Giubileo
+1152	Suburb Grottarossa
+1153	Suburb Grottarossa
+1154	Suburb Castel Giubileo
+1155	Suburb Colle Salario
+1156	Suburb Colle Salario
+1157	Suburb Colle Salario
+1158	Suburb Grottarossa
+1159	Suburb Colle Salario
+1160	Suburb Grottarossa
+1161	Suburb Grottarossa
+1162	Suburb Colle Salario
+1163	Suburb Colle Salario
+1164	Suburb Val Melaina
+1165	Suburb Val Melaina
+1166	Suburb Porta di Roma
+1167	Suburb Porta di Roma
+1168	Suburb Colle Salario
+1169	Suburb Porta di Roma
+1170	Suburb Porta di Roma
+1171	Suburb Porta di Roma
+1172	Suburb Porta di Roma
+1173	Suburb Porta di Roma
+1174	Suburb Porta di Roma
+1175	Suburb Porta di Roma
+1176	Suburb Val Melaina
+1177	Suburb Porta di Roma
+1178	Suburb Porta di Roma
+1179	Suburb Porta di Roma
+1180	Suburb Porta di Roma
+1181	Suburb Porta di Roma
+1182	Suburb Porta di Roma
+1183	Suburb Porta di Roma
+1184	Suburb Casal Boccone
+1185	Suburb Marcigliana
+1186	Suburb Marcigliana
+1187	Suburb Porta di Roma
+1188	Suburb Casal Boccone
+1189	Suburb Casal Boccone
+1190	Suburb Casal Boccone
+1191	Suburb Casal Boccone
+1192	Suburb Casal Boccone
+1193	Suburb Casal Boccone
+1194	Suburb Casal Boccone
+1195	Suburb Casal Boccone
+1196	Suburb Valle dei Corsi
+1197	Suburb Casal Boccone
+1198	Suburb San Basilio
+1199	Suburb Colleverde
+1200	Post Code 00013
+1201	Post Code 00013
+1202	Suburb Colleverde
+1203	Suburb Parco Azzurro
+1204	City District Municipio Roma IV
+1205	Suburb Colle Laghetto
+1206	Post Code 00013
+1207	Post Code 00013
+1208	Suburb Colle Laghetto
+1209	Suburb Marco Simone
+1210	Suburb Marco Simone
+1211	Suburb La Pietrara
+1212	Suburb Tragliatella
+1213	City District Municipio Roma XIV
+1214	Suburb La Storta
+1215	Post Code 00123
+1216	Suburb La Storta
+1217	Suburb La Storta
+1218	Post Code 00123
+1219	Suburb La Storta
+1220	Suburb Tomba di Nerone
+1221	Suburb Valle Muricana
+1222	Suburb Valle Muricana
+1223	Suburb Tomba di Nerone
+1224	Suburb Tomba di Nerone
+1225	Suburb Valle Muricana
+1226	Suburb Prima Porta
+1227	Suburb Prima Porta
+1228	Suburb Prima Porta
+1229	Suburb Labaro
+1230	Suburb Labaro
+1231	Suburb Labaro
+1232	Suburb Prima Porta
+1233	Suburb Castel Giubileo
+1234	Suburb Labaro
+1235	Suburb Labaro
+1236	Suburb Labaro
+1237	Suburb Castel Giubileo
+1238	Suburb Castel Giubileo
+1239	Suburb Marcigliana
+1240	Suburb Marcigliana
+1241	Suburb Valle dei Corsi
+1242	Suburb Tor Lupara
+1243	Suburb Tor Lupara
+1244	Suburb Tor Lupara
+1245	Suburb Tor Lupara
+1246	Suburb Valle dei Corsi
+1247	Suburb Tor Lupara
+1248	Suburb Tor Lupara
+1249	Post Code 00013
+1250	Suburb La Pietrara
+1251	Post Code 00012
+1252	Suburb Tragliatella
+1253	Suburb Osteria Nuova
+1254	Suburb Osteria Nuova
+1255	Suburb Olgiata
+1256	Suburb Olgiata
+1257	Suburb Olgiata
+1258	Suburb Valle Muricana
+1259	Suburb Valle Muricana
+1260	Suburb Valle Muricana
+1261	Suburb Marcigliana
+1262	Suburb Marcigliana
+1263	City District Municipio Roma III
+1264	Suburb Monte San Salvatore
+1265	Suburb Immaginella
+1266	Post Code 00013
+1267	Road Via Roma
