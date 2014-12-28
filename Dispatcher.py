@@ -41,9 +41,9 @@ class DispatcherThread(Thread):
 					message["last"] = True
 
 				queue = self._broker.get_message_queue(r_id)
-				queue.put(message)
-
-				self._queue.delete_message(raw_message)
+				if queue != None:
+					queue.put(message)
+					self._queue.delete_message(raw_message)
 
 
 
