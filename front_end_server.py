@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import os, sys, time, json, itertools, ConfigParser
+import os, sys, time, json, itertools, ConfigParser, re
 from bcrypt import hashpw, gensalt
 
 from boto.sqs.message import Message
@@ -9,7 +9,7 @@ import boto.sqs as sqs
 from boto.dynamodb2.table import Table
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './backend_server')))
-from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest # @UnresolvedImport
+from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest, subscribeEmailNotification # @UnresolvedImport
 
 from multiprocessing.pool import Pool, ThreadPool
 from DispatcherBroker import DispatcherBroker
@@ -133,6 +133,7 @@ class LoginHandler(MyHandler):
 			passw = user.get('user_password')
 			if hashpw(password, passw) == passw: #se le password coincidono autentica l'utente con un cookie
 				self.set_secure_cookie("username", user.get('user_username'))
+				self.set_secure_cookie("email", user.get('user_email'))
 				self.set_flash_message("login_msg", "")
 				return
 			else:
@@ -155,11 +156,59 @@ class LogoutHandler(MyHandler):
 	def get(self):
 
 		self.clear_cookie("username")
+		self.clear_cookie("email")
 		self.redirect("/")
 
 	def post(self):
 
 		self.redirect("/")
+
+'''Handler per il processamento delle richieste di sottoscrizione ad uno o più quadranti'''
+
+class QuadrantsSubscriptionHandler(MyHandler):
+
+	def initialize(self, subs_requests_queue):
+
+		self.__subs_requests_queue = subs_requests_queue
+
+	def get(self):
+
+		self.redirect("/")
+
+	@tornado.web.asynchronous
+	def post(self):
+
+		quadrants = self.get_arguments("quadrants")
+		pool = ThreadPool(processes=1)
+		pool.apply_async(self.__write_subscriptions, args=(quadrants, ), callback=self.__onfinish)
+		pool.close
+
+	def __write_subscriptions(self, quadrants):
+
+		print quadrants
+		quadrants = self.__validate_input(quadrants)
+		print quadrants
+		user_email = self.get_secure_cookie("email")
+		for quadrant in quadrants:
+			subscription = subscribeEmailNotification(quadrant, user_email)
+			print subscription
+			msg = Message()
+			msg.set_body(subscription)
+			self.__subs_requests_queue.write(msg)
+		return
+
+	def __validate_input(self, quadrants):
+
+		return [int(q) for q in quadrants if re.match("^\d+$", q)]
+
+	def __onfinish(self, result):
+
+		self.write(json.dumps("success"))
+		self.finish()
+
+
+
+
 
 '''Handler per la gestione delle richieste riguardanti la mappa, lo scambio di messaggi req/resp avviene su una websocket'''
 
@@ -308,6 +357,7 @@ def initialize(sqs_conn, user_table, settings):
   	
 	sqs_queues = {}
 	request_queue = sqs.get_queue(settings['request_queue'])
+	notification_queue = sqs.get_queue(settings['notification_queue'])
 	dispatcher = DispatcherBroker(int(settings['dispatcher_threads']), settings['response_queue'], settings['zone'])
 	quadrantslist = openQuadrantsList(settings['quadrants_list_path'])
 
@@ -318,7 +368,8 @@ def initialize(sqs_conn, user_table, settings):
 		(r'/map', MapHandler, dict(sqs_conn=sqs, request_queue=request_queue, dispatcher=dispatcher, quadrantslist=quadrantslist, pool=pool, settings=settings)),
 		(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'], table=user_table)),
 		(r'/login', LoginHandler, dict(table=user_table)),
-		(r'/logout', LogoutHandler)], 
+		(r'/logout', LogoutHandler),
+		(r'/subsquadrants', QuadrantsSubscriptionHandler, dict(subs_requests_queue=notification_queue))], 
 		template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,
 		xsrf_cookies=True,
 		cookie_secret="l/4VqtnPR3Wv08iW5cX9UR+t7Prkekxuq82yjZn5eDc=")

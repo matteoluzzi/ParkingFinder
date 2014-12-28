@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="{{ static_url("bootstrap-tagsinput.css") }}">
         <link rel="stylesheet" type="text/css" href="{{ static_url("map.css") }}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
@@ -12,6 +13,7 @@
         <script type="text/javascript" src="{{ static_url("map.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("utils.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("websocketHandler.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("bootstrap-tagsinput.js") }}"></script>
          <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
             <!--[if lt IE 9]>
               <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -95,30 +97,54 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
-                <div id="left-column"> 
-                    <div class="well">
-                        <h3>Pannello utente</h3>
-                        {% if current_user %}
-                        <h2>Benvenuto {{ current_user }}</h>
-                        {% end %}
-                        <p>
-                            <input class='form-control' id='search_address' placeholder='Inserisici un indirizzo' type='text' />
-                        </p>
-                        <p>
-                            <button type='button' id='search_button' class="btn btn-primary btn-lg">
-                                Cerca
-                            </button>
-                            <button type='button' id='reset_button' class='btn btn-default btn-lg'>
-                                Reset
-                            </button>
-                        </p>
-                    </div>
+                    <div id="left-column"> 
+                        <div class="well" id="pannelloUtente">
+                            {% if current_user %}
+                            <h2>Benvenuto {{ current_user }}</h2>
+                            {% else %}
+                            <h2>Pannello utente</h2>
+                            {% end %}
 
+                                <br><br>
+                                <p>
+                                    <input class='form-control' id='search_address' placeholder='Inserisici un indirizzo' type='text' />
+                                </p>
+                                <p>
+                                    <button type='button' id='search_button' class="btn btn-primary btn-lg">
+                                        Cerca
+                                    </button>
+                                    <button type='button' id='reset_button' class='btn btn-default btn-lg'>
+                                        Reset
+                                    </button>
+                                </p>
+                                {% if current_user %}
+                                    <h3>Rimani aggiornato sullo stato dei quadranti</h3>
+                                    <label for="enable_selection">Abilita la selezione dei quadranti</label>
+                                    <input type="checkbox" id="enable_selection">
+                                <p>
+                                    <input type="text" id="subsquadrants" data-role="tagsinput" readonly />
+
+                                </p>
+                                <p>
+                                    <button type='button' id='subs_button' class="btn btn-primary btn-lg">
+                                    Invia
+                                    </button>
+                                    <button type='button' id='delete_subs_button' class='btn btn-default btn-lg'>
+                                    Cancella selezionati
+                                    </button>
+                                </p>
+
+
+                            {% end %}
+                        </div>
+
+                    </div>
+                
+                    
                 </div>
-            </div>
-            <div class="col-md-8">
-                <div id="map"></div>
-            </div> 
+                <div class="col-md-8">
+                    <div id="map"></div>
+                </div> 
             </div>                  
         </div> <!-- end container-fluid -->
 
@@ -148,6 +174,46 @@
             get_my_position(function(center) {
                 centerMap(center);
             });
+        });
+
+        $('#enable_selection').click(function()
+        {
+            if($('#enable_selection').is(':checked'))
+            {
+                //console.log(window.polygonArray);
+                var i = window.polygonArray.length;
+                while(i--)
+                {
+                    polygon = window.polygonArray[i].polygon;
+                    polygon.setOptions({map: window.map, strokeColor : "#000000", visible : true});
+                    google.maps.event.addListener(window.polygonArray[i].polygon, 'click', function()
+                        {   
+                            $('#subsquadrants').tagsinput("add", this.ID);
+                        });
+                }
+            }
+            else
+            {
+                var i = window.polygonArray.length;
+                while(i--)
+                {
+                    polygon = window.polygonArray[i].polygon;
+                    polygon.setOptions({strokeColor : "#FFFFFF"});
+                    google.maps.event.clearInstanceListeners(polygon);
+                }
+            }
+        });
+
+        $('#subs_button').click(function() 
+        {
+            var subs_quadrants = $('#subsquadrants').tagsinput('items');
+            sendSubscribedQuadrants(subs_quadrants, "{{feAddress}}", "{{fePort}}");
+            $('#delete_subs_button').click();  
+        });
+
+        $('#delete_subs_button').click(function()
+        {
+            $('#subsquadrants').tagsinput('removeAll');
         });
 
         function validatePasswords()

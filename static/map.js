@@ -89,6 +89,39 @@ function sendMapMessage(ws, quadrants)
 
 };
 
+function sendSubscribedQuadrants(data, feAddress, fePort)
+{
+	if(data.length > 0)
+	{
+		json_data = $.param({quadrants : data, _xsrf : getCookie("_xsrf")}, true);
+		console.log(json_data);
+		$.ajax({
+			type : "POST",
+			url : "http://" +feAddress + ":" + fePort + "/subsquadrants" ,
+			data : json_data,
+			dataType: "json",
+			success : function(result) {
+				console.log("success");
+				var div = $('<div class="form-control" style="margin-top: 8px;border:none;background-color: transparent" />');
+				div.text("Richiesta inviata con successo, controllare l'email per la conferma");
+				$('#pannelloUtente').append(div);
+
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				console.log("error");
+				var div = $('<div class="form-control" style="margin-top: 8px;border:none" />');
+				div.text("Errore durante il processamento della richiesta, riprovare");
+				$('#pannelloUtente').append(div);
+			}
+		});
+	}
+}
+
+function getCookie(name) {
+var c = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+return c ? c[1] : undefined;
+}
+
 
 function colorPolygon(data, quadrants) 
 {

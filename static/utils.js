@@ -3,43 +3,48 @@ function parseQuadrantList(list)
 
 	lines = list.split("\n");
 	quadrants = new Array();
-
+	window.polygonArray = [];
 
 	for (var index = 0; index < lines.length; index++)
 	{
 		var quadrant = {};
-		var line_arr = lines[index].split("#");
-		quadrant.id = parseInt(line_arr.splice(0, 1)[0]);
-		var NW, NE, SW, SE;
-		var coordinates = new google.maps.LatLngBounds();
-		for(var i = 0; i < line_arr.length; i++)
+		if (lines[index].length > 0)
 		{
-			var point_arr = line_arr[i].split("|");
-			switch (i) {
-				case 0:
-					NW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.extend(NW);
-					break;
-				case 1:
-					NE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.extend(NE);
-					break;
-				case 2:
-					SW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.extend(SW);
-					break;
-				case 3:
-					SE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
-					coordinates.extend(SE);
-					break;
+			var line_arr = lines[index].split("#");
+			var id = parseInt(line_arr.splice(0, 1)[0]);
+			quadrant.id = id;
+			var NW, NE, SW, SE;
+			var coordinates = new google.maps.LatLngBounds();
+			for(var i = 0; i < line_arr.length; i++)
+			{
+				var point_arr = line_arr[i].split("|");
+				switch (i) {
+					case 0:
+						NW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+						coordinates.extend(NW);
+						break;
+					case 1:
+						NE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+						coordinates.extend(NE);
+						break;
+					case 2:
+						SW = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+						coordinates.extend(SW);
+						break;
+					case 3:
+						SE = new google.maps.LatLng(parseFloat(point_arr[0]), parseFloat(point_arr[1]));
+						coordinates.extend(SE);
+						break;
+				}
 			}
-		}
-		
 			quadrant.polygon = new google.maps.Rectangle({
 			bounds: coordinates,
-
-		});
-		quadrants.push(quadrant);
+			});
+			quadrant.polygon.ID = id; 
+			window.polygonArray.push(quadrant);
+			quadrants.push(quadrant);
+		}
+		
 	}
 	return quadrants;
 };
