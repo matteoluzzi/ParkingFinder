@@ -11,6 +11,7 @@ class NotificationServer(threading.Thread):
 	topics			=	{}
 	snsRegion		=	0
 	settingsHandler	=	0
+	androidPlatformApplication	=	0
 	def __init__(self):	
 		threading.Thread.__init__(self)
 		self.settingsHandler		=	settings.Settings("testimp.txt")
@@ -26,6 +27,8 @@ class NotificationServer(threading.Thread):
 			if myTopic:
 				self.topics[str(counter)] 	=	myTopic
 			counter	=	counter	+	1
+		androidPlatformApplication	=	self.snsConnection.list_platform_applications()
+		print "NotificationServer.py lista application platform "+str(androidPlatformApplication)
 			
 	def run(self):
 		print "inizio thread"
