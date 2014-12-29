@@ -11,5 +11,6 @@ rangeEnd#180
 awsRegion#eu-west-1
 nQuadrants#1267
 notificationFreq#600
+apparn#arn:aws:sns:eu-west-1:738106480252:app/GCM/APPosto
 cacheurl#appostocache2.ndaqz6.cfg.euw1.cache.amazonaws.com:11211
 cache2url#apposto2.ndaqz6.cfg.euw1.cache.amazonaws.com:11211

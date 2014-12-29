@@ -48,6 +48,11 @@ def subscribeEmailNotification(quadrantId,mailAddress):
 	data		=	{"type":"emailSubscribe" , "quadrantID":str(quadrantId) ,"address":str(mailAddress)}
 	data_string	=	json.dumps(data)
 	return data_string
+	
+def subscribeAndroidNotification(quadrantId,token):
+	data		=	{"type":"androidSubscribe" , "quadrantID":str(quadrantId) ,"token":str(token)}
+	data_string	=	json.dumps(data)
+	return data_string
 
 testa	=	sendNotificationForQuadrant(88,"oggetto","trimone")
 testb	=	subscribeEmailNotification(88,"paride.casulli@gmail.com")
