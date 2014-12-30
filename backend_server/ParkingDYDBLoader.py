@@ -119,7 +119,7 @@ class ParkingDYDBLoader:
 				if(self.cache==True):
 					print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
-						parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)

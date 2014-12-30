@@ -54,7 +54,8 @@ class Quadrant:
 		return aList
 	
 	def getPercentageFreeParkings(self):
-		if int(self.getNumberOfParkings())==0:
+		nparkings	=	self.getNumberOfParkings()
+		if int(nparkings)==0:
 			return 0
 		startTime	=	float(tm.time())
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
@@ -70,9 +71,10 @@ class Quadrant:
 			self.updater.batchUpdate(parkingList)
 			for item in parkingList:
 				state	=	item.getStatus()
-				print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)+" "+item.timestamp
+				print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)+" timestamp "+str(item.timestamp)
 				if str(state)=="E":
 					free	=	free+1
+			print "Quadrant.py state of quadrant: free "+str(free)+" total "+str(nparkings)
 			perc	=	(free/len(self.parklist))*100
 			self.updater.setUtilizationPercentage(self,perc)
 			return perc

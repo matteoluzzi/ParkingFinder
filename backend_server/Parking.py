@@ -1,5 +1,5 @@
 import json
-import time.time()
+import time
 class Parking:
 	__parkid	=	0
 	__latitude	=	0
