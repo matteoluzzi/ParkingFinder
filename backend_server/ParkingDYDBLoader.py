@@ -28,7 +28,7 @@ class ParkingDYDBLoader:
 		self.cache		=	enableCache
 		self.cexpire	=	cacheExpireTime
 		self.qexpire	=	queryCacheExpire
-		self.hit			=	0
+		self.qhit			=	0
 		self.qmiss			=	0
 		self.phit			=	0
 		self.pmiss			=	0
@@ -50,18 +50,18 @@ class ParkingDYDBLoader:
 		if(not unposto):	#if I have cache miss retreive from DYDB
 			try:
 				unposto	= self.table.get_item(aParking.getId())
-				#print "ParkingDYDBLoader.py POSTO CACHE MISS"
+				print "ParkingDYDBLoader.py POSTO CACHE MISS"
 				self.pmiss	=	self.pmiss+1
-				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit"+str(self.qhit)
+				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 				if(self.cache==True):
 					self.cacheClient.setValue(str(aParking.getId()),unposto,int(self.cexpire))
 			except Exception:
 				print "error with DYNAMO DB"
 				return -1
 		else: 
-			#print "ParkingDYDBLoader.py POSTO CACHE HIT"
+			print "ParkingDYDBLoader.py POSTO CACHE HIT"
 			self.phit	=	self.phit+1
-			print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit"+str(self.qhit)
+			print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 		myParking	=	aParking
 		lat		=	unposto['latitudine']
 		lon		=	unposto['longitudine']
@@ -79,11 +79,11 @@ class ParkingDYDBLoader:
 			if not unastat:
 				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				self.qmiss	=	self.qmiss+1
-				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit"+str(self.qhit)
+				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 				return -1
 			else:
 				self.qhit	=	self.qhit+1
-				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit"+str(self.qhit)
+				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 			if unastat==101:	#test, probabilmente a memcached non piace lo 0
 				unastat = 0
 			print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
@@ -138,7 +138,7 @@ class ParkingDYDBLoader:
 				unposto	= self.cacheClient.getValue(str(parkId))
 				if not unposto:
 					self.pmiss	=	self.pmiss+1
-					print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit"+str(self.qhit)
+					print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 					parkingListDict[parkId]=item
 					idList.append(parkId)	
 				else:
@@ -147,8 +147,8 @@ class ParkingDYDBLoader:
 					state	=	unposto['stato']
 					extra	=	unposto['extra']
 					print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
-					self.pmiss	=	self.pmiss+1
-					print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit"+str(self.qhit)
+					self.pmiss	=	self.phit+1
+					print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 					item.updateStatus(lat,lon,state,extra)
 					 
 			else:
