@@ -23,7 +23,7 @@ class Quadrant:
 		self.SE	=	mySE
 		self.updater	=	myupdater
 		self.parklist	=	list()
-		self.overview_lock	=	threading.lock()
+		self.overview_lock	=	threading.Lock()
 
 	#def changeParkList(self,aList):
 	#	self.parklist	=	aList
