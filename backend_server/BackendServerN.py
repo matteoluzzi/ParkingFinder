@@ -19,12 +19,12 @@ class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow s
 		self.idList			=	myidList
 
 	def run(self):
-		for qitem in self.idList:
-			myQuadrant = self.quadrantlist.getQuadrantInstance(int(qitem))
-			print "Backendserver.py: prefetching quadrant "+str(myQuadrant.getID())
-			myQuadrant.getPercentageFreeParkings()
+		while(1>0):
+			for qitem in self.idList:
+				myQuadrant = self.quadrantlist.getQuadrantInstance(int(qitem))
+				print "Backendserver.py: prefetching quadrant "+str(myQuadrant.getID())
+				myQuadrant.getPercentageFreeParkings()
 			tm.sleep(self.wtime)
-		return 0
 
 class EndSlowStart(threading.Thread): #precarica i dati in fase di slow start
 	wtime		=	0
@@ -48,6 +48,7 @@ expiretime			=	int(settingsHandler.settings['cacheexpire'])
 queryexpire			=	int(settingsHandler.settings['queryexpire'])
 slowstart			=	int(settingsHandler.settings['slowstart'])		#slowstart duration
 myQuadrantsId		=	settingsHandler.settings['quadrants']
+nThreads			=	int(settingsHandler.settings['poolsize'])
 myQuadrantsRangeStart	=	-1
 cacheUrl		=	-1
 try:
@@ -98,7 +99,7 @@ try:
 	#anHandler.start()
 	endSlow	=	EndSlowStart(myDBLoader,slowstart,expiretime,queryexpire)
 	endSlow.start()
-	fetcher		=	QuadrantPrefetching(listaQuadranti,myQuadrantsId,int(0))
+	fetcher		=	QuadrantPrefetching(listaQuadranti,myQuadrantsId,queryexpire)
 	fetcher.start()
 	fetcher.join()
 except: 
@@ -108,7 +109,7 @@ endCreation = False
 threadCounter = 0
 print "BackendServer.py starting serving threads"
 #while endCreation==False:
-while threadCounter<100:
+while threadCounter<nThreads:
 	try:
 		anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader,threadCounter)
 		anHandler.start()

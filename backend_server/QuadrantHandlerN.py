@@ -52,8 +52,8 @@ class QuadrantHandler(threading.Thread):
 					aQuadrantID		=	myrequest[0]["quadrant"]
 					requestID		=	myrequest[0]["r_id"]
 					responseQueue	=	myrequest[0]["resp_queue"]
-					myTime	=	float(tm.time()) - float(startTime)
-					print "QuadrantHandler.py: "+str(self.threadID)+" obtanining quadrant in "+str(myTime)+" seconds"
+					#myTime	=	float(tm.time()) - float(startTime)
+					#print "QuadrantHandler.py: "+str(self.threadID)+" obtanining quadrant in "+str(myTime)+" seconds"
 					currentQuadrant	=	self.quadrants.getQuadrantInstance(int(aQuadrantID))
 					if currentQuadrant==-1:
 						print "wrong quadrant request "+str(aQuadrantID)+" quadrant not in list"
@@ -61,11 +61,11 @@ class QuadrantHandler(threading.Thread):
 						my_queue.delete_message(item)
 						rtype	=	myrequest[0]["type"]
 						if str(rtype)=="overview":
-							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: "+str(self.threadID)+" start query in "+str(myTime)+" seconds"
+							#myTime	=	float(tm.time()) - float(startTime)
+							#print "QuadrantHandler.py: "+str(self.threadID)+" start query in "+str(myTime)+" seconds"
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
-							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(myTime)+" seconds"
+							#myTime	=	float(tm.time()) - float(startTime)
+							#print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(myTime)+" seconds"
 							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
 							#print "Serving an overview request"
 							myResponse	=	jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID())
@@ -95,8 +95,8 @@ class QuadrantHandler(threading.Thread):
 							raise Exception("Unknown type request")
 						#CODICE DA TESTARE!!! (dovrebbe funzionare
 						if myResponse:
-							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: "+str(self.threadID)+" before connecting in "+str(myTime)+" seconds"
+							#myTime	=	float(tm.time()) - float(startTime)
+							#print "QuadrantHandler.py: "+str(self.threadID)+" before connecting in "+str(myTime)+" seconds"
 							my_resp_queue = conn.get_queue(str(responseQueue))
 							#print "Response queue" + str(my_queue)
 							while not my_resp_queue:
@@ -106,8 +106,8 @@ class QuadrantHandler(threading.Thread):
 								print "queue creation failed"
 							m = Message()
 							m.set_body(str(myResponse))
-							myTime	=	float(tm.time()) - float(startTime)
-							print "QuadrantHandler.py: "+str(self.threadID)+" going to send in "+str(myTime)+" seconds"
+							#myTime	=	float(tm.time()) - float(startTime)
+							#print "QuadrantHandler.py: "+str(self.threadID)+" going to send in "+str(myTime)+" seconds"
 							my_resp_queue.write(m)
 							startTime	=	float(tm.time()) - float(startTime)
 							print "QuadrantHandler.py: "+str(self.threadID)+" request served in "+str(startTime)+" seconds"
