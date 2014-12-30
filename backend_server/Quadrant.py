@@ -4,6 +4,7 @@ import json
 import Parking as pk
 import gc
 import time as tm
+import threading
 
 class Quadrant:
 	__qid	=	0
@@ -13,7 +14,7 @@ class Quadrant:
 	__SE	=	0
 	__parklist	=	0
 	updater	=	0
-	
+	overview_lock	=	0
 	def __init__(self,myid,myNW,myNE,mySW,mySE,myupdater=0):
 		self.qid	=	myid
 		self.NW	=	myNW
@@ -22,6 +23,7 @@ class Quadrant:
 		self.SE	=	mySE
 		self.updater	=	myupdater
 		self.parklist	=	list()
+		self.overview_lock	=	threading.lock()
 
 	#def changeParkList(self,aList):
 	#	self.parklist	=	aList
@@ -58,10 +60,12 @@ class Quadrant:
 		if int(nparkings)==0:
 			return 0
 		startTime	=	float(tm.time())
+		self.overview_lock.acquire()
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
 		myTime	=	float(tm.time()) - float(startTime)
 		if (int(cacheRis)>-1):
 			#print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)+" cache time access "+str(myTime)
+			self.overview_lock.release()
 			return cacheRis
 		else:
 			free	=	0
@@ -77,6 +81,7 @@ class Quadrant:
 			#print "Quadrant.py state of quadrant: free "+str(free)+" total "+str(nparkings)
 			perc	=	((float(free))/(float(len(self.parklist))))*100
 			self.updater.setUtilizationPercentage(self,perc)
+			self.overview_lock.release()
 			return perc
 		
 		
