@@ -45,7 +45,7 @@ class QuadrantHandler(threading.Thread):
 			myResponse 	=	""
 			for item in requests:
 				try:
-					startTime	=	tm.time()
+					startTime	=	int(tm.time())
 					#print "deleting "+str(item)
 					text	=	item.get_body()
 					myrequest =	json.loads(text)
@@ -109,7 +109,7 @@ class QuadrantHandler(threading.Thread):
 							#myTime	=	float(tm.time()) - float(startTime)
 							#print "QuadrantHandler.py: "+str(self.threadID)+" going to send in "+str(myTime)+" seconds"
 							my_resp_queue.write(m)
-							startTime	=	float(tm.time()) - float(startTime)
+							startTime	=	int(tm.time()) - int(startTime)
 							print "QuadrantHandler.py: "+str(self.threadID)+" request served in "+str(startTime)+" seconds"
 						else:
 							print "QuadrantHandler.py: error on request processing"
