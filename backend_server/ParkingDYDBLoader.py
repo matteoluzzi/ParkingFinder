@@ -42,22 +42,22 @@ class ParkingDYDBLoader:
 		if(not unposto):	#if I have cache miss retreive from DYDB
 			try:
 				unposto	= self.table.get_item(aParking.getId())
-				#print "CACHE MISS"
+				print "ParkingDYDBLoader.py POSTO CACHE MISS"
 				if(self.cache==True):
 					self.cacheClient.setValue(str(aParking.getId()),unposto,int(self.cexpire))
 			except Exception:
 				print "error with DYNAMO DB"
 				return -1
-		#else: 
-			#print "CACHE HIT"
+		else: 
+			print "ParkingDYDBLoader.py POSTO CACHE HIT"
 		myParking	=	aParking
 		lat		=	unposto['latitudine']
 		lon		=	unposto['longitudine']
 		state	=	unposto['stato']
 		extra	=	unposto['extra']
-		#print str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
+		print "ParkingDYDBLoader.py "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
 		myParking.updateStatus(lat,lon,state,extra)
-		#print "parking updated"
+		print "ParkingDYDBLoader.py parking updated"
 		return 0
 		
 	def getUtilizationPercentage(self,aQuadrant):
