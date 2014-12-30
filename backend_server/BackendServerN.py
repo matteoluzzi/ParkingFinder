@@ -106,6 +106,7 @@ except:
 	print traceback.format_exc()
 endCreation = False
 threadCounter = 0
+print "BackendServer.py starting serving threads"
 #while endCreation==False:
 while threadCounter<100:
 	try:
