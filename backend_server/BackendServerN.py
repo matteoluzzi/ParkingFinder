@@ -100,6 +100,7 @@ try:
 	endSlow.start()
 	fetcher		=	QuadrantPrefetching(listaQuadranti,myQuadrantsId,int(0))
 	fetcher.start()
+	fetcher.join()
 except: 
 	print "BackendServer.py error while starting threads"
 	print traceback.format_exc()

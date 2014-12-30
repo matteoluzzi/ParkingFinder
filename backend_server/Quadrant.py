@@ -61,20 +61,20 @@ class Quadrant:
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
 		myTime	=	float(tm.time()) - float(startTime)
 		if (int(cacheRis)>-1):
-			print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)+" cache time access "+str(myTime)
+			#print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)+" cache time access "+str(myTime)
 			return cacheRis
 		else:
 			free	=	0
 			#print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings())
-			print "Quadrant.py CACHE MISS"
+			#print "Quadrant.py CACHE MISS"
 			parkingList	=	self.getParkList() 
 			self.updater.batchUpdate(parkingList)
 			for item in parkingList:
 				state	=	item.getStatus()
-				print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)+" timestamp "+str(item.timestamp)
+				#print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)+" timestamp "+str(item.timestamp)
 				if str(state)=="E":
 					free	=	free+1
-			print "Quadrant.py state of quadrant: free "+str(free)+" total "+str(nparkings)
+			#print "Quadrant.py state of quadrant: free "+str(free)+" total "+str(nparkings)
 			perc	=	(free/len(self.parklist))*100
 			self.updater.setUtilizationPercentage(self,perc)
 			return perc
