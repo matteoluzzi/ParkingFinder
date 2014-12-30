@@ -50,7 +50,7 @@ class ParkingDYDBLoader:
 		if(not unposto):	#if I have cache miss retreive from DYDB
 			try:
 				unposto	= self.table.get_item(aParking.getId())
-				print "ParkingDYDBLoader.py POSTO CACHE MISS"
+				#print "ParkingDYDBLoader.py POSTO CACHE MISS"
 				self.pmiss	=	self.pmiss+1
 				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 				if(self.cache==True):
@@ -59,7 +59,7 @@ class ParkingDYDBLoader:
 				print "error with DYNAMO DB"
 				return -1
 		else: 
-			print "ParkingDYDBLoader.py POSTO CACHE HIT"
+			#print "ParkingDYDBLoader.py POSTO CACHE HIT"
 			self.phit	=	self.phit+1
 			print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 		myParking	=	aParking
@@ -77,16 +77,16 @@ class ParkingDYDBLoader:
 		if (self.cache==True):
 			unastat	=	self.cache2Client.getValue(str(quadrantID))
 			if not unastat:
-				print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
+				#print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				self.qmiss	=	self.qmiss+1
-				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 				return -1
 			else:
 				self.qhit	=	self.qhit+1
 				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 			if unastat==101:	#test, probabilmente a memcached non piace lo 0
 				unastat = 0
-			print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
+			#print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
 			return unastat
 		return -1
 		
@@ -97,7 +97,7 @@ class ParkingDYDBLoader:
 				if perc==0:
 					perc=101	#test, probabilmente a memcached non piace lo 0
 				res	=	self.cache2Client.setValue(str(quadrantID),perc,int(self.qexpire))
-				print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
+				#print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
 			
@@ -117,7 +117,7 @@ class ParkingDYDBLoader:
 				state	=	item['stato']
 				extra	=	item['extra']
 				if(self.cache==True):
-					print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
+					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
@@ -138,7 +138,7 @@ class ParkingDYDBLoader:
 				unposto	= self.cacheClient.getValue(str(parkId))
 				if not unposto:
 					self.pmiss	=	self.pmiss+1
-					print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+					#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 					parkingListDict[parkId]=item
 					idList.append(parkId)	
 				else:
@@ -156,7 +156,7 @@ class ParkingDYDBLoader:
 				idList.append(parkId)
 		if(len(idList)>0):
 			hundreds	=	int(len(idList)/100)+1
-			print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
+			#print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
 			iterations	=	range(hundreds)
 			counter		=	0
 			for item in iterations:
