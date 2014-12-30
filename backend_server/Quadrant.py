@@ -75,7 +75,7 @@ class Quadrant:
 				if str(state)=="E":
 					free	=	free+1
 			#print "Quadrant.py state of quadrant: free "+str(free)+" total "+str(nparkings)
-			perc	=	(free/len(self.parklist))*100
+			perc	=	((float(free))/(float(len(self.parklist))))*100
 			self.updater.setUtilizationPercentage(self,perc)
 			return perc
 		

@@ -94,7 +94,7 @@ class ParkingDYDBLoader:
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
 			try:
-				if perc==0:
+				if perc<1:
 					perc=101	#test, probabilmente a memcached non piace lo 0
 				res	=	self.cache2Client.setValue(str(quadrantID),str(perc),int(self.qexpire))
 				#print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
