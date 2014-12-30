@@ -119,11 +119,7 @@ class ParkingDYDBLoader:
 				if(self.cache==True):
 					print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
-					
-					test =	self.cache2Client.getValue(str(idp))
-					print "ParkingDYDBLoader.py: "+str(test)+" NON DEVE ESSERE NULL"
-					
-				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+						parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
@@ -150,9 +146,9 @@ class ParkingDYDBLoader:
 					lon		=	unposto['longitudine']
 					state	=	unposto['stato']
 					extra	=	unposto['extra']
-					print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
-					self.pmiss	=	self.phit+1
-					print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+					#print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
+					self.phit	=	self.phit+1
+					#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 					item.updateStatus(lat,lon,state,extra)
 					 
 			else:

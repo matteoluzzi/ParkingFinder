@@ -1,4 +1,5 @@
 import json
+import time.time()
 class Parking:
 	__parkid	=	0
 	__latitude	=	0
@@ -6,6 +7,7 @@ class Parking:
 	__status	=	0
 	__extra		=	0
 	__parkingUpdater=	0
+	timestamp	=	0
 
 	def __init__(self,my_id,updater=0,parkLatitude=0,parkLongitude=0):
 		self.parkid		=	my_id
@@ -14,7 +16,7 @@ class Parking:
 		self.longitude		=	parkLongitude
 		self.status			=	0
 		self.extra		=	0
-		
+		self.timestamp	=	-1	#timestamp ultimo update
 	#equivalent toString() on Java
 	def __str__(self):
 		return str(self.parkid)+" lat "+str(self.latitude)+" lon "+str(self.longitude)+" state "+str(self.status)+" extra "+str(self.extra) 
@@ -36,7 +38,8 @@ class Parking:
 		self.longitude	=	lon
 		self.status		=	state
 		self.extra		=	newextra
-	
+		self.timestamp	=	time.time()
+		
 	def getStatus(self):
 		return self.status
 	

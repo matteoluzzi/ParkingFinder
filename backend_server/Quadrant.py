@@ -70,7 +70,7 @@ class Quadrant:
 			self.updater.batchUpdate(parkingList)
 			for item in parkingList:
 				state	=	item.getStatus()
-				#print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)
+				print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)+" "+item.timestamp
 				if str(state)=="E":
 					free	=	free+1
 			perc	=	(free/len(self.parklist))*100
