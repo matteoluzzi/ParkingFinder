@@ -9,6 +9,7 @@ import JSONManager as jm
 import boto
 from boto.sqs.message import Message
 import json
+import time
 
 imp				=	settings.Settings("testimp.txt")
 print "connecting to "+str(imp.settings['SQSzone'])+"region"
@@ -31,8 +32,9 @@ while dest_queue == None:
 	if dest_queue==None:
 		print "queue creation failed"
 print "destination queue "+str(dest_queue)
-while (aCount<500):
-	testrequest	=	jm.createOverviewRequest(15,queueName,int((aCount%50)+1))
+timea	=	time.time()
+while (aCount<1000000):
+	testrequest	=	jm.createOverviewRequest(15,queueName,int((aCount%1200)+1))
 	m = Message()
 	m.set_body(str(testrequest))
 	dest_queue.write(m)
@@ -41,6 +43,7 @@ while (aCount<500):
 	aCount	=	aCount+1
 
 receivedAnswer	= False
+aCount=1
 while not receivedAnswer:
 	requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
 	print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
@@ -53,6 +56,9 @@ while not receivedAnswer:
 		print response[0]["r_id"]
 		responseID	=	int(response[0]["r_id"])
 		my_queue.delete_message(item)
-		print "fetched response "+str(response_id)
+		timeb	=	time.time()
+		delta	=	timeb-timea
+		print "fetched response "+str(aCount)+" elaborato in "+str(delta)+" "+str(response_id)
+		aCount	=	aCount+1
 
 

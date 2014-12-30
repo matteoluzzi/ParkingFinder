@@ -1,13 +1,13 @@
 prova#stocazzo
 prova2#a|b|c
 quadrants#98|147|2
-cacheexpire#90
-queryexpire#30
-slowstart#600
+cacheexpire#300
+queryexpire#180
+slowstart#900
 region#EMEA
 SQSzone#eu-west-1
 rangeStart#1
-rangeEnd#180
+rangeEnd#1201
 awsRegion#eu-west-1
 nQuadrants#1267
 notificationFreq#600
