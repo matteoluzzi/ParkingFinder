@@ -119,6 +119,10 @@ class ParkingDYDBLoader:
 				if(self.cache==True):
 					print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
+					
+					test =	self.cache2Client.getValue(str(idp))
+					print "ParkingDYDBLoader.py: "+str(test)+" NON DEVE ESSERE NULL"
+					
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
