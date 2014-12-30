@@ -100,6 +100,7 @@ class ParkingDYDBLoader:
 				state	=	item['stato']
 				extra	=	item['extra']
 				if(self.cache==True):
+					print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
@@ -135,7 +136,7 @@ class ParkingDYDBLoader:
 				idList.append(parkId)
 		if(len(idList)>0):
 			hundreds	=	int(len(idList)/100)+1
-			#print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
+			print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
 			iterations	=	range(hundreds)
 			counter		=	0
 			for item in iterations:
