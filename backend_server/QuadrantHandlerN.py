@@ -41,7 +41,7 @@ class QuadrantHandler(threading.Thread):
 		while 1:
 			#print "Working"
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
-			#print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
+			print "QuadrantHandlerN.py thread "+str(this.threadID)+" queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
 			myResponse 	=	""
 			for item in requests:
 				try:
