@@ -47,7 +47,7 @@ class ParkingDYDBLoader:
 				database	=	boto.connect_dynamodb()
 				tablelist	=	database.list_tables()
 				#print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
-				tableconn		=	database.get_table(str(self.mytable))
+				tableconn		=	database.get_table(str(self.tablename))
 				unposto	= tableconn.get_item(aParking.getId())
 				#print "ParkingDYDBLoader.py POSTO CACHE MISS"
 				self.pmiss	=	self.pmiss+1
@@ -107,7 +107,7 @@ class ParkingDYDBLoader:
 		batch	=	database.new_batch_list()
 		tablelist	=	database.list_tables()
 		#print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
-		tableconn		=	database.get_table(str(self.mytable))
+		tableconn		=	database.get_table(str(self.tablename))
 		batch.add_batch(tableconn,idlist)
 		try:
 			res		=	batch.submit()
