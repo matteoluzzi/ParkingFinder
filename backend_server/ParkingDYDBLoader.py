@@ -103,8 +103,8 @@ class ParkingDYDBLoader:
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
 		myIdList		=	idlist
-		batch	=	database.new_batch_list()
 		database	=	boto.connect_dynamodb()
+		batch	=	database.new_batch_list()
 		tablelist	=	database.list_tables()
 		#print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
 		tableconn		=	database.get_table(str(self.mytable))
