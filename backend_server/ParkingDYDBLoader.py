@@ -44,10 +44,10 @@ class ParkingDYDBLoader:
 			unposto		=	self.cacheClient.getValue(str(parkingId))
 		if(not unposto):	#if I have cache miss retreive from DYDB
 			try:
-				self.database	=	boto.connect_dynamodb()
-				tablelist	=	self.database.list_tables()
+				database	=	boto.connect_dynamodb()
+				tablelist	=	database.list_tables()
 				#print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
-				tableconn		=	self.database.get_table(str(self.mytable))
+				tableconn		=	database.get_table(str(self.mytable))
 				unposto	= tableconn.get_item(aParking.getId())
 				#print "ParkingDYDBLoader.py POSTO CACHE MISS"
 				self.pmiss	=	self.pmiss+1
@@ -103,11 +103,11 @@ class ParkingDYDBLoader:
 	def batchQuery(self,idlist,parkDict):
 		parkingListDict	=	parkDict
 		myIdList		=	idlist
-		batch	=	self.database.new_batch_list()
-		self.database	=	boto.connect_dynamodb()
-		tablelist	=	self.database.list_tables()
+		batch	=	database.new_batch_list()
+		database	=	boto.connect_dynamodb()
+		tablelist	=	database.list_tables()
 		#print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
-		tableconn		=	self.database.get_table(str(self.mytable))
+		tableconn		=	database.get_table(str(self.mytable))
 		batch.add_batch(tableconn,idlist)
 		try:
 			res		=	batch.submit()
