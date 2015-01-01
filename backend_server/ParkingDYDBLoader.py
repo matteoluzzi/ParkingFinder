@@ -6,6 +6,9 @@ import time
 import traceback
 import CacheManager as cm
 class ParkingDYDBLoader:
+	utime	=	0
+	ctime	=	0
+	qtime	=	0
 	__table			=	0
 	__database		=	0
 	__cache			=	0
@@ -21,6 +24,9 @@ class ParkingDYDBLoader:
 
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,percentageCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
+		self.qtime	=	0
+		self.ptime	=	0
+		self.ctime	=	0
 		self.database	=	boto.connect_dynamodb()
 		tablelist	=	self.database.list_tables()
 		print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
@@ -110,7 +116,11 @@ class ParkingDYDBLoader:
 		ctime	=	0
 		utime	=	0
 		try:
+			step0	=	time.time()
 			res		=	batch.submit()
+			step1	=	time.time()
+			delta	=	step1-step0
+			self.qtime	=	self.qtime	+	delta
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.tablename)]['Items']:
@@ -125,12 +135,12 @@ class ParkingDYDBLoader:
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 					step1	=	time.time()
 					delta	=	step1-step0
-					ctime	=	ctime	+	delta
+					self.ctime	=	self.ctime	+	delta
 					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 					step2	=	time.time()
 					delta	=	step2-step1
-					utime	=	utime+delta
-				print "ParkingDYDBLoader tempo di cache: "+str(ctime)+" tempo di updates "+str(utime)
+					self.utime	=	self.utime+delta
+				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
