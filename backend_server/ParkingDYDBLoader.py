@@ -130,7 +130,8 @@ class ParkingDYDBLoader:
 		try:
 			res		=	batch.submit()
 			if(self.cache==True):
-				
+				loader	=	CacheLoader(self.cacheClient,res['Responses'][str(self.tablename)]['Items'],self.cexpire)
+				loader.start()
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.tablename)]['Items']:
@@ -139,9 +140,7 @@ class ParkingDYDBLoader:
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-				if(self.cache==True):
-					loader	=	CacheLoader(self.cacheClient,res['Responses'][str(self.tablename)]['Items'],self.cexpire)
-					loader.start()
+				#if(self.cache==True):
 					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 					#self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
