@@ -91,6 +91,7 @@ class ParkingDYDBLoader:
 			else:
 				self.qhit	=	self.qhit+1
 				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
 			if unastat==101:	#test, probabilmente a memcached non piace lo 0
 				unastat = 0
 			#print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
@@ -140,7 +141,6 @@ class ParkingDYDBLoader:
 					step2	=	time.time()
 					delta	=	step2-step1
 					self.utime	=	self.utime+delta
-				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
