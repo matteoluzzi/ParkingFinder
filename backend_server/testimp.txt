@@ -3,7 +3,7 @@ prova2#a|b|c
 quadrants#98|147|2
 cacheexpire#300
 queryexpire#180
-slowstart#900
+slowstart#1800
 region#EMEA
 SQSzone#eu-west-1
 rangeStart#1
