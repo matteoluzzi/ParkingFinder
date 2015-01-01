@@ -2,34 +2,30 @@ import boto
 from boto.dynamodb2.table import Table
 import Parking as parking
 import memcache
-import time
 import traceback
 import CacheManager as cm
+import threading
 
+class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow start
+	myCache	=	0
+	myList	=	0
+	cexpire	=	0
 
-class CacheParkingAdder(threading.Thread): #precarica i dati in fase di slow start
-	mycache		=	0
-	parklist	=	0
-	
-	def __init__(self,cache,parklist):
+	def __init__(self,aCache,aList,expire):
 		threading.Thread.__init__(self)
-		self.wtime			=	atime
-		self.quadrantlist	=	aquadrantlist
-	
-	def run(self):
-		for item in parklist:
-				idp	=	item['idposto']
-				lat		=	item['latitudine']
-				lon		=	item['longitudine']
-				state	=	item['stato']
-				extra	=	item['extra']
-				if(self.cache==True):
-					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
+		self.myCache	=	aCache
+		self.myList		=	aList
 
+	def run(self):
+		for item in myList:
+			idp	=	item['idposto']
+			lat		=	item['latitudine']
+			lon		=	item['longitudine']
+			state	=	item['stato']
+			extra	=	item['extra']
+			self.myCache.setValue(str(idp),item,int(self.cexpire))
+			
 class ParkingDYDBLoader:
-	utime	=	0
-	ctime	=	0
-	qtime	=	0
 	__table			=	0
 	__database		=	0
 	__cache			=	0
@@ -45,9 +41,6 @@ class ParkingDYDBLoader:
 
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,percentageCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
-		self.qtime	=	0
-		self.ptime	=	0
-		self.ctime	=	0
 		self.database	=	boto.connect_dynamodb()
 		tablelist	=	self.database.list_tables()
 		print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
@@ -134,26 +127,25 @@ class ParkingDYDBLoader:
 		myIdList		=	idlist
 		batch	=	self.database.new_batch_list()
 		batch.add_batch(self.table,idlist)
-		ctime	=	0
-		utime	=	0
 		try:
-			step0	=	time.time()
 			res		=	batch.submit()
-			step1	=	time.time()
-			delta	=	step1-step0
-			self.qtime	=	self.qtime	+	delta
+			if(self.cache==True):
+				
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
-			if(self.cache==True):
-				cacher	=	CacheParkingAdder(self.cacheClient,res['Responses'][str(self.tablename)]['Items'])
-				cacher.start()
 			for item in res['Responses'][str(self.tablename)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
+				if(self.cache==True):
+					loader	=	CacheLoader(self.cacheClient,res['Responses'][str(self.tablename)]['Items'],self.cexpire)
+					loader.start()
+					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
+					#self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
 			print traceback.format_exc()
