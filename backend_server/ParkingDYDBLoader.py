@@ -122,8 +122,8 @@ class ParkingDYDBLoader:
 			step0	=	time.time()
 			res		=	batch.submit()
 			step1	=	time.time()
-			delta	=	step1-step0
-			self.qtime	=	self.qtime	+	delta
+			deltaq	=	step1-step0
+			self.qtime	=	self.qtime	+	deltaq
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.tablename)]['Items']:
@@ -137,12 +137,14 @@ class ParkingDYDBLoader:
 				if(self.cache==True):
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
 				step1	=	time.time()
-				delta	=	step1-step0
-				self.ctime	=	self.ctime	+	delta
+				deltac	=	step1-step0
+				
+				self.ctime	=	self.ctime	+	deltac
 				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 				step2	=	time.time()
-				delta	=	step2-step1
-				self.utime	=	self.utime+delta
+				deltau	=	step2-step1
+				self.utime	=	self.utime+deltau
+				print"ParkingDYDBLoader: tempi query "+str(deltaq)+" cache "+str(deltac)+" update "+str(deltau)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
