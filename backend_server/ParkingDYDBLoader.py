@@ -6,7 +6,7 @@ import traceback
 import CacheManager as cm
 import threading
 
-class QuadrantPrefetching(threading.Thread): #precarica i dati in fase di slow start
+class CacheLoader(threading.Thread): #precarica i dati in fase di slow start
 	myCache	=	0
 	myList	=	0
 	cexpire	=	0
