@@ -61,6 +61,8 @@ class Quadrant:
 			return 0
 		startTime	=	float(tm.time())
 		self.overview_lock.acquire()
+		myTime	=	float(tm.time()) - float(startTime)
+		print "Quadrant.py tempo sul lock: "+str(myTime)
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
 		myTime	=	float(tm.time()) - float(startTime)
 		if (int(cacheRis)>-1):

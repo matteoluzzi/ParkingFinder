@@ -2,6 +2,7 @@ import boto
 from boto.dynamodb2.table import Table
 import Parking as parking
 import memcache
+import time
 import traceback
 import CacheManager as cm
 class ParkingDYDBLoader:
@@ -106,11 +107,13 @@ class ParkingDYDBLoader:
 		myIdList		=	idlist
 		batch	=	self.database.new_batch_list()
 		batch.add_batch(self.table,idlist)
+		ctime	=	0
+		utime	=	0
 		try:
 			res		=	batch.submit()
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
-			for item in res['Responses'][str(self.table.name)]['Items']:
+			for item in res['Responses'][str(self.tablename)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
 				lon		=	item['longitudine']
@@ -118,8 +121,16 @@ class ParkingDYDBLoader:
 				extra	=	item['extra']
 				if(self.cache==True):
 					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
+					step0	=	time.time()
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
+					step1	=	time.time()
+					delta	=	step1-step0
+					ctime	=	ctime	+	delta
 					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+					step2	=	time.time()
+					delta	=	step2-step1
+					utime	=	utime+delta
+				print "ParkingDYDBLoader tempo di cache: "+str(ctime)+" tempo di updates "+str(utime)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
@@ -168,7 +179,7 @@ class ParkingDYDBLoader:
 					while len(res) >0:
 						print "failed, retry"
 						templist2	=	list()
-						for item in res[str(self.table.name)]['Keys']:
+						for item in res[str(self.tablename)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
 						#raise Exception("Error while inserting in DYDB "+str(len(templist))+" "+str(len(parkingList))+" "+str(len(res['posti']['Keys'])))
@@ -178,7 +189,7 @@ class ParkingDYDBLoader:
 					while len(res) >0:
 						print "failed, retry"
 						templist2	=	list()
-						for item in res[(self.table.name)]['Keys']:
+						for item in res[(self.tablename)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
 						#raise Exception("Error while inserting in DYDB"+str(len(res))+" "+str(len(parkingList)))
