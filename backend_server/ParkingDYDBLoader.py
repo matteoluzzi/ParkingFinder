@@ -4,6 +4,7 @@ import Parking as parking
 import memcache
 import time
 import traceback
+import threading
 import CacheManager as cm
 class ParkingDYDBLoader:
 	utime	=	0
@@ -86,7 +87,8 @@ class ParkingDYDBLoader:
 			if not unastat:
 				#print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				self.qmiss	=	self.qmiss+1
-				#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
 				return -1
 			else:
 				self.qhit	=	self.qhit+1
@@ -130,17 +132,17 @@ class ParkingDYDBLoader:
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-				if(self.cache==True):
 					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
-					step0	=	time.time()
+				step0	=	time.time()
+				if(self.cache==True):
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
-					step1	=	time.time()
-					delta	=	step1-step0
-					self.ctime	=	self.ctime	+	delta
-					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
-					step2	=	time.time()
-					delta	=	step2-step1
-					self.utime	=	self.utime+delta
+				step1	=	time.time()
+				delta	=	step1-step0
+				self.ctime	=	self.ctime	+	delta
+				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+				step2	=	time.time()
+				delta	=	step2-step1
+				self.utime	=	self.utime+delta
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
