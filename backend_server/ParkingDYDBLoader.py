@@ -5,6 +5,27 @@ import memcache
 import time
 import traceback
 import CacheManager as cm
+
+
+class CacheParkingAdder(threading.Thread): #precarica i dati in fase di slow start
+	mycache		=	0
+	parklist	=	0
+	
+	def __init__(self,cache,parklist):
+		threading.Thread.__init__(self)
+		self.wtime			=	atime
+		self.quadrantlist	=	aquadrantlist
+	
+	def run(self):
+		for item in parklist:
+				idp	=	item['idposto']
+				lat		=	item['latitudine']
+				lon		=	item['longitudine']
+				state	=	item['stato']
+				extra	=	item['extra']
+				if(self.cache==True):
+					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
+
 class ParkingDYDBLoader:
 	utime	=	0
 	ctime	=	0
@@ -123,25 +144,16 @@ class ParkingDYDBLoader:
 			self.qtime	=	self.qtime	+	delta
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
+			if(self.cache==True):
+				cacher	=	CacheParkingAdder(self.cacheClient,res['Responses'][str(self.tablename)]['Items'])
+				cacher.start()
 			for item in res['Responses'][str(self.tablename)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-				if(self.cache==True):
-					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
-					step0	=	time.time()
-					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
-					step1	=	time.time()
-					delta	=	step1-step0
-					self.ctime	=	self.ctime	+	delta
-					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
-					step2	=	time.time()
-					delta	=	step2-step1
-					self.utime	=	self.utime+delta
-				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
-				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
+				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
 			print traceback.format_exc()
