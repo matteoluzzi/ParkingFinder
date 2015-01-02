@@ -83,7 +83,7 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			unastat	=	self.cache2Client.getValue("Q"str(quadrantID))
+			unastat	=	self.cache2Client.getValue("Q"+str(quadrantID))
 			if not unastat:
 				#print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				self.qmiss	=	self.qmiss+1
