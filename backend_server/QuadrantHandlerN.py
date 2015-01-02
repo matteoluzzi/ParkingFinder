@@ -66,7 +66,7 @@ class QuadrantHandler(threading.Thread):
 							#print "QuadrantHandler.py: "+str(self.threadID)+" start query in "+str(myTime)+" seconds"
 							step1	=	tm.time()
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
-							delta	=	time.time()-step1
+							delta	=	tm.time()-step1
 							#myTime	=	float(tm.time()) - float(startTime)
 							print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(delta)+" seconds"
 							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
