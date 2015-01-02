@@ -83,7 +83,7 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			unastat	=	self.cache2Client.getValue(str(quadrantID))
+			unastat	=	self.cache2Client.getValue("Q"str(quadrantID))
 			if not unastat:
 				#print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				self.qmiss	=	self.qmiss+1
@@ -106,7 +106,7 @@ class ParkingDYDBLoader:
 			try:
 				if perc<1:
 					perc=101	#test, probabilmente a memcached non piace lo 0
-				res	=	self.cache2Client.setValue(str(quadrantID),str(perc),int(self.qexpire))
+				res	=	self.cache2Client.setValue("Q"+str(quadrantID),str(perc),int(self.qexpire))
 				#print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
