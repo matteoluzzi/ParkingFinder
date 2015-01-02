@@ -14,4 +14,5 @@ poolsize#20
 notificationFreq#600
 apparn#arn:aws:sns:eu-west-1:738106480252:app/GCM/APPosto
 cacheurl#127.0.0.1:11211
-cache2url#127.0.0.1:11211 
+cache2url#127.0.0.1:11211
+placemark#vuoto
