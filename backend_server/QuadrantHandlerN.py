@@ -4,6 +4,7 @@ import Settings
 import boto.sqs
 from boto.sqs.message import Message
 import threading
+import traceback
 import json
 import ParkingDYDBLoader as DBloader
 import JSONManager as jm

@@ -118,7 +118,7 @@ while threadCounter<nThreads:
 	threadCounter =	threadCounter+1
 	threadList.append(anHandler)
 print "BackendServer.py no more threads allowed, number of threads created "+str(threadCounter)
-
+threadCounter = 0
 while 1>0:
 	print "BackendServer.py checking threads status"
 	try:
@@ -126,9 +126,10 @@ while 1>0:
 			alive	=	item.isAlive()
 			if alive==False:
 				threadList.remove(item)
-				anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader)
+				anHandler	=	qh.QuadrantHandler(listaQuadranti,settingsHandler,myDBLoader,threadCounter)
 				anHandler.start()
 				threadList.append(anHandler)
+				threadCounter	=	threadCounter+1
 				print "BackendServer: effettuato recovery thread"
 		tm.sleep(60)
 	except:
