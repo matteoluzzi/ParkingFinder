@@ -144,7 +144,7 @@ class ParkingDYDBLoader:
 				step2	=	time.time()
 				deltau	=	step2-step1
 				self.utime	=	self.utime+deltau
-				print"ParkingDYDBLoader: tempi query "+str(deltaq)+" cache "+str(deltac)+" update "+str(deltau)
+				#print"ParkingDYDBLoader: tempi query "+str(deltaq)+" cache "+str(deltac)+" update "+str(deltau)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
