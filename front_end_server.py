@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import os, sys, time, json, itertools, ConfigParser, re
+from Queue import Empty
 from bcrypt import hashpw, gensalt
 
 from boto.sqs.message import Message
@@ -22,6 +23,7 @@ import tornado.gen
 import tornado.websocket
 from tornado.escape import xhtml_escape, xhtml_unescape, json_encode, json_decode
 
+
 '''Handler generico dal quale ereditano tutti gli altri handlers che nesessitano di comunicare tramite cookies'''
 
 class MyHandler(tornado.web.RequestHandler):
@@ -33,6 +35,7 @@ class MyHandler(tornado.web.RequestHandler):
 		val = self.get_secure_cookie('flash_msg_%s' % key)
 		self.clear_cookie('flash_msg_%s' % key)
 		return val
+
 
 '''Handler principale responsabile di renderizzare l'home page del sito'''
 
@@ -59,6 +62,7 @@ class BaseHandler(MyHandler):
 		return self.get_secure_cookie("username")
 
 '''Handler per gestire la registrazione di un utente al sito'''
+
 
 class RegisterHandler(MyHandler):
 
@@ -101,7 +105,10 @@ class RegisterHandler(MyHandler):
 
 	def __onfinish(self, result):
 
+		self.clear_cookie("_xsrf")
+
 		self.redirect("/")
+
 
 '''Handler per gestire il login di un utente, la sessione viene mantenuta tramite un cookie settato sul browser'''
 
@@ -147,7 +154,9 @@ class LoginHandler(MyHandler):
 
 	def __onfinish(self, result):
 
+			self.clear_cookie("_xsrf")
 			self.redirect("/")
+
 
 '''Handler per la gestione del logout, cancella il cookie settato'''
 
@@ -157,15 +166,21 @@ class LogoutHandler(MyHandler):
 
 		self.clear_cookie("username")
 		self.clear_cookie("email")
+		self.clear_cookie("_xsrf")
 		self.redirect("/")
 
 	def post(self):
 
 		self.redirect("/")
 
+
 '''Handler per il processamento delle richieste di sottoscrizione ad uno o più quadranti'''
 
 class QuadrantsSubscriptionHandler(MyHandler):
+
+	def check_origin(self, origin):
+
+		return True
 
 	def initialize(self, subs_requests_queue):
 
@@ -205,9 +220,6 @@ class QuadrantsSubscriptionHandler(MyHandler):
 
 		self.write(json.dumps("success"))
 		self.finish()
-
-
-
 
 
 '''Handler per la gestione delle richieste riguardanti la mappa, lo scambio di messaggi req/resp avviene su una websocket'''
@@ -312,25 +324,28 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 		self._dispatcher.subscribe(idReq, req_size)
 
-		msg = Message()
-		msg.set_body(data)	
-		res = queue.write(msg)
-		print "scritto messaggio ", res.get_body()
+		if self._dispatcher.put_id_request(q_id, idReq) == False: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
+			msg = Message()
+			msg.set_body(data)	
+			res = queue.write(msg)
+			print "scritto messaggio ", res.get_body()
 		
 		queue = self._dispatcher.get_message_queue(idReq)
 
-		print queue
+		try:
+			message = queue.get(timeout=20)
 
-		message = queue.get()
-		print "message: " + repr(message)
-		if message.has_key("last"):
-			message.pop("last", None)
-			self.write_message(message)
-			print "ultimo messaggio"
-			self._dispatcher.delete_queue(idReq)
-			tornado.ioloop.IOLoop.instance().add_callback()			
-		else:
-			self.write_message(message)
+			print "message: " + repr(message)
+			if message.has_key("last"):
+				message.pop("last", None)
+				self.write_message(message)
+				print "ultimo messaggio"
+				self._dispatcher.delete_queue(idReq)
+				tornado.ioloop.IOLoop.instance().add_callback()			
+			else:
+				self.write_message(message)
+		except Empty:
+			print "nessun messaggio entro il timeout"
 
 	@staticmethod
 	def __create_request_message(settings, idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
@@ -358,8 +373,8 @@ def initialize(sqs_conn, user_table, settings):
 	sqs_queues = {}
 	request_queue = sqs.get_queue(settings['request_queue'])
 	notification_queue = sqs.get_queue(settings['notification_queue'])
-	dispatcher = DispatcherBroker(int(settings['dispatcher_threads']), settings['response_queue'], settings['zone'])
 	quadrantslist = openQuadrantsList(settings['quadrants_list_path'])
+	dispatcher = DispatcherBroker(int(settings['dispatcher_threads']), settings['response_queue'], settings['zone'], len(quadrantslist))
 
 	pool = ThreadPool(int(settings['pool_size']))
 
@@ -369,7 +384,8 @@ def initialize(sqs_conn, user_table, settings):
 		(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'], table=user_table)),
 		(r'/login', LoginHandler, dict(table=user_table)),
 		(r'/logout', LogoutHandler),
-		(r'/subsquadrants', QuadrantsSubscriptionHandler, dict(subs_requests_queue=notification_queue))], 
+		(r'/subsquadrants', QuadrantsSubscriptionHandler, dict(subs_requests_queue=notification_queue)),
+		(r'/imgs/(.*)', tornado.web.StaticFileHandler, {'path': 'static/imgs'},)], 
 		template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), debug = True,
 		xsrf_cookies=True,
 		cookie_secret="l/4VqtnPR3Wv08iW5cX9UR+t7Prkekxuq82yjZn5eDc=")

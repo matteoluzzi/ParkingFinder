@@ -6,6 +6,12 @@ from boto.sqs.message import Message
 import boto.sqs as sqs
 from json import loads, dumps
 from Queue import Queue
+import logging
+
+LOG_FILENAME = './logging/Dispatcher_log.out'
+
+logging.basicConfig(format='%(asctime)s %(thread)d %(message)s', level=logging.INFO, filename=LOG_FILENAME)
+
 
 class DispatcherThread(Thread):
 
@@ -17,62 +23,56 @@ class DispatcherThread(Thread):
 		self._broker = broker
 		if self._queue == None:
 			self._queue = self._sqs_conn.create_queue(queue_name)
+
+		logging.info("Inizialiazzazione completa")
 	
 	def get_message_queue(self, requestID):
 
 		return self._broker.get_message_queue(requestID)
 
 	def run(self):
-
-		print "Waiting on the response queue ", self._queue  
+ 
 		while True:
-			raw_messages = self._queue.get_messages(wait_time_seconds=20, num_messages=10)
+			raw_messages = self._queue.get_messages(wait_time_seconds=20, num_messages=1)
 
-			print "Dispatcher, got " + str(len(raw_messages)) + " messages"
+			logging.info("Rivevuti " + str(len(raw_messages)) + " messages")
 
 			for raw_message in raw_messages:
 
-				print "Dispatcher - new message ", raw_message.get_body()
-				message = loads(raw_message.get_body())[0]
-
+				logging.info("Nuovo messaggio " + str(raw_message.get_body()))
+				message = loads(raw_message.get_body())[0]				
+				
 				r_id = message['r_id']
+					
+				#se il messaggio appartiene al server, processalo
+				if self._broker.belongsTo(r_id):
 
-				if self._broker.add_subscriber(r_id):
-					message["last"] = True
+					if message['type'] == "overview_response":
+						q_id = message['quadrantID']	
+						#scrivi il messaggio su tutte le code dove ci sono threads che lo hanno richiesto
+						while True:
+							r_id = self._broker.get_id_request(q_id)
+							
+							logging.info("Richiesta recuperata " + str(r_id) + " per il quadrante " + str(q_id))
+							if r_id is None:
+								logging.info("Non ci sono più richieste in attesa per il quadrante " + str(q_id))
+								break
+							else:
+								if self._broker.add_subscriber(r_id):
+									message["last"] = True
+								queue = self._broker.get_message_queue(r_id)
+								queue.put(message)
+								self._queue.delete_message(raw_message)
 
-				queue = self._broker.get_message_queue(r_id)
-				if queue != None:
-					queue.put(message)
-					self._queue.delete_message(raw_message)
+					else:
+						if self._broker.add_subscriber(r_id):
+								message["last"] = True
+						queue = self._broker.get_message_queue(r_id)
+						queue.put(message)
+						self._queue.delete_message(raw_message)
 
 
 
-
-
-				# if r_id in self._queues.keys():
-				# 	queue = self._queues[r_id]
-				# 	print "queue max size ", queue.maxsize
-				# 	if not r_id in self._subscribers.keys():
-				# 		self._subscribers[r_id] = 1
-				# 		current_subs = 1
-				# 	else:
-				# 		current_subs = self._subscribers[r_id] + 1
-				# 		self._subscribers[r_id] = current_subs
-				# 	counter = queue.maxsize - current_subs
-				# 	print "--------------->current_subs=", current_subs, " counter=", counter
-
-				# 	if counter == 0: #ultimo subscribers
-				# 		print "Ultimo messaggio"
-				# 		message["last"] = True
-				# 	queue.put(message)
-				# 	print "messaggio messo in coda"
-
-				# 	self._queue.delete_message(raw_message)
-
-				# else:
-				# 	print "errore relativo alla richiesta " + r_id
-				# 	self._queue.delete_message(raw_message)
-				# 	#print "cancello messaggio spurio"
 
 
 
