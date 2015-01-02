@@ -4,6 +4,7 @@ import Settings
 import boto.sqs
 from boto.sqs.message import Message
 import threading
+import traceback
 import json
 import ParkingDYDBLoader as DBloader
 import JSONManager as jm
@@ -41,7 +42,7 @@ class QuadrantHandler(threading.Thread):
 		while 1:
 			#print "Working"
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
-			#print "queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
+			print "QuadrantHandlerN.py thread "+str(self.threadID)+" queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
 			myResponse 	=	""
 			for item in requests:
 				try:
@@ -63,9 +64,11 @@ class QuadrantHandler(threading.Thread):
 						if str(rtype)=="overview":
 							#myTime	=	float(tm.time()) - float(startTime)
 							#print "QuadrantHandler.py: "+str(self.threadID)+" start query in "+str(myTime)+" seconds"
+							step1	=	tm.time()
 							freePercentage	=	int(currentQuadrant.getPercentageFreeParkings())
+							delta	=	tm.time()-step1
 							#myTime	=	float(tm.time()) - float(startTime)
-							#print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(myTime)+" seconds"
+							print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(delta)+" seconds"
 							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
 							#print "Serving an overview request"
 							myResponse	=	jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID())
@@ -115,5 +118,6 @@ class QuadrantHandler(threading.Thread):
 							print "QuadrantHandler.py: error on request processing"
 				except:
 					print "QuadrantHandler.py problem while processing a request"
+					print traceback.format_exc()
 
 

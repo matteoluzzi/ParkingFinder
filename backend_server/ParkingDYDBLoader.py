@@ -2,9 +2,14 @@ import boto
 from boto.dynamodb2.table import Table
 import Parking as parking
 import memcache
+import time
 import traceback
+import threading
 import CacheManager as cm
 class ParkingDYDBLoader:
+	utime	=	0
+	ctime	=	0
+	qtime	=	0
 	__table			=	0
 	__database		=	0
 	__cache			=	0
@@ -20,6 +25,9 @@ class ParkingDYDBLoader:
 
 	
 	def __init__(self,myTableName,enableCache=False,myCacheURL=0,percentageCacheURL=0,cacheExpireTime=180,queryCacheExpire=120):
+		self.qtime	=	0
+		self.ptime	=	0
+		self.ctime	=	0
 		self.database	=	boto.connect_dynamodb()
 		tablelist	=	self.database.list_tables()
 		print	"ParkingDYDBLoader.py list of available tables "+str(tablelist)
@@ -75,15 +83,17 @@ class ParkingDYDBLoader:
 	def getUtilizationPercentage(self,aQuadrant):
 		quadrantID	=	aQuadrant.getID()
 		if (self.cache==True):
-			unastat	=	self.cache2Client.getValue(str(quadrantID))
+			unastat	=	self.cache2Client.getValue("Q"+str(quadrantID))
 			if not unastat:
 				#print "ParkingDYDBLoader.py: cache miss with ID "+"Q_"+str(quadrantID)
 				self.qmiss	=	self.qmiss+1
-				#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
 				return -1
 			else:
 				self.qhit	=	self.qhit+1
 				print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
+				print "ParkingDYDBLoader tempo di cache: "+str(self.ctime)+" tempo di updates "+str(self.utime)+" tempo di query "+str(self.qtime)
 			if unastat==101:	#test, probabilmente a memcached non piace lo 0
 				unastat = 0
 			#print "ParkingDYDBLoader.py: cache hit with ID "+"Q_"+str(quadrantID)+" value "+str(unastat)
@@ -96,7 +106,7 @@ class ParkingDYDBLoader:
 			try:
 				if perc<1:
 					perc=101	#test, probabilmente a memcached non piace lo 0
-				res	=	self.cache2Client.setValue(str(quadrantID),str(perc),int(self.qexpire))
+				res	=	self.cache2Client.setValue("Q"+str(quadrantID),str(perc),int(self.qexpire))
 				#print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
@@ -106,20 +116,35 @@ class ParkingDYDBLoader:
 		myIdList		=	idlist
 		batch	=	self.database.new_batch_list()
 		batch.add_batch(self.table,idlist)
+		ctime	=	0
+		utime	=	0
 		try:
+			step0	=	time.time()
 			res		=	batch.submit()
+			step1	=	time.time()
+			deltaq	=	step1-step0
+			self.qtime	=	self.qtime	+	deltaq
 			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
 			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
-			for item in res['Responses'][str(self.table.name)]['Items']:
+			for item in res['Responses'][str(self.tablename)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-				if(self.cache==True):
 					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
+				step0	=	time.time()
+				if(self.cache==True):
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
-					parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+				step1	=	time.time()
+				deltac	=	step1-step0
+				
+				self.ctime	=	self.ctime	+	deltac
+				parkingListDict[int(idp)].updateStatus(lat,lon,state,extra)
+				step2	=	time.time()
+				deltau	=	step2-step1
+				self.utime	=	self.utime+deltau
+				#print"ParkingDYDBLoader: tempi query "+str(deltaq)+" cache "+str(deltac)+" update "+str(deltau)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
@@ -168,7 +193,7 @@ class ParkingDYDBLoader:
 					while len(res) >0:
 						print "failed, retry"
 						templist2	=	list()
-						for item in res[str(self.table.name)]['Keys']:
+						for item in res[str(self.tablename)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
 						#raise Exception("Error while inserting in DYDB "+str(len(templist))+" "+str(len(parkingList))+" "+str(len(res['posti']['Keys'])))
@@ -178,7 +203,7 @@ class ParkingDYDBLoader:
 					while len(res) >0:
 						print "failed, retry"
 						templist2	=	list()
-						for item in res[(self.table.name)]['Keys']:
+						for item in res[(self.tablename)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
 						#raise Exception("Error while inserting in DYDB"+str(len(res))+" "+str(len(parkingList)))
@@ -212,9 +237,3 @@ class ParkingDYDBLoader:
 					#park.save()
 				
 			
-		
-		
-		
-		
-		
-
