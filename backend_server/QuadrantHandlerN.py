@@ -117,5 +117,6 @@ class QuadrantHandler(threading.Thread):
 							print "QuadrantHandler.py: error on request processing"
 				except:
 					print "QuadrantHandler.py problem while processing a request"
+					print traceback.format_exc()
 
 
