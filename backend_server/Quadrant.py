@@ -90,6 +90,7 @@ class Quadrant:
 				print traceback.format_exc()
 				print "Quadrant.py: eccezione gestita effettuo unlock risorse: "
 				self.overview_lock.release()
+				perc	=	-1
 			return perc
 		
 		
