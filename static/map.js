@@ -1,5 +1,6 @@
 function displayMap(quadrants, ws, my_center)
 {
+	window.markers = [];
 	console.log("displaing map...");
 	var element = $("#map")[0];
 
@@ -9,6 +10,15 @@ function displayMap(quadrants, ws, my_center)
 		mapTypeId : "OSM",
 		mapTypeControl : false,
 		streetViewControl : false
+	});
+
+	var my_position_icon = 'imgs/map_pointer.png';
+
+	var marker = new google.maps.Marker({
+		map : window.map,
+		position : my_center,
+		visible : true,
+		icon : my_position_icon
 	});
 
 	window.map.mapTypes.set("OSM", new google.maps.ImageMapType({
@@ -58,15 +68,31 @@ function displayMap(quadrants, ws, my_center)
 	//window.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
 };
 
-function centerMap(center)
+function centerMap(center, start)
 {
-	window.map.setCenter(center);
-	window.map.setZoom(16);
-	var marker = new google.maps.Marker({
-		map : window.map,
-		position : center,
-		visible : true
-	});
+	deleteMarkers();
+	if(start)
+	{
+		window.map.setCenter(center);
+		window.map.setZoom(16);
+		var marker = new google.maps.Marker({
+			map : window.map,
+			position : center,
+			visible : true
+		});
+		window.markers.push(marker);
+	}
+}
+
+function deleteMarkers()
+{
+	var i = window.markers.length;
+	while(i--)
+	{
+		var marker = window.markers.pop();
+		marker.setMap(null);
+		marker = null;
+	}
 }
 
 

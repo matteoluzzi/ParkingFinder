@@ -165,14 +165,14 @@
         $('#search_button').click(function()
         {
             var place = autocomplete.getPlace();
-            centerMap(place.geometry.location);
+            centerMap(place.geometry.location, true);
         });
 
         $('#reset_button').click(function()
         {
             $('#search_address').val('');
             get_my_position(function(center) {
-                centerMap(center);
+                centerMap(center, false);
             });
         });
 
