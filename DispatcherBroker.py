@@ -34,7 +34,7 @@ class DispatcherBroker():
 			self._subsQueues[requestID]
 			return True
 		except KeyError:
-			print "errore nel recuperare una subsQueue, coda non trovata"
+			print "errore nella belongsTo nel recuperare una subsQueue, coda non trovata"
 			return False
 
 	def get_message_queue(self, requestID):

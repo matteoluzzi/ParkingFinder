@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from threading import Thread
+from threading import Thread, Lock
 
 from boto.sqs.message import Message
 import boto.sqs as sqs
@@ -23,6 +23,8 @@ class DispatcherThread(Thread):
 		self._broker = broker
 		if self._queue == None:
 			self._queue = self._sqs_conn.create_queue(queue_name)
+		self._lock_overview = Lock()
+		self._lock_detail = Lock()
 
 		logging.info("Inizialiazzazione completa")
 	
@@ -58,15 +60,19 @@ class DispatcherThread(Thread):
 								logging.info("Non ci sono più richieste in attesa per il quadrante " + str(q_id))
 								break
 							else:
+								self._lock_overview.acquire()
 								if self._broker.add_subscriber(r_id):
 									message["last"] = True
+								self._lock_overview.release()
 								queue = self._broker.get_message_queue(r_id)
 								queue.put(message)
 								self._queue.delete_message(raw_message)
 
 					else:
+						self._lock_detail.acquire()
 						if self._broker.add_subscriber(r_id):
 								message["last"] = True
+						self._lock_detail.release()
 						queue = self._broker.get_message_queue(r_id)
 						queue.put(message)
 						self._queue.delete_message(raw_message)

@@ -247,10 +247,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		quadrant_list_msg = json.dumps({"type": "quadrant_list", "data" : self._quadrants_list})
 		self.write_message(quadrant_list_msg)
 
-	@tornado.gen.engine
 	def on_message(self, raw_message):
-
-
 		message = json.loads(raw_message)
 		idReq = message['id']
 		zoom_level = message['zoom_level']
@@ -263,7 +260,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		q_ids = set(map(lambda x: int(x),quadrants.split("|")))
 		print q_ids
 
-		re_write = yield tornado.gen.Task(self.__write_background, self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
+		self.__write_background(self.__send_parking_spots_request, callback=None, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
 
 
 	def on_close(self):
@@ -273,47 +270,24 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 	
 	def __write_background(self, func, callback, args=(), kwargs={}):
 		'''funzione che lancia la scrittura sulle code'''
+
+		def on_write_complete(result):
+			print "nella on_wrritecomeplet"
+			ws_conn = result[0]
+			idReq = result[1]
+			
+			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))	
 		
-		# def _callback(idReq):
-
-
-		# 	queue = self._dispatcher.get_message_queue(idReq)
-
-		# 	print "waiting on ", queue
-		# 	print queue
-
-		# 	message = queue.get()
-		# 	print "message: " + repr(message)
-		# 	if message.has_key("last"):
-		# 		message.pop("last", None)
-		# 		self.write_message(message)
-		# 		print "ultimo messaggio"
-		# 		tornado.ioloop.IOLoop.instance().add_callback(lambda: callback(idReq))
-		# 		self._dispatcher.delete_message_queue(idReq)
-
-				
-		# 	else:
-		# 		self.write_message(message)
-
-
-		# 	print "messaggio scritto al client"
-
-		request = False
-
-		sqs_queues_ids	= args[2]
+		quadrant_ids = args[2]
 		pool = kwargs['pool']
 		settings = kwargs['settings']	
-
-		for id in sqs_queues_ids:
-			try:
-				request = True
-				pool.apply_async(func, args=(self._sqs_request_queue, id ,len(sqs_queues_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings))					
-
-			except KeyError:
-				self.write_message(json.dumps({"type": "not found",  "quadrantID" : id, "percentage": -1}))			
+		for id in quadrant_ids:
+			pool.apply_async(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)					
+		print "writing jobs submitted!!!!!!!!!!!"
 		
 	def __send_parking_spots_request(self, queue, q_id, req_size, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
 
+		print "nella sendparkign..."
 		if int(zoom_level) >= 18:
 			req_type = settings['specific_req_type']
 			print req_type
@@ -329,24 +303,35 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			msg.set_body(data)	
 			res = queue.write(msg)
 			print "scritto messaggio ", res.get_body()
-		
+
+		return (self.ws_connection, idReq)
+
+	def __retrive_and_write(self, ws_conn, idReq):
+
 		queue = self._dispatcher.get_message_queue(idReq)
 
 		try:
-			message = queue.get(timeout=20)
+			message = queue.get()
 
 			print "message: " + repr(message)
 			if message.has_key("last"):
 				message.pop("last", None)
-				self.write_message(message)
+				if isinstance(message, dict):
+					message = tornado.escape.json_encode(message)
+				ws_conn.write_message(message)
 				print "ultimo messaggio"
-				self._dispatcher.delete_queue(idReq)
-				tornado.ioloop.IOLoop.instance().add_callback()			
+				self._dispatcher.delete_queue(idReq)	
 			else:
-				self.write_message(message)
+				if isinstance(message, dict):
+					message = tornado.escape.json_encode(message)
+				ws_conn.write_message(message)
+				print "scritto messaggio al client"
 		except Empty:
 			print "nessun messaggio entro il timeout"
-
+		except:
+			import traceback
+			print traceback.format_exc()
+		
 	@staticmethod
 	def __create_request_message(settings, idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
 		
