@@ -7,6 +7,7 @@ function displayMap(quadrants, ws, my_center)
 	window.map = new google.maps.Map(element, {
 		center : my_center,
 		zoom : 16,
+		minZoom : 14,
 		mapTypeId : "OSM",
 		mapTypeControl : false,
 		streetViewControl : false
@@ -155,7 +156,11 @@ function colorPolygon(data, quadrants)
 	q_id = data['quadrantID'];
 	quadrant = quadrants[q_id - 1];
 	percentage = data['percentage'];
-	if(percentage > 66)
+	if(percentage == -1)
+	{
+		setQuadrantColor(quadrant, "#C0C0C0");
+	}
+	else if(percentage > 66)
 	{
 		setQuadrantColor(quadrant, "#00FF00");
 	}
