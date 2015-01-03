@@ -147,8 +147,12 @@ class ParkingDYDBLoader:
 				#print"ParkingDYDBLoader: tempi query "+str(deltaq)+" cache "+str(deltac)+" update "+str(deltau)
 				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
-			print "ParkingDYDBLoader.py: error while reading DB "+str(res)
+			print "ParkingDYDBLoader.py: error while reading DB, query result (may be null)"
+			if res:
+				print str(res)
 			print traceback.format_exc()
+			
+			print "ParkingDYDBLoader.py: exception correctly catched, will try again"
 			return myIdList 	#se qualcosa va storto faccio fare nuova elaborazione completa 
 		return res['UnprocessedKeys']
 			
