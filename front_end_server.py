@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import os, sys, time, json, itertools, ConfigParser, re
+import os, sys, time, json, itertools, ConfigParser, re, functools
 from Queue import Empty
 from bcrypt import hashpw, gensalt
 
@@ -10,9 +10,12 @@ import boto.sqs as sqs
 from boto.dynamodb2.table import Table
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './backend_server')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './lib/futures')))
 from JSONManager import createOverviewRequest, createFullListRequest, createBoundedListRequest, subscribeEmailNotification # @UnresolvedImport
 
 from multiprocessing.pool import Pool, ThreadPool
+from multiprocessing import Lock
+from concurrent.futures import ThreadPoolExecutor
 from DispatcherBroker import DispatcherBroker
 
 import tornado.httpserver
@@ -22,6 +25,8 @@ import tornado.web
 import tornado.gen
 import tornado.websocket
 from tornado.escape import xhtml_escape, xhtml_unescape, json_encode, json_decode
+
+subscribe_lock = Lock()
 
 
 '''Handler generico dal quale ereditano tutti gli altri handlers che nesessitano di comunicare tramite cookies'''
@@ -260,7 +265,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		q_ids = set(map(lambda x: int(x),quadrants.split("|")))
 		print q_ids
 
-		self.__write_background(self.__send_parking_spots_request, callback=None, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
+		self.__write_background(self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
 
 
 	def on_close(self):
@@ -268,7 +273,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		self._connections.discard(self)
 		
 	
-	def __write_background(self, func, callback, args=(), kwargs={}):
+	def __write_background(self, func, args=(), kwargs={}):
 		'''funzione che lancia la scrittura sulle code'''
 
 		def on_write_complete(result):
@@ -276,13 +281,21 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			ws_conn = result[0]
 			idReq = result[1]
 			
-			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))	
+			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
+			#self._pool.submit(self.__retrive_and_write, args=(ws_conn, idReq), kwargs=None)	
 		
 		quadrant_ids = args[2]
 		pool = kwargs['pool']
 		settings = kwargs['settings']	
 		for id in quadrant_ids:
-			pool.apply_async(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)					
+			try:
+				pool.apply_async(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)					
+	 			# f =	pool.submit(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), kwargs=None)
+	 			# print f
+	 			# f.add_done_callback(lambda future: tornado.ioloop.IOLoop.instance().add_callback(functools.partial(on_write_complete, future)))
+	 		except:
+	 			import traceback
+				print traceback.format_exc()	
 		print "writing jobs submitted!!!!!!!!!!!"
 		
 	def __send_parking_spots_request(self, queue, q_id, req_size, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
@@ -295,20 +308,28 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		else:
 			req_type = settings['global_req_type']
 			data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
+		
+		global subscribe_lock
 
+		subscribe_lock.acquire()
 		self._dispatcher.subscribe(idReq, req_size)
+		subscribe_lock.release()
 
-		if self._dispatcher.put_id_request(q_id, idReq) == False: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
+
+		if self._dispatcher.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
 			msg = Message()
 			msg.set_body(data)	
 			res = queue.write(msg)
 			print "scritto messaggio ", res.get_body()
+		else:
+			self._dispatcher.put_id_request(q_id, idReq)
 
 		return (self.ws_connection, idReq)
 
 	def __retrive_and_write(self, ws_conn, idReq):
 
 		queue = self._dispatcher.get_message_queue(idReq)
+
 
 		try:
 			message = queue.get()
@@ -362,6 +383,7 @@ def initialize(sqs_conn, user_table, settings):
 	dispatcher = DispatcherBroker(int(settings['dispatcher_threads']), settings['response_queue'], settings['zone'], len(quadrantslist))
 
 	pool = ThreadPool(int(settings['pool_size']))
+	#pool = ThreadPoolExecutor(max_workers=int(settings['pool_size']))
 
 		
 	app = tornado.web.Application([(r'/', BaseHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])), 

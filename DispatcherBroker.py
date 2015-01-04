@@ -2,6 +2,7 @@
 
 from Queue import Queue, Empty
 from Dispatcher import DispatcherThread
+from threading import Lock
 
 class DispatcherBroker():
 
@@ -15,6 +16,8 @@ class DispatcherBroker():
 
 		#dizionario qID-queue dove salvo le richieste per un dato quadrante
 		self._quadrantsRequests = {}
+
+		self._lock = Lock()
 
 		for i in range(1, quadrantsNum):
 			self._quadrantsRequests[i] = None
@@ -97,17 +100,27 @@ class DispatcherBroker():
 			self._quadrantsRequests[qID] = None
 		return None
 
-	def put_id_request(self, qID, reqID):
-		'''inserisce la richiesta per il quadrante qID, viene creata la coda di richieste nel caso non fosse presente'''
-		queue = self._quadrantsRequests[qID]
-		if queue is not None:
-			queue.put_nowait(reqID)
-			print "here"
+	def create_quadrant_request(self, qID, reqID):
+		'''crea la coda di richieste per il qudrante qID nel caso non fosse presente e vi iniserisce la richiesta'''
+		print "nella create_quadrant_request"
+		self._lock.acquire()
+		print "nella create_quadrant_request, lock acquisito"
+		if not self._quadrantsRequests[qID]:
+			self._quadrantsRequests[qID] = Queue()
+			self._quadrantsRequests[qID].put_nowait(reqID)
+			print "coda creata ", self._quadrantsRequests[qID]
+			self._lock.release()
 			return True
 		else:
-			print "creo coda per " + str(qID)
-			queue = Queue()
-			self._quadrantsRequests[qID] = queue
-			queue.put_nowait(reqID)
+			print self._quadrantsRequests[qID]
+			self._lock.release()
+			print "nella create_quadrant_request, lock rilasciato"
 			return False
 
+	def put_id_request(self, qID, reqID):
+		'''inserisce la richiesta per il quadrante qID'''
+		queue = self._quadrantsRequests[qID]
+		queue.put_nowait(reqID)
+		print "aggiunta richiesta " + str(reqID) + " per il quadrante " + str(qID)
+
+				
