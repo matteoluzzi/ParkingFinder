@@ -1,6 +1,8 @@
 function displayMap(quadrants, ws, my_center)
 {
 	window.markers = [];
+	window.parking_markers = [];
+	window.zoom = 0;
 	console.log("displaing map...");
 	var element = $("#map")[0];
 
@@ -37,6 +39,13 @@ function displayMap(quadrants, ws, my_center)
 	google.maps.event.addListener(map, 'idle', function()
 	{
 
+			var current_zoom = window.map.getZoom();
+
+			if(current_zoom < 18 && window.zoom == 18) //cancella i markers dei parcheggi dalla mappa
+			{
+				deleteMarkers(window.parking_markers);
+			}
+
 			var newBounds = window.map.getBounds();
 			var newWindow = getWindowsFromBounds(newBounds);
 			var newQuadrants = getCurrentQuadrants(newWindow, quadrants);
@@ -46,7 +55,7 @@ function displayMap(quadrants, ws, my_center)
 			var i = newQuadrants.length;
 
 			while(i--) {
-				if(!contains(currentQuadrants, newQuadrants[i]) || window.map.getZoom() > 17) 
+				if(!contains(currentQuadrants, newQuadrants[i]) || current_zoom > 17 || (current_zoom < 18 && window.zoom == 18)) 
 					quadrantsToBeQuered.push(newQuadrants[i]);
 			}
 
@@ -58,24 +67,20 @@ function displayMap(quadrants, ws, my_center)
 			if(quadrantsToBeQuered.length > 0)
 			{
 				currentQuadrants = newQuadrants;
-				sendMapMessage(ws, quadrantsToBeQuered);
+				sendMapMessage(ws, quadrantsToBeQuered, current_zoom, newBounds);
 			}
+			window.zoom = window.map.getZoom();
 			
 	});
-//	var centerControlDiv = document.createElement('div');
-//	var centrerControl = new CenterControl(centerControlDiv, window.map);
-	
-	//centerControlDiv.index = 1;
-	//window.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
 };
 
 function centerMap(center, start)
 {
-	deleteMarkers();
+	deleteMarkers(window.markers);
+	window.map.setCenter(center);
+	window.map.setZoom(16);
 	if(start)
-	{
-		window.map.setCenter(center);
-		window.map.setZoom(16);
+	{	
 		var marker = new google.maps.Marker({
 			map : window.map,
 			position : center,
@@ -85,25 +90,22 @@ function centerMap(center, start)
 	}
 }
 
-function deleteMarkers()
+function deleteMarkers(array)
 {
-	var i = window.markers.length;
+	var i = array.length;
 	while(i--)
 	{
-		var marker = window.markers.pop();
+		var marker = array.pop();
 		marker.setMap(null);
 		marker = null;
 	}
 }
 
 
-function sendMapMessage(ws, quadrants) 
+function sendMapMessage(ws, quadrants, zoom, bounds) 
 {
 
-	var quadrants_str = quadrants.join("|");
-    var zoom = map.getZoom();
-    var bounds = map.getBounds();
-    
+	var quadrants_str = quadrants.join("|");  
 	var neLat = bounds.getNorthEast().lat();
 	var neLon = bounds.getNorthEast().lng();
 	var swLat = bounds.getSouthWest().lat();
@@ -185,15 +187,21 @@ function displayParkingSpots(data)
 {
 	var parkingsArray = data.parkings;
 	var i = parkingsArray.length;
+	var my_parking_icon = 'imgs/parking_icon.png';
 //	console.log(parkingsArray);
 	while(i--)
 	{
-		var coordinates = new google.maps.LatLng(parseFloat(parkingsArray[i].lat), parseFloat(parkingsArray[i].lon));
-		console.log(coordinates);
-		var marker = new google.maps.Marker({
-			map : window.map,
-			position : coordinates,
-			visible : true
-	});
+		if(parkingsArray[i].state == parseInt("0"))
+		{
+			var coordinates = new google.maps.LatLng(parseFloat(parkingsArray[i].lat), parseFloat(parkingsArray[i].lon));
+			console.log(coordinates);
+			var marker = new google.maps.Marker({
+				map : window.map,
+				position : coordinates,
+				visible : true,
+				icon : my_parking_icon,
+			});
+			parking_markers.push(marker);
+		}		
 	}
 }

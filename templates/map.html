@@ -12,6 +12,7 @@
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&sensor=false"></script>
         <script type="text/javascript" src="{{ static_url("map.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("utils.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("test.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("websocketHandler.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("bootstrap-tagsinput.js") }}"></script>
          <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -37,6 +38,9 @@
                 <div class="navbar-collapse collapse" id='navbar-menu' >
                   <ul class='nav navbar-nav navbar-left'>
                     <li><a href='/'>Mappa</a></li>
+                  </ul>
+                  <ul class='nav navbar-nav navbar-left'>
+                    <li><a id="test" href='#'>Test</a></li>
                   </ul>
                   <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown" id="menuLogin">
@@ -214,6 +218,11 @@
         $('#delete_subs_button').click(function()
         {
             $('#subsquadrants').tagsinput('removeAll');
+        });
+
+        $('#test').click(function()
+        {
+            createTestConnection("{{feAddress}}", "{{fePort}}");
         });
 
         function validatePasswords()
