@@ -5,7 +5,6 @@ from threading import Thread, Lock
 from boto.sqs.message import Message
 import boto.sqs as sqs
 from json import loads, dumps
-from Queue import Queue
 import logging
 
 LOG_FILENAME = './logging/Dispatcher_log.out'
@@ -27,10 +26,14 @@ class DispatcherThread(Thread):
 		self._lock_detail = Lock()
 
 		logging.info("Inizialiazzazione completa")
-	
-	def get_message_queue(self, requestID):
 
-		return self._broker.get_message_queue(requestID)
+	def copyMessage(self, msg):
+
+		logging.info("nella copyMessage")
+		new_msg = {}
+		for key in msg.keys():
+			new_msg[key] = msg[key]
+		return new_msg
 
 	def run(self):
  
@@ -51,22 +54,26 @@ class DispatcherThread(Thread):
 
 					if message['type'] == "overview_response":
 						q_id = message['quadrantID']	
+
 						#scrivi il messaggio su tutte le code dove ci sono threads che lo hanno richiesto
-						while True:
-							r_id = self._broker.get_id_request(q_id)
-							
-							logging.info("Richiesta recuperata " + str(r_id) + " per il quadrante " + str(q_id))
-							if r_id is None:
-								logging.info("Non ci sono più richieste in attesa per il quadrante " + str(q_id))
-								break
-							else:
-								self._lock_overview.acquire()
-								if self._broker.add_subscriber(r_id):
-									message["last"] = True
-								self._lock_overview.release()
+						r_ids = self._broker.get_id_request(q_id)
+
+						for r_id in r_ids:		
+							logging.info("prima della copyMessage")
+							current_msg = self.copyMessage(message)
+							logging.info("Richiesta recuperata " + str(r_id) + " per il quadrante " + str(q_id))	
+							self._lock_overview.acquire()
+							if self._broker.add_subscriber(r_id):
+								current_msg["last"] = True
+								logging.info("ultimo messaggio per " + r_id)
+							self._lock_overview.release()
+							try:
 								queue = self._broker.get_message_queue(r_id)
-								queue.put(message)
-								self._queue.delete_message(raw_message)
+								queue.put(current_msg)
+							except:
+								logging.info("errore nel dispatcher, coda non trovata " + r_id) 
+
+						self._queue.delete_message(raw_message)
 
 					else:
 						self._lock_detail.acquire()
@@ -76,10 +83,6 @@ class DispatcherThread(Thread):
 						queue = self._broker.get_message_queue(r_id)
 						queue.put(message)
 						self._queue.delete_message(raw_message)
-
-
-
-
 
 
 

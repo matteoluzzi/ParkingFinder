@@ -15,7 +15,6 @@ from JSONManager import createOverviewRequest, createFullListRequest, createBoun
 
 from multiprocessing.pool import Pool, ThreadPool
 from multiprocessing import Lock
-from concurrent.futures import ThreadPoolExecutor
 from DispatcherBroker import DispatcherBroker
 
 import tornado.httpserver
@@ -286,7 +285,8 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 		quadrant_ids = args[2]
 		pool = kwargs['pool']
-		settings = kwargs['settings']	
+		settings = kwargs['settings']
+		self._dispatcher.subscribe(args[0], len(quadrant_ids))	
 		for id in quadrant_ids:
 			try:
 				pool.apply_async(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)					
@@ -305,24 +305,18 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			req_type = settings['specific_req_type']
 			print req_type
 			data = self.__create_request_message(settings, idReq, req_type, q_id, zoom_level=zoom_level, neLat=neLat, neLon=neLon, swLat=swLat, swLon=swLon)
-		else:
-			req_type = settings['global_req_type']
-			data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
-		
-		global subscribe_lock
-
-		subscribe_lock.acquire()
-		self._dispatcher.subscribe(idReq, req_size)
-		subscribe_lock.release()
-
-
-		if self._dispatcher.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
 			msg = Message()
 			msg.set_body(data)	
 			res = queue.write(msg)
 			print "scritto messaggio ", res.get_body()
 		else:
-			self._dispatcher.put_id_request(q_id, idReq)
+			if self._dispatcher.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
+				req_type = settings['global_req_type']
+				data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
+				msg = Message()
+				msg.set_body(data)	
+				res = queue.write(msg)
+				print "scritto messaggio ", res.get_body()
 
 		return (self.ws_connection, idReq)
 
@@ -332,22 +326,24 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 
 		try:
-			message = queue.get()
+			message = queue.get(timeout=30)
 
-			print "message: " + repr(message)
+			#print "message: " + repr(message)
+			message['r_id'] = idReq
 			if message.has_key("last"):
 				message.pop("last", None)
 				if isinstance(message, dict):
 					message = tornado.escape.json_encode(message)
 				ws_conn.write_message(message)
-				print "ultimo messaggio"
+				print "ultimo messaggio, cancello la coda per " + idReq
 				self._dispatcher.delete_queue(idReq)	
 			else:
 				if isinstance(message, dict):
 					message = tornado.escape.json_encode(message)
 				ws_conn.write_message(message)
-				print "scritto messaggio al client"
+				print "scritto messaggio al client ", idReq
 		except Empty:
+			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
 			print "nessun messaggio entro il timeout"
 		except:
 			import traceback

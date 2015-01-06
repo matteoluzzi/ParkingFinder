@@ -18,6 +18,7 @@ class DispatcherBroker():
 		self._quadrantsRequests = {}
 
 		self._lock = Lock()
+		self._message_queue_lock = Lock()
 
 		for i in range(1, quadrantsNum):
 			self._quadrantsRequests[i] = None
@@ -28,17 +29,23 @@ class DispatcherBroker():
 			dispatcher.start()
 
 	def subscribe(self, requestID, maxsize):
+		self._message_queue_lock.acquire()
 		if not self._subsQueues.has_key(requestID):
 			self._subsQueues[requestID] = Queue(maxsize=maxsize)
+		self._message_queue_lock.release()
 
 	def belongsTo(self, requestID):
 		'''verifica l'appartenenza di una richiesta al server'''
+		self._message_queue_lock.acquire()
 		try:
 			self._subsQueues[requestID]
+			self._message_queue_lock.release()
 			return True
 		except KeyError:
 			print "errore nella belongsTo nel recuperare una subsQueue, coda non trovata"
 			return False
+			self._message_queue_lock.release()
+		
 
 	def get_message_queue(self, requestID):
 		'''ritorna il riferimento alla coda richiesta'''
@@ -46,7 +53,7 @@ class DispatcherBroker():
 			queue = self._subsQueues[requestID]
 			return queue
 		except KeyError:
-			print "errore nel recuperare una subsQueue, coda non trovata"
+			print "errore nel recuperare una subsQueue, coda non trovata ", requestID
 			return None
 
 	def delete_queue(self, requestID):
@@ -78,10 +85,11 @@ class DispatcherBroker():
 				self._subscribers[requestID] = current_subs
 
 			counter = queue.maxsize - current_subs
-			print "--------------->current_subs=", current_subs, " counter=", counter
+			print "--------------->current_subs=", current_subs, " counter=", counter, requestID
 
 			if counter == 0: #ultimo messaggio
 				self.delete_subscribers(requestID)
+				print "ultimo messaggio per " + requestID
 				return True
 			return False
 		else:
@@ -89,16 +97,21 @@ class DispatcherBroker():
 			return False
 
 	def get_id_request(self, qID):
-		'''ritorna la il codice della richiesta per un determinato quadrante, None se non è presente'''
-		try:
-			ret = self._quadrantsRequests[qID].get_nowait()
-			return ret
-		except KeyError:
-			print "coda di richieste non trovata per il quadrante " + str(qID)
-		except Empty:
-			print "coda di richieste vuota, la cancello"
-			self._quadrantsRequests[qID] = None
-		return None
+		'''ritorna i codici di richiesta per un determinato quadrante'''
+		self._lock.acquire()
+		ret = []
+		while True:
+			try:
+				ret.append(self._quadrantsRequests[qID].get_nowait())				
+			except KeyError:
+				print "coda di richieste non trovata per il quadrante " + str(qID)
+				break
+			except Empty:
+				print "coda di richieste vuota, la cancello"
+				self._quadrantsRequests[qID] = None
+				break
+		self._lock.release()
+		return ret
 
 	def create_quadrant_request(self, qID, reqID):
 		'''crea la coda di richieste per il qudrante qID nel caso non fosse presente e vi iniserisce la richiesta'''
@@ -108,19 +121,14 @@ class DispatcherBroker():
 		if not self._quadrantsRequests[qID]:
 			self._quadrantsRequests[qID] = Queue()
 			self._quadrantsRequests[qID].put_nowait(reqID)
-			print "coda creata ", self._quadrantsRequests[qID]
+			print "coda creata ", self._quadrantsRequests[qID], qID, reqID
 			self._lock.release()
 			return True
 		else:
-			print self._quadrantsRequests[qID]
+			print "coda già presente, aggiunta richiesta " + str(reqID) + " per il quadrante " + str(qID)
+			queue = self._quadrantsRequests[qID]
+			queue.put_nowait(reqID)
 			self._lock.release()
 			print "nella create_quadrant_request, lock rilasciato"
 			return False
 
-	def put_id_request(self, qID, reqID):
-		'''inserisce la richiesta per il quadrante qID'''
-		queue = self._quadrantsRequests[qID]
-		queue.put_nowait(reqID)
-		print "aggiunta richiesta " + str(reqID) + " per il quadrante " + str(qID)
-
-				
