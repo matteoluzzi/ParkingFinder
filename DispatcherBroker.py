@@ -43,10 +43,9 @@ class DispatcherBroker():
 			return True
 		except KeyError:
 			print "errore nella belongsTo nel recuperare una subsQueue, coda non trovata"
-			return False
 			self._message_queue_lock.release()
-		
-
+			return False
+			
 	def get_message_queue(self, requestID):
 		'''ritorna il riferimento alla coda richiesta'''
 		try:

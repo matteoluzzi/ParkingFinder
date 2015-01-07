@@ -279,54 +279,61 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			print "nella on_wrritecomeplet"
 			ws_conn = result[0]
 			idReq = result[1]
+			writing_jobs_size = result[2]
+
+			for i in range(0, writing_jobs_size):
 			
-			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
-			#self._pool.submit(self.__retrive_and_write, args=(ws_conn, idReq), kwargs=None)	
+				self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
+				#self._pool.submit(self.__retrive_and_write, args=(ws_conn, idReq), kwargs=None)	
 		
 		quadrant_ids = args[2]
 		pool = kwargs['pool']
 		settings = kwargs['settings']
 		self._dispatcher.subscribe(args[0], len(quadrant_ids))	
-		for id in quadrant_ids:
-			try:
-				pool.apply_async(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)					
-	 			# f =	pool.submit(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), kwargs=None)
-	 			# print f
-	 			# f.add_done_callback(lambda future: tornado.ioloop.IOLoop.instance().add_callback(functools.partial(on_write_complete, future)))
-	 		except:
-	 			import traceback
-				print traceback.format_exc()	
+		# for id in quadrant_ids:
+		# 	try:
+		# 		pool.apply_async(func, args=(self._sqs_request_queue, id ,len(quadrant_ids), args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)					
+	 # 		except:
+	 # 			import traceback
+		# 		print traceback.format_exc()
+		try:
+			pool.apply_async(func, args=(self._sqs_request_queue, quadrant_ids, args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)
+		except:
+	 		import traceback
+		 	print traceback.format_exc()
+
 		print "writing jobs submitted!!!!!!!!!!!"
 		
-	def __send_parking_spots_request(self, queue, q_id, req_size, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
+	def __send_parking_spots_request(self, queue, q_ids, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
 
-		print "nella sendparkign..."
-		if int(zoom_level) >= 18:
-			req_type = settings['specific_req_type']
-			print req_type
-			data = self.__create_request_message(settings, idReq, req_type, q_id, zoom_level=zoom_level, neLat=neLat, neLon=neLon, swLat=swLat, swLon=swLon)
-			msg = Message()
-			msg.set_body(data)	
-			res = queue.write(msg)
-			print "scritto messaggio ", res.get_body()
-		else:
-			if self._dispatcher.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
-				req_type = settings['global_req_type']
-				data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
+		for q_id in q_ids:
+
+			print "nella sendparkign..."
+			if int(zoom_level) >= 18:
+				req_type = settings['specific_req_type']
+				print req_type
+				data = self.__create_request_message(settings, idReq, req_type, q_id, zoom_level=zoom_level, neLat=neLat, neLon=neLon, swLat=swLat, swLon=swLon)
 				msg = Message()
 				msg.set_body(data)	
 				res = queue.write(msg)
 				print "scritto messaggio ", res.get_body()
+			else:
+				if self._dispatcher.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
+					req_type = settings['global_req_type']
+					data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
+					msg = Message()
+					msg.set_body(data)	
+					res = queue.write(msg)
+					print "scritto messaggio ", res.get_body()
 
-		return (self.ws_connection, idReq)
+		return (self.ws_connection, idReq, len(q_ids))
 
 	def __retrive_and_write(self, ws_conn, idReq):
 
-		queue = self._dispatcher.get_message_queue(idReq)
-
+		queue = self._dispatcher.get_message_queue(idReq)			
 
 		try:
-			message = queue.get(timeout=30)
+			message = queue.get()
 
 			#print "message: " + repr(message)
 			message['r_id'] = idReq
@@ -334,13 +341,15 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 				message.pop("last", None)
 				if isinstance(message, dict):
 					message = tornado.escape.json_encode(message)
-				ws_conn.write_message(message)
+				if ws_conn:
+					ws_conn.write_message(message)
 				print "ultimo messaggio, cancello la coda per " + idReq
 				self._dispatcher.delete_queue(idReq)	
 			else:
 				if isinstance(message, dict):
 					message = tornado.escape.json_encode(message)
-				ws_conn.write_message(message)
+				if ws_conn:
+					ws_conn.write_message(message)
 				print "scritto messaggio al client ", idReq
 		except Empty:
 			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
