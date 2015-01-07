@@ -104,6 +104,10 @@ function deleteMarkers(array)
 
 function sendMapMessage(ws, quadrants, zoom, bounds) 
 {
+	if(zoom == null)
+		zoom = 14;
+	if(bounds == null)
+		bounds = window.map.getBounds();
 
 	var quadrants_str = quadrants.join("|");  
 	var neLat = bounds.getNorthEast().lat();
