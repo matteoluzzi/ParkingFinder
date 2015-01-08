@@ -16,9 +16,9 @@ from JSONManager import subscribeEmailNotification
 
 class QuadrantsSubscriptionHandler(BaseHandler):
 
-	def check_origin(self, origin):
-
-		return True
+	def set_default_headers(self):
+		
+		self.set_header("Access-Control-Allow-Origin", "*")
 
 	def initialize(self, subs_requests_queue):
 
@@ -35,6 +35,7 @@ class QuadrantsSubscriptionHandler(BaseHandler):
 		pool = ThreadPool(processes=1)
 		pool.apply_async(self.__write_subscriptions, args=(quadrants, ), callback=self.__onfinish)
 		pool.close
+		self.__onfinish(None)
 
 	def __write_subscriptions(self, quadrants):
 

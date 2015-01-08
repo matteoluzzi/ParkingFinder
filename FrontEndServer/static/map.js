@@ -133,7 +133,7 @@ function sendSubscribedQuadrants(data, feAddress, fePort)
 		console.log(json_data);
 		$.ajax({
 			type : "POST",
-			url : "http://" +feAddress + ":" + fePort + "/subsquadrants" ,
+			url : "http://" +feAddress + "/subsquadrants" ,
 			data : json_data,
 			dataType: "json",
 			success : function(result) {
