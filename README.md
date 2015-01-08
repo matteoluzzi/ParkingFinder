@@ -15,3 +15,7 @@ Dipendenze Front-end Server:
     <code>sudo python setup.py install</code><br>
   
   </li>
+</ul>
+<p>
+  Per l'avvio del server di front end bisogna lanciare il file <code>FrontEndServer.py</code> nella cartella FrontEndServer, specificando l'indirizzo della macchina nel file <code>settings/FrontEndServer.ini</code>
+</p>
