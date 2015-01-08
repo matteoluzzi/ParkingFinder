@@ -34,6 +34,9 @@ function displayMap(quadrants, ws, my_center)
 		maxZoom : 18
 	}));
 
+	map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('custom_legend'));
+	$("#custom_legend").show();
+	
 	var currentQuadrants = [];
 		
 	google.maps.event.addListener(map, 'idle', function()

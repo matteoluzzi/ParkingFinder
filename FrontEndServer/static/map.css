@@ -16,3 +16,15 @@ div#footer {
     z-index: 2;
     background: WHITE;
 }
+
+.custom_legend {
+        background: transparent;
+        padding: 10px;   
+        }
+.custom_legend ul {list-style-type: none}
+.custom_legend li {float: left; margin-right: 50px;}
+.custom_legend span {border: 1px solid #000000; float: left; width: 20px; height: 20px; margin: 5px;}
+.custom_legend .high-parkings {background-color: #00FF00;}
+.custom_legend .medium-parkings {background-color: #FF9900;}
+.custom_legend .low-parkings {background-color: #CC0000;}
+.custom_legend .notdefined-parkings {background-color: #C0C0C0;}

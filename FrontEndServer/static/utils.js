@@ -123,9 +123,3 @@ function generateUUID() {
 			});
 	return uuid;
 };
-
-
-function Constants() {
-
-	this.WsURL = "ws://ec2-54-194-215-24.eu-west-1.compute.amazonaws.com:8000/map";
-}
