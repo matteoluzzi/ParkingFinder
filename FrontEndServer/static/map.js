@@ -33,9 +33,8 @@ function displayMap(quadrants, ws, my_center)
 		name : "OpenStreetMap",
 		maxZoom : 18
 	}));
-
-	map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('custom_legend'));
-	$("#custom_legend").show();
+	
+	map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('custom_legend').cloneNode(true));
 	
 	var currentQuadrants = [];
 		
