@@ -5,6 +5,7 @@ import Parking as pk
 import gc
 import time as tm
 import threading
+import traceback
 
 class Quadrant:
 	__qid	=	0
