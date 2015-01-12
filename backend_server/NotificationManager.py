@@ -44,8 +44,7 @@ class NotificationPoller (threading.Thread):
 	def run(self):
 		#per ogni quadrante genera le richieste di overview ogni freqtime
 		print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
-		#conn = boto.sqs.connect_to_region(self.mysqsZone)
-		conn = boto.sqs.connection.SQSConnection(aws_access_key_id="AKIAJM2G6HWH3WE6DJ5A", aws_secret_access_key="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",region=self.mysqsZone)
+		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
 		fakelist	=	range(int(self.rEnd)-int(self.rStart))
@@ -84,8 +83,7 @@ class ResponseManager(threading.Thread):
 	def run(self):
 		#definisci coda su cui ricevere risposte e rimani in ascolto
 		print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
-		#conn = boto.sqs.connect_to_region(self.mysqsZone)
-		conn = boto.sqs.connection.SQSConnection(aws_access_key_id="AKIAJM2G6HWH3WE6DJ5A", aws_secret_access_key="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",region=self.mysqsZone)
+		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
 		queueName	=	"_APPosto_SDCC_notification_poller"
@@ -126,8 +124,7 @@ class NotificationManager():
 		
 	def manageEvent(self,newPercentage):
 		#print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
-		#conn = boto.sqs.connect_to_region(self.mysqsZone)
-		conn = boto.sqs.connection.SQSConnection(aws_access_key_id="AKIAJM2G6HWH3WE6DJ5A", aws_secret_access_key="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",region=self.mysqsZone)
+		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
 		notifQueue	=	conn.get_queue("_APPosto_notificationQueue")

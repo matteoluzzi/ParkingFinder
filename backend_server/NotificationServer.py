@@ -18,7 +18,7 @@ class NotificationServer(threading.Thread):
 		myRegion			=	str(self.settingsHandler.settings['awsRegion'])
 		myRegion			=	myRegion[:-1] #mistero... backspace in fondo a stringa
 		self.snsRegion		=	myRegion
-		self.snsConnection		=	boto.sns.SNSConnection(aws_access_key_id="AKIAJM2G6HWH3WE6DJ5A", aws_secret_access_key="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",region=myRegion)
+		self.snsConnection		=	boto.sns.connect_to_region(myRegion)
 		self.nQuadrants			=	str(self.settingsHandler.settings['nQuadrants'])
 		self.androidPlatformArn	=	str(self.settingsHandler.settings['apparn'])
 		fakelist	=	range(int(self.nQuadrants))
