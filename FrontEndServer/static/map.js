@@ -8,7 +8,7 @@ function displayMap(quadrants, ws, my_center)
 
 	window.map = new google.maps.Map(element, {
 		center : my_center,
-		zoom : 16,
+		zoom : 15,
 		minZoom : 14,
 		mapTypeId : "OSM",
 		mapTypeControl : false,

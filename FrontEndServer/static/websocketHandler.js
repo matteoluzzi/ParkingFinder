@@ -4,9 +4,12 @@ function get_my_position(callback) {
 					callback(new google.maps.LatLng(position.coords.latitude,
 	                position.coords.longitude));
 				},
-				function () {				
-					callback(new google.maps.LatLng(41.88976989299657,
-					12.514091491699224));
+				function () {		
+					var randomLat = Math.random() * (42.06 - 41.75) + 41.75;
+					var randomLon = Math.random() * (12.74 - 12.25) + 12.25;
+
+					//callback(new google.maps.LatLng(41.88976989299657, 12.514091491699224));
+					callback(new google.maps.LatLng(randomLat, randomLon));
 				});			
 };
 
@@ -59,6 +62,10 @@ function on_message(message, quadrants) {
 };
 
 function on_close(event, ws, feAddr, fePort) {
+	if($('#enable_selection').is(':checked'))
+	{
+		$('#enable_selection').click();
+	}
 	console.log("Websocket chiusa - riconnessione");
 	var center = window.map.getCenter();
 	ws = create_connection(center, feAddr, fePort);
