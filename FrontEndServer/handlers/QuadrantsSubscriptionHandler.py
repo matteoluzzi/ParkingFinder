@@ -35,7 +35,7 @@ class QuadrantsSubscriptionHandler(BaseHandler):
 		pool = ThreadPool(processes=1)
 		pool.apply_async(self.__write_subscriptions, args=(quadrants, ), callback=self.__onfinish)
 		pool.close
-		self.__onfinish(None)
+		#self.__onfinish(None)
 
 	def __write_subscriptions(self, quadrants):
 

@@ -64,7 +64,6 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		'''funzione che lancia la scrittura sulle code'''
 
 		def on_write_complete(result):
-			print "nella on_wrritecomeplet"
 			ws_conn = result[0]
 			idReq = result[1]
 			writing_jobs_size = result[2]
@@ -89,7 +88,6 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 		for q_id in q_ids:
 
-			print "nella sendparkign..."
 			if int(zoom_level) >= 18:
 				req_type = settings['specific_req_type']
 				print req_type
@@ -114,7 +112,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		queue = self._dispatcher.get_message_queue(idReq)			
 
 		try:
-			message = queue.get()
+			message = queue.get(timeout=30)
 
 			#print "message: " + repr(message)
 			message['r_id'] = idReq
@@ -141,8 +139,6 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 	@staticmethod
 	def __create_request_message(settings, idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
-		
-		print "nella create...."
 
 		request = ""
 		if reqType == settings['global_req_type']:

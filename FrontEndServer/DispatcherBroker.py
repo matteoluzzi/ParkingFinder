@@ -106,7 +106,6 @@ class DispatcherBroker():
 				print "coda di richieste non trovata per il quadrante " + str(qID)
 				break
 			except Empty:
-				print "coda di richieste vuota, la cancello"
 				self._quadrantsRequests[qID] = None
 				break
 		self._lock.release()
@@ -114,9 +113,7 @@ class DispatcherBroker():
 
 	def create_quadrant_request(self, qID, reqID):
 		'''crea la coda di richieste per il qudrante qID nel caso non fosse presente e vi iniserisce la richiesta'''
-		print "nella create_quadrant_request"
 		self._lock.acquire()
-		print "nella create_quadrant_request, lock acquisito"
 		if not self._quadrantsRequests[qID]:
 			self._quadrantsRequests[qID] = Queue()
 			self._quadrantsRequests[qID].put_nowait(reqID)
@@ -128,6 +125,5 @@ class DispatcherBroker():
 			queue = self._quadrantsRequests[qID]
 			queue.put_nowait(reqID)
 			self._lock.release()
-			print "nella create_quadrant_request, lock rilasciato"
 			return False
 

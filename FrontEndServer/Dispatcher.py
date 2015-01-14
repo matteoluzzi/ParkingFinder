@@ -5,12 +5,6 @@ from threading import Thread, Lock
 from boto.sqs.message import Message
 import boto.sqs as sqs
 from json import loads, dumps
-import logging
-
-LOG_FILENAME = './logging/Dispatcher_log.out'
-
-logging.basicConfig(format='%(asctime)s %(thread)d %(message)s', level=logging.INFO, filename=LOG_FILENAME)
-
 
 class DispatcherThread(Thread):
 
@@ -25,11 +19,11 @@ class DispatcherThread(Thread):
 		self._lock_overview = Lock()
 		self._lock_detail = Lock()
 
-		logging.info("Inizialiazzazione completa")
+		print "Inizialiazzazione completa"
 
 	def copyMessage(self, msg):
 
-		logging.info("nella copyMessage")
+		#logging.info("nella copyMessage")
 		new_msg = {}
 		for key in msg.keys():
 			new_msg[key] = msg[key]
@@ -40,11 +34,11 @@ class DispatcherThread(Thread):
 		while True:
 			raw_messages = self._queue.get_messages(wait_time_seconds=20, num_messages=1)
 
-			logging.info("Rivevuti " + str(len(raw_messages)) + " messages")
+			#logging.info("Rivevuti " + str(len(raw_messages)) + " messages")
 
 			for raw_message in raw_messages:
 
-				logging.info("Nuovo messaggio " + str(raw_message.get_body()))
+				#logging.info("Nuovo messaggio " + str(raw_message.get_body()))
 				message = loads(raw_message.get_body())[0]				
 				
 				r_id = message['r_id']
@@ -59,19 +53,19 @@ class DispatcherThread(Thread):
 						r_ids = self._broker.get_id_request(q_id)
 
 						for r_id in r_ids:		
-							logging.info("prima della copyMessage")
+							#logging.info("prima della copyMessage")
 							current_msg = self.copyMessage(message)
-							logging.info("Richiesta recuperata " + str(r_id) + " per il quadrante " + str(q_id))	
+							#logging.info("Richiesta recuperata " + str(r_id) + " per il quadrante " + str(q_id))	
 							self._lock_overview.acquire()
 							if self._broker.add_subscriber(r_id):
 								current_msg["last"] = True
-								logging.info("ultimo messaggio per " + r_id)
+								#logging.info("ultimo messaggio per " + r_id)
 							self._lock_overview.release()
 							try:
 								queue = self._broker.get_message_queue(r_id)
 								queue.put(current_msg)
 							except:
-								logging.info("errore nel dispatcher, coda non trovata " + r_id) 
+								#logging.info("errore nel dispatcher, coda non trovata " + r_id) 
 
 						self._queue.delete_message(raw_message)
 
