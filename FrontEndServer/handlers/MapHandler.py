@@ -41,19 +41,26 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 	def on_message(self, raw_message):
 		message = json.loads(raw_message)
-		idReq = message['id']
-		zoom_level = message['zoom_level']
-		neLat = message['neLat']
-		neLon = message['neLon']
-		swLat = message['swLat']
-		swLon = message['swLon']
-		quadrants = message['quadrants']
 
-		q_ids = set(map(lambda x: int(x),quadrants.split("|")))
-		print q_ids
+		msg_type = message["type"]
+		
+		if msg_type == "normal":
 
-		self.__write_background(self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
+			idReq = message['id']
+			zoom_level = message['zoom_level']
+			neLat = message['neLat']
+			neLon = message['neLon']
+			swLat = message['swLat']
+			swLon = message['swLon']
+			quadrants = message['quadrants']
 
+			q_ids = set(map(lambda x: int(x),quadrants.split("|")))
+			print q_ids
+
+			self.__write_background(self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
+
+		else: #messaggio di heartbeat
+			pass
 
 	def on_close(self):
 		print "WebSocket closed!"

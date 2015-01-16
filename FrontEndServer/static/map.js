@@ -118,7 +118,7 @@ function sendMapMessage(ws, quadrants, zoom, bounds)
 	var swLon = bounds.getSouthWest().lng();
 	var id = generateUUID();
 
-	var message = JSON.stringify({"id":id, "zoom_level" :zoom, "neLat": neLat, "neLon":neLon, "swLat":swLat, "swLon":swLon, "quadrants":quadrants_str});
+	var message = JSON.stringify({"type":"normal", "id":id, "zoom_level" :zoom, "neLat": neLat, "neLon":neLon, "swLat":swLat, "swLon":swLon, "quadrants":quadrants_str});
 
 	sendMessage(ws, message, true);
 

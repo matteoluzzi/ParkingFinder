@@ -18,6 +18,17 @@ function create_connection(my_center, feAddr, fePort) {
 
 	var quadrants;
 
+	ws.onopen = function(event)
+	{
+		console.log('websocket opened');
+		setInterval(function()
+		{
+			var ping_message = JSON.stringify({"type" : "Heartbeat"});
+			console.log("sending ping");
+			sendMessage(ws, ping_message, false);
+		}, 40000);
+	} 
+
 	ws.onmessage = function(event) 
 	{ 
 		var data_obj = JSON.parse(event.data);
@@ -62,13 +73,17 @@ function on_message(message, quadrants) {
 };
 
 function on_close(event, ws, feAddr, fePort) {
+/*	if($('#enable_selection').is(':checked'))
+=======
 	if($('#enable_selection').is(':checked'))
+>>>>>>> 59705ed5a6438f7b799f5ccf08098dfd03096800
 	{
 		$('#enable_selection').click();
 	}
 	console.log("Websocket chiusa - riconnessione");
 	var center = window.map.getCenter();
 	ws = create_connection(center, feAddr, fePort);
+	*/
 };
 
 function on_error(even) {
