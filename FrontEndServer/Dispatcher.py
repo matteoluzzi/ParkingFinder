@@ -8,8 +8,7 @@ from json import loads, dumps
 
 class DispatcherThread(Thread):
 
-	def __init__(self, broker, queue_name, zone):
-		
+	def __init__(self, broker, queue_name, zone):		
 		Thread.__init__(self)
 		self._sqs_conn = sqs.connect_to_region(zone)
 		self._queue = self._sqs_conn.get_queue(queue_name)
@@ -65,7 +64,8 @@ class DispatcherThread(Thread):
 								queue = self._broker.get_message_queue(r_id)
 								queue.put(current_msg)
 							except:
-								#logging.info("errore nel dispatcher, coda non trovata " + r_id) 
+								#logging.info("errore nel dispatcher, coda non trovata " + r_id)
+								pass
 
 						self._queue.delete_message(raw_message)
 
