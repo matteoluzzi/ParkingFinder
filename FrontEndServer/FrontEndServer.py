@@ -7,13 +7,13 @@ from multiprocessing.pool import ThreadPool
 import boto.sqs as sqs
 from boto.dynamodb2.table import Table
 
-from DispatcherBroker import DispatcherBroker
+from DispatcherBroker_alt import DispatcherBroker
 from handlers.HomeHandler import HomeHandler
 from handlers.RegisterHandler import RegisterHandler
 from handlers.LoginHandler import LoginHandler
 from handlers.LogoutHandler import LogoutHandler
 from handlers.QuadrantsSubscriptionHandler import QuadrantsSubscriptionHandler
-from handlers.MapHandler import MapHandler
+from handlers.MapHandler_alt import MapHandler
 
 import tornado.httpserver
 import tornado.ioloop

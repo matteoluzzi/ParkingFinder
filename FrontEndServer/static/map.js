@@ -5,6 +5,7 @@ function displayMap(quadrants, ws, my_center)
 	window.zoom = 0;
 	console.log("displaing map...");
 	var element = $("#map")[0];
+	window.count = -1;
 
 	window.map = new google.maps.Map(element, {
 		center : my_center,
@@ -70,6 +71,7 @@ function displayMap(quadrants, ws, my_center)
 			{
 				currentQuadrants = newQuadrants;
 				sendMapMessage(ws, quadrantsToBeQuered, current_zoom, newBounds);
+				window.count = quadrantsToBeQuered.length;
 			}
 			window.zoom = window.map.getZoom();
 			
@@ -187,6 +189,7 @@ function setQuadrantColor(quadrant, color)
 {
 	var polygon = quadrant.polygon;
 	polygon.setOptions({fillColor: color, fillOpacity: 0.20, map: window.map, strokeColor : "#FFFFFF", strokeOpacity : 0, visible : true, editable : false, draggable : false});	
+	window.count = window.count -1;
 }
 
 function displayParkingSpots(data)
