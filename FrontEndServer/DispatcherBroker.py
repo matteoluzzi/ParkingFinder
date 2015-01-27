@@ -11,14 +11,13 @@ class DispatcherBroker():
 		#dizionario reqID-subs dove salvo i subscriber serviti
 		self._subscribers = {}
 		
-		#dizionario reqID-queue dove salvo le code di comunicazione con i subscribers
-		self._subsQueues = {}
-
 		#dizionario qID-queue dove salvo le richieste per un dato quadrante
 		self._quadrantsRequests = {}
 
 		self._lock = Lock()
-		self._message_queue_lock = Lock()
+		self._subscribers_lock = Lock()
+		self._dispatcherThreads = set()
+
 
 		for i in range(1, quadrantsNum):
 			self._quadrantsRequests[i] = None
@@ -27,41 +26,35 @@ class DispatcherBroker():
 		for i in range(0, num_threads):
 			dispatcher = DispatcherThread(self, queue_name, zone)
 			dispatcher.start()
+			self._dispatcherThreads.add(dispatcher)
+
+	def setComponents(self, handler, queue):
+		
+		for dispatcher in self._dispatcherThreads:
+			dispatcher.setHandler(handler)
+			dispatcher.setQueue(queue)
+
+
 
 	def subscribe(self, requestID, maxsize):
-		self._message_queue_lock.acquire()
-		if not self._subsQueues.has_key(requestID):
-			self._subsQueues[requestID] = Queue(maxsize=maxsize)
-		self._message_queue_lock.release()
+		'''registra una richiesta'''
+		self._subscribers_lock.acquire()
+		if not self._subscribers.has_key(requestID):
+			self._subscribers[requestID] = maxsize
+		self._subscribers_lock.release()
 
 	def belongsTo(self, requestID):
 		'''verifica l'appartenenza di una richiesta al server'''
-		self._message_queue_lock.acquire()
+		self._subscribers_lock.acquire()
 		try:
-			self._subsQueues[requestID]
-			self._message_queue_lock.release()
+			self._subscribers[requestID]
+			self._subscribers_lock.release()
 			return True
 		except KeyError:
 			print "errore nella belongsTo nel recuperare una subsQueue, coda non trovata"
-			self._message_queue_lock.release()
+			self._subscribers_lock.release()
 			return False
-			
-	def get_message_queue(self, requestID):
-		'''ritorna il riferimento alla coda richiesta'''
-		try:
-			queue = self._subsQueues[requestID]
-			return queue
-		except KeyError:
-			print "errore nel recuperare una subsQueue, coda non trovata ", requestID
-			return None
 
-	def delete_queue(self, requestID):
-		'''cancella la coda identificata da requestID quando tutti i subscribers sono stati serviti'''
-		try:
-			del self._subsQueues[requestID]
-		except KeyError:
-			print "errore nella cancellazione della subsQueue, coda non trovata"
-			return None
 
 	def delete_subscribers(self, requestID):
 		'''cancella l'entry del dizionario relativo ai subscribers per una requestID'''
@@ -73,25 +66,21 @@ class DispatcherBroker():
 
 	def add_subscriber(self, requestID):
 		'''aggiunge un subscribers ogni volta che arriva un messaggio, cancella il dizionario se è l'ultimo messaggio relativo a requestID'''
-		queue = self.get_message_queue(requestID)
-		current_subs = 0
-		if queue != None:
-			if not requestID in self._subscribers.keys():
-				self._subscribers[requestID] = 1
-				current_subs = 1
-			else:
-				current_subs = self._subscribers[requestID] + 1
-				self._subscribers[requestID] = current_subs
-
-			counter = queue.maxsize - current_subs
-			print "--------------->current_subs=", current_subs, " counter=", counter, requestID
-
-			if counter == 0: #ultimo messaggio
+		self._subscribers_lock.acquire()
+		try:
+			curr_subs = self._subscribers[requestID]
+			curr_subs -= 1
+			print "---------------> " + repr(requestID) + " mancano " + repr(curr_subs)
+			if curr_subs == 0:
 				self.delete_subscribers(requestID)
+				self._subscribers_lock.release()
 				print "ultimo messaggio per " + requestID
 				return True
-			return False
-		else:
+			else:
+				self._subscribers[requestID] = curr_subs
+				self._subscribers_lock.release()
+		except KeyError:
+			self._subscribers_lock.release()
 			print "errore relativo alla richiesta " + requestID
 			return False
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from Queue import Empty
+from Queue import Empty, Queue
 from multiprocessing.pool import Pool
+from threading import RLock
 import json, sys, os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend_server')))
@@ -12,7 +13,11 @@ from boto.sqs.message import Message
 
 import tornado.websocket
 from tornado.escape import json_encode, json_decode
+from tornado.ioloop import IOLoop
 
+connections = dict()
+ws = dict()
+messages_queue = Queue()
 
 '''Handler per la gestione delle richieste riguardanti la mappa, lo scambio di messaggi req/resp avviene su una websocket'''
 
@@ -25,9 +30,8 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		self._dispatcher = dispatcher
 		self._settings = settings
 		self._quadrants_list = quadrantslist
-		'''insieme di connessioni al server'''
-		self._connections = set()
 		self._pool = pool
+		self._dispatcher.setComponents(self, messages_queue)
 
 	def check_origin(self, origin):
 
@@ -35,12 +39,13 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 		
 	def open(self):
 		print "WebSocket opened!"
-		self._connections.add(self)
+		ws[self] = set()
 		quadrant_list_msg = json.dumps({"type": "quadrant_list", "data" : self._quadrants_list})
 		self.write_message(quadrant_list_msg)
 
 	def on_message(self, raw_message):
 		message = json.loads(raw_message)
+		print ws, connections
 
 		msg_type = message["type"]
 		
@@ -54,43 +59,38 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			swLon = message['swLon']
 			quadrants = message['quadrants']
 
+			connections[idReq] = self.ws_connection
+			ws[self].add(idReq)
+			#print "aggiunta connessione a " + repr(connections)
+
 			q_ids = set(map(lambda x: int(x),quadrants.split("|")))
 			print q_ids
 
-			self.__write_background(self.__send_parking_spots_request, args=(idReq, zoom_level, q_ids, neLat, neLon, swLat, swLon), kwargs={'pool':self._pool, 'settings':self._settings})
+			self._dispatcher.subscribe(idReq, len(q_ids))
 
+			try:
+				self._pool.apply_async(self.__send_parking_spots_request, args=(self._sqs_request_queue, q_ids, idReq, zoom_level, neLat, neLon, swLat, swLon, self._settings), callback=None)
+			except:
+		 		import traceback
+			 	print traceback.format_exc()
+
+			print "writing jobs submitted!!!!!!!!!!!"
+			
 		else: #messaggio di heartbeat
 			pass
 
 	def on_close(self):
+
+		for idReq in ws[self]:
+			try:	
+				del connections[idReq]
+			except KeyError:
+				pass
+		
+		del ws[self]
 		print "WebSocket closed!"
-		self._connections.discard(self)
-		
-	
-	def __write_background(self, func, args=(), kwargs={}):
-		'''funzione che lancia la scrittura sulle code'''
+		print connections, ws
 
-		def on_write_complete(result):
-			ws_conn = result[0]
-			idReq = result[1]
-			writing_jobs_size = result[2]
-
-			for i in range(0, writing_jobs_size):
-			
-				self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
-		
-		quadrant_ids = args[2]
-		pool = kwargs['pool']
-		settings = kwargs['settings']
-		self._dispatcher.subscribe(args[0], len(quadrant_ids))	
-		try:
-			pool.apply_async(func, args=(self._sqs_request_queue, quadrant_ids, args[0], args[1], args[3], args[4], args[5], args[6], settings), callback=on_write_complete)
-		except:
-	 		import traceback
-		 	print traceback.format_exc()
-
-		print "writing jobs submitted!!!!!!!!!!!"
-		
 	def __send_parking_spots_request(self, queue, q_ids, idReq, zoom_level, neLat, neLon, swLat, swLon, settings):
 
 		for q_id in q_ids:
@@ -111,39 +111,8 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 					msg.set_body(data)	
 					res = queue.write(msg)
 					print "scritto messaggio ", res.get_body()
+		return 
 
-		return (self.ws_connection, idReq, len(q_ids))
-
-	def __retrive_and_write(self, ws_conn, idReq):
-
-		queue = self._dispatcher.get_message_queue(idReq)			
-
-		try:
-			message = queue.get(timeout=30)
-
-			#print "message: " + repr(message)
-			message['r_id'] = idReq
-			if message.has_key("last"):
-				message.pop("last", None)
-				if isinstance(message, dict):
-					message = tornado.escape.json_encode(message)
-				if ws_conn:
-					ws_conn.write_message(message)
-				print "ultimo messaggio, cancello la coda per " + idReq
-				self._dispatcher.delete_queue(idReq)	
-			else:
-				if isinstance(message, dict):
-					message = tornado.escape.json_encode(message)
-				if ws_conn:
-					ws_conn.write_message(message)
-				print "scritto messaggio al client ", idReq
-		except Empty:
-			self._pool.apply_async(self.__retrive_and_write, args=(ws_conn, idReq))
-			print "nessun messaggio entro il timeout"
-		except:
-			import traceback
-			print traceback.format_exc()
-		
 	@staticmethod
 	def __create_request_message(settings, idReq, reqType, q_id, zoom_level=None, neLat=None, neLon=None, swLat=None, swLon=None):
 
@@ -156,3 +125,30 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			request = createBoundedListRequest(idReq, settings['response_queue'], q_id, (neLat, neLon), (swLat, swLon))
 		
 		return request	
+
+
+	def write_message_to_client(self):
+
+		try:
+		 	message = messages_queue.get_nowait()
+
+			idReq = message['r_id']
+
+			try:
+				ws_conn = connections[idReq]
+				if isinstance(message, dict):
+					message = tornado.escape.json_encode(message)
+				if ws_conn:
+					#print "scrivo " + message + " al client su " + repr(ws_conn)
+					ws_conn.write_message(message)
+				if "last" in message:
+					del connections[idReq]
+			except KeyError: #il client ha chiuso la pagina con messaggi in processamento
+				pass
+			del message
+
+		except Empty:
+			pass
+
+	
+
