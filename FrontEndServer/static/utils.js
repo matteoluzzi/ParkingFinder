@@ -40,6 +40,7 @@ function parseQuadrantList(list)
 			quadrant.polygon = new google.maps.Rectangle({
 			bounds: coordinates,
 			});
+			//quadrant.polygon.setOptions({map : window.map});
 			quadrant.polygon.ID = id; 
 			window.polygonArray.push(quadrant);
 			quadrants.push(quadrant);
@@ -123,3 +124,15 @@ function generateUUID() {
 			});
 	return uuid;
 };
+
+function linkPolygonsToMap(quadrants)
+{
+	var i = quadrants.length;
+	while(i--)
+	{
+
+		var quadrant = quadrants[i].polygon;
+		//quadrant.setOptions({map : window.map});
+		quadrant.setOptions({map : window.map, fillColor: '#FF0000', fillOpacity: 0.00001, strokeColor: '#FF0000', strokeOpacity: 0.00001, strokeWeight: 0});
+	}
+}
