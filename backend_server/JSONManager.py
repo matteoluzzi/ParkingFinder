@@ -45,7 +45,7 @@ def sendNotificationForQuadrant(quadrantId,subject,messageBody):
 	return data_string
 
 def subscribeEmailNotification(quadrantId,mailAddress):
-	data		=	{"type":"emailSubscribe" , "quadrantID":str(quadra{"type": "emailSubscribe", "quadrantID": "76", "address": "paride.casulli@gmail.com"}ntId) ,"address":str(mailAddress)}
+	data		=	{"type":"emailSubscribe" , "quadrantID":str(quadrantId) ,"address":str(mailAddress)}
 	data_string	=	json.dumps(data)
 	return data_string
 	
