@@ -24,11 +24,11 @@ def createBoundedListRequest(arg_id,arg_response_queue_name,arg_quadrant_id,arg_
 	data_string	=	json.dumps(data)
 	return data_string
 	
-def createListResponse(arg_id,parkingList): #da testare
+def createListResponse(arg_id,parkingList,totseq=1,numberofsequence=0): #da testare
 	datalist	=	list()
 	for item in parkingList:
 		datalist.append(item.getDictionary())
-	data		=	[{"type":"list_response" , "r_id" : arg_id, "parkings":datalist}]
+	data		=	[{"type":"list_response" , "r_id" : arg_id, "parkings":datalist, "npackets":totseq, "sequencen":numberofsequence}]
 	data_string	=	json.dumps(data)
 	return data_string
 
@@ -45,7 +45,7 @@ def sendNotificationForQuadrant(quadrantId,subject,messageBody):
 	return data_string
 
 def subscribeEmailNotification(quadrantId,mailAddress):
-	data		=	{"type":"emailSubscribe" , "quadrantID":str(quadrantId) ,"address":str(mailAddress)}
+	data		=	{"type":"emailSubscribe" , "quadrantID":str(quadra{"type": "emailSubscribe", "quadrantID": "76", "address": "paride.casulli@gmail.com"}ntId) ,"address":str(mailAddress)}
 	data_string	=	json.dumps(data)
 	return data_string
 	
@@ -62,6 +62,8 @@ print testb
 
 #test1 = createOverviewRequest(2,"pippo",123)
 #test2 = createFullListRequest(3,"pluto",124)
+testmail	=	subscribeEmailNotification(76,"paride.casulli@gmail.com")
+print str(testmail)
 #NW	=	{"lat":12.44,"lon":44.34}
 #SE	=	{"lat":9.55,"lon":26.73}
 #test3 = createBoundedListRequest(4,"topolino",125,NW,SE)

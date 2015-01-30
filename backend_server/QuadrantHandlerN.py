@@ -26,6 +26,28 @@ class QuadrantHandler(threading.Thread):
 		self.myLoader	=	aLoader
 		self.threadID	=	thId
 		
+	def splittedResponse(self,requestID,aParkList):
+		athreshold	=	int(self.mySettings.settings['split'])
+		aList		=	list()
+		rList		=	list()
+		counter		=	0
+		rest 		= 	(len(aParkList))%(athreshold)
+		total		=	((len(aParkList))/(athreshold))+1
+		rcounter	=	1
+		for pitem in aParkList:
+			aList.append(pitem)
+			counter	=	counter+1
+			if(counter%athreshold)==0:
+				rList.append(jm.createListResponse(requestID,aList,totseq=total,numberofsequence=rcounter))
+				rcounter	=	rcounter+1
+				aList		=	list()
+		if rest>0:
+				rList.append(jm.createListResponse(requestID,aList,totseq=total,numberofsequence=rcounter))
+				rcounter	=	rcounter+1
+		return rList
+				
+				
+		
 	def run(self):
 		#print "connecting to "+str(self.mySettings.settings['SQSzone'])+"region"
 		conn = boto.sqs.connect_to_region(self.mySettings.settings['SQSzone'][:-1])
@@ -71,13 +93,14 @@ class QuadrantHandler(threading.Thread):
 							print "QuadrantHandler.py: "+str(self.threadID)+" had result in "+str(delta)+" seconds"
 							#print "percentuale parcheggi liberi "+str(freePercentage)+" richiesta id "+str(requestID)
 							#print "Serving an overview request"
-							myResponse	=	jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID())
+							myResponse	=	list()
+							myResponse.append(jm.createOverviewResponse(requestID,freePercentage,currentQuadrant.getID()))
 							#print "Overview JSON response "+str(myResponse)
 						elif str(rtype)=="full_list":
 							tempList	=	list()
 							myParkList	=	currentQuadrant.getParkList()
 							print "full list request"
-							myResponse	=	jm.createListResponse(requestID,myParkList)
+							myResponse	=	self.splittedResponse(requestID,myParkList)
 							print "full list JSON response"+str(myResponse)
 						elif str(rtype)=="bounded_list":
 							tempList	=	list()
@@ -92,7 +115,7 @@ class QuadrantHandler(threading.Thread):
 								if((itemLat<=maxlat)and(itemLat>=minlat)and(itemLon>=minlon)and(itemLon<=maxlon)):
 									tempList.append(item)
 							print "bounded list request"
-							myResponse	=	jm.createListResponse(requestID,tempList)
+							myResponse	=	self.splittedResponse(requestID,myParkList)
 							print "bounded list JSON response"+str(myResponse)
 						else:
 							raise Exception("Unknown type request")
@@ -107,11 +130,13 @@ class QuadrantHandler(threading.Thread):
 								my_resp_queue = conn.create_queue(str(responseQueue))
 							if my_resp_queue==None:
 								print "queue creation failed"
-							m = Message()
-							m.set_body(str(myResponse))
-							#myTime	=	float(tm.time()) - float(startTime)
-							#print "QuadrantHandler.py: "+str(self.threadID)+" going to send in "+str(myTime)+" seconds"
-							my_resp_queue.write(m)
+							for anitem in myResponse:
+								print str("QuadrantHandlerN:"+anitem)
+								m = Message()
+								m.set_body(str(anitem))
+								#myTime	=	float(tm.time()) - float(startTime)
+								#print "QuadrantHandler.py: "+str(self.threadID)+" going to send in "+str(myTime)+" seconds"
+								my_resp_queue.write(m)
 							startTime	=	int(tm.time()) - int(startTime)
 							print "QuadrantHandler.py: "+str(self.threadID)+" request served in "+str(startTime)+" seconds"
 						else:
