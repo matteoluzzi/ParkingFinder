@@ -24,7 +24,7 @@ def createBoundedListRequest(arg_id,arg_response_queue_name,arg_quadrant_id,arg_
 	data_string	=	json.dumps(data)
 	return data_string
 	
-def createListResponse(arg_id,parkingList,totseq=1,numberofsequence=0): #da testare
+def createListResponse(arg_id,parkingList,totseq=1,numberofsequence=1): #da testare
 	datalist	=	list()
 	for item in parkingList:
 		datalist.append(item.getDictionary())
