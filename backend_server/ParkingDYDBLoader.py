@@ -222,13 +222,13 @@ class ParkingDYDBLoader:
 					
 					
 					batch.put_item(data={
-					'idposto': item[0],
+					'idposto': int(item[0]),
 					'extra': item[1],
 					'latitudine': item[2],
 					'longitudine': item[3],
 					'stato' : item[1]})
 					if(self.cache==True):
-						dictio={'idposto': item[0],
+						dictio={'idposto': int(item[0]),
 						'extra': item[1],
 						'latitudine': item[2],
 						'longitudine': item[3],
