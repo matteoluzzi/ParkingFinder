@@ -42,8 +42,8 @@ class QuadrantHandler(threading.Thread):
 				rcounter	=	rcounter+1
 				aList		=	list()
 		if rest>0:
-				rList.append(jm.createListResponse(requestID,aList,totseq=total,numberofsequence=rcounter))
-				rcounter	=	rcounter+1
+			rList.append(jm.createListResponse(requestID,aList,totseq=total,numberofsequence=rcounter))
+			rcounter	=	rcounter+1
 		return rList
 				
 				
