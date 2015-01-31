@@ -20,10 +20,8 @@ class DispatcherThread(Thread):
 		self._broker = broker
 		if self._queue == None:
 			self._queue = self._sqs_conn.create_queue(queue_name)
-		self._lock_overview = Lock()
-		self._lock_detail = Lock()
 		self._handler = None
-		self_messages_queue = None
+		self._messages_queue = None
 
 		print "Inizialiazzazione completa"
 
@@ -70,11 +68,9 @@ class DispatcherThread(Thread):
 							#logging.info("prima della copyMessage")
 							current_msg = self.copyMessage(message)
 							#logging.info("Richiesta recuperata " + str(r_id) + " per il quadrante " + str(q_id))	
-							#self._lock_overview.acquire()
 							if self._broker.add_subscriber(r_id):
 								current_msg["last"] = True
 								#logging.info("ultimo messaggio per " + r_id)
-							#self._lock_overview.release()
 							current_msg['r_id'] = r_id
 							if self._handler:
 								print "aggiungo callback al client" + " curr_message" + repr(current_msg)
@@ -88,8 +84,15 @@ class DispatcherThread(Thread):
 						self._queue.delete_message(raw_message)
 
 					else:
-						if self._broker.add_subscriber(r_id):
-								message["last"] = True
+						print "new message " + str(message['quadrantID']) +"\n"
+						npackets = message['npackets'] #nel caso di più messaggi splittati
+						res = True
+						if npackets > 1:
+							key = (message['quadrantID'], message['r_id'])
+							res = self._broker.updateSplittedMessages(key, npackets)
+						if res:
+							if self._broker.add_subscriber(r_id):
+									message["last"] = True
 						if self._handler:
 								print "aggiungo callback al client"
 								self._messages_queue.put_nowait(message)

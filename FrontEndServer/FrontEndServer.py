@@ -40,7 +40,7 @@ class Application(tornado.web.Application):
 						(r'/logout', LogoutHandler),
 						(r'/subsquadrants', QuadrantsSubscriptionHandler, dict(subs_requests_queue=self.notification_queue)),
 						(r'/imgs/(.*)', tornado.web.StaticFileHandler, {'path': 'static/imgs'}),
-						(r'/map', MapHandler, dict(sqs_conn=sqs_conn, request_queue=self.request_queue, dispatcher=self.dispatcher, quadrantslist=self.quadrantslist, pool=pool, settings=settings))				
+						(r'/map', MapHandler, dict(request_queue=self.request_queue, dispatcher=self.dispatcher, quadrantslist=self.quadrantslist, pool=pool, settings=settings))				
 		]
 		settings = dict(
 						template_path=os.path.join(os.path.dirname(__file__), "templates"), static_path=os.path.join(os.path.dirname(__file__), "static"), 

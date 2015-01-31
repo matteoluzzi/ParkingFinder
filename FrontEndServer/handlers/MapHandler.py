@@ -23,15 +23,14 @@ messages_queue = Queue()
 
 class MapHandler(tornado.websocket.WebSocketHandler):
 
-	def initialize(self, sqs_conn, request_queue, dispatcher, quadrantslist, pool, settings):
+	def initialize(self, request_queue, dispatcher, quadrantslist, pool, settings):
 
-		self._sqs_conn = sqs_conn
 		self._sqs_request_queue = request_queue
-		self._dispatcher = dispatcher
+		self._broker = dispatcher
 		self._settings = settings
 		self._quadrants_list = quadrantslist
 		self._pool = pool
-		self._dispatcher.setComponents(self, messages_queue)
+		self._broker.setComponents(self, messages_queue)
 
 	def check_origin(self, origin):
 
@@ -66,7 +65,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 			q_ids = set(map(lambda x: int(x),quadrants.split("|")))
 			print q_ids
 
-			self._dispatcher.subscribe(idReq, len(q_ids))
+			self._broker.subscribe(idReq, len(q_ids))
 
 			try:
 				self._pool.apply_async(self.__send_parking_spots_request, args=(self._sqs_request_queue, q_ids, idReq, zoom_level, neLat, neLon, swLat, swLon, self._settings), callback=None)
@@ -104,7 +103,7 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 				res = queue.write(msg)
 				print "scritto messaggio ", res.get_body()
 			else:
-				if self._dispatcher.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
+				if self._broker.create_quadrant_request(q_id, idReq) == True: #scrivo il messaggio su sqs solo se nessun altro lo ha già fatto
 					req_type = settings['global_req_type']
 					data = self.__create_request_message(settings, idReq, req_type, q_id , zoom_level=zoom_level)
 					msg = Message()
