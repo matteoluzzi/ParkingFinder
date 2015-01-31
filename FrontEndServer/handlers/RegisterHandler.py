@@ -12,8 +12,6 @@ class RegisterHandler(BaseHandler):
 
 	def initialize(self, front_end_address, port, table):
 
-		self._address = front_end_address
-		self._port = port
 		self._table = table
 
 	def get(self):
