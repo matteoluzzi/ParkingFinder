@@ -26,7 +26,7 @@ class QuadrantHandler(threading.Thread):
 		self.myLoader	=	aLoader
 		self.threadID	=	thId
 		
-	def splittedResponse(self,requestID,aParkList):
+	def splittedResponse(self,requestID,aParkList,quadrantID):
 		athreshold	=	int(self.mySettings.settings['split'])
 		aList		=	list()
 		rList		=	list()
@@ -38,11 +38,11 @@ class QuadrantHandler(threading.Thread):
 			aList.append(pitem)
 			counter	=	counter+1
 			if(counter%athreshold)==0:
-				rList.append(jm.createListResponse(requestID,aList,totseq=total,numberofsequence=rcounter))
+				rList.append(jm.createListResponse(requestID,aList,quadrantID,totseq=total,numberofsequence=rcounter))
 				rcounter	=	rcounter+1
 				aList		=	list()
 		if rest>0:
-			rList.append(jm.createListResponse(requestID,aList,totseq=total,numberofsequence=rcounter))
+			rList.append(jm.createListResponse(requestID,aList,quadrantID,totseq=total,numberofsequence=rcounter))
 			rcounter	=	rcounter+1
 		return rList
 				
@@ -100,7 +100,7 @@ class QuadrantHandler(threading.Thread):
 							tempList	=	list()
 							myParkList	=	currentQuadrant.getParkList()
 							print "full list request"
-							myResponse	=	self.splittedResponse(requestID,myParkList)
+							myResponse	=	self.splittedResponse(requestID,myParkList,currentQuadrant.getID())
 							print "full list JSON response"+str(myResponse)
 						elif str(rtype)=="bounded_list":
 							tempList	=	list()
