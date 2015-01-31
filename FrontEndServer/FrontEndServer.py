@@ -35,7 +35,7 @@ class Application(tornado.web.Application):
 
 		handlers = [
 						(r'/', HomeHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'])),
-						(r'/register', RegisterHandler, dict(front_end_address=settings['front_end_address'], port=settings['port'], table=user_table)),
+						(r'/register', RegisterHandler, dict(table=user_table)),
 						(r'/login', LoginHandler, dict(table=user_table)),
 						(r'/logout', LogoutHandler),
 						(r'/subsquadrants', QuadrantsSubscriptionHandler, dict(subs_requests_queue=self.notification_queue)),
