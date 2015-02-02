@@ -202,7 +202,7 @@ function displayParkingSpots(data)
 //	console.log(parkingsArray);
 	while(i--)
 	{
-		if(parkingsArray[i].state == parseInt("0"))
+		if(parkingsArray[i].state == parseInt("0") && window.map.getZoom() == 18)
 		{
 			var coordinates = new google.maps.LatLng(parseFloat(parkingsArray[i].lat), parseFloat(parkingsArray[i].lon));
 			console.log(coordinates);
