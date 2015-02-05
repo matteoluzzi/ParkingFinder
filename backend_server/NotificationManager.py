@@ -18,12 +18,10 @@ def getQuadrantZoneList(myfilename):
 		while ((mystring!="")and(mystring!="\0")):
 			quadrantinfo = mystring.split("\t")
 			name		=	quadrantinfo[1]
-			#print "estratto "+str(name)
 			mydict[str(myId)]	=	name
 			myId	=	myId+1
 			mystring=inputFile.readline()
 			mystring=mystring.split('\n')[0]
-		#print mydict
 		return mydict
 		
 class NotificationPoller (threading.Thread):
@@ -42,8 +40,6 @@ class NotificationPoller (threading.Thread):
 		self.rEnd			=	rangeEnd	
 	
 	def run(self):
-		#per ogni quadrante genera le richieste di overview ogni freqtime
-		print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"
@@ -65,7 +61,6 @@ class NotificationPoller (threading.Thread):
 				dest_queue.write(m)
 				currentID	=	currentID+1
 			duration	=	time.time()-now
-			print "NotificationManager: finito round richieste polling in "+str(duration)
 			slack	=	int(self.frequency)-int(duration)
 			if slack>0:
 				print "NotificationManager: prossimo polling tra almeno "+str(slack)+" secondi"
@@ -96,7 +91,6 @@ class ResponseManager(threading.Thread):
 		while(1>0):
 			#preleva i messaggi ed effettua il dispatch al manager corretto
 			requests	=	my_queue.get_messages(wait_time_seconds=20)#tanto di default ne preleva solo 1
-			#print "NotificationManager.py: queue "+str(queueName)+"pulled "+str(len(requests))+" messages"
 			for item in requests:
 				text		=	item.get_body()
 				response	=	json.loads(text)
@@ -104,7 +98,6 @@ class ResponseManager(threading.Thread):
 				quadrant_id	=	int(response[0]["quadrantID"])
 				responseID	=	int(response[0]["r_id"])
 				my_queue.delete_message(item)
-				#print "NotificationManager.py: fetched response "+str(response_id)
 				newPercentage	=	int(response[0]["percentage"])
 				manager = self.managerDict[str(quadrant_id)]
 				manager.manageEvent(newPercentage)
@@ -123,7 +116,6 @@ class NotificationManager():
 		self.namesList		=	nList
 		
 	def manageEvent(self,newPercentage):
-		#print "NotificationManager.py: connecting to SQS service in zone "+str(self.mysqsZone)
 		conn = boto.sqs.connect_to_region(self.mysqsZone)
 		if not conn:
 			print "NotificationManager.py: error while connecting at"+self.mysqsZone+"zone"

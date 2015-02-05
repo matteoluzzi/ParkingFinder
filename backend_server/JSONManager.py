@@ -53,30 +53,3 @@ def subscribeAndroidNotification(quadrantId,token):
 	data		=	{"type":"androidSubscribe" , "quadrantID":str(quadrantId) ,"token":str(token)}
 	data_string	=	json.dumps(data)
 	return data_string
-
-testa	=	sendNotificationForQuadrant(88,"oggetto","trimone")
-testb	=	subscribeEmailNotification(88,"paride.casulli@gmail.com")
-print testa
-print "----------------------------"
-print testb
-
-#test1 = createOverviewRequest(2,"pippo",123)
-#test2 = createFullListRequest(3,"pluto",124)
-testmail	=	subscribeEmailNotification(76,"paride.casulli@gmail.com")
-print str(testmail)
-#NW	=	{"lat":12.44,"lon":44.34}
-#SE	=	{"lat":9.55,"lon":26.73}
-#test3 = createBoundedListRequest(4,"topolino",125,NW,SE)
-#print test1
-#print test2
-#print test3
-#testp1	=	park.Parking(1)
-#testp2	=	park.Parking(2)
-#testp3	=	park.Parking(3)
-#plist	=	list()
-#plist.append(testp1)
-#plist.append(testp2)
-#plist.append(testp3)
-#print testp1.getStatus()
-#print testp1.getExtra()
-#print createListResponse(23,plist)

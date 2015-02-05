@@ -1,3 +1,6 @@
+#USATO UNA VOLTA SOLA, NON FA PARTE DEL PROGETTO
+
+
 import Quadrant as quadrant
 import SearchQuadrant as searchquadrant
 import QuadrantTextFileLoader as loader

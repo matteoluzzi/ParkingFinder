@@ -1,5 +1,3 @@
-prova#stocazzo
-prova2#a|b|c
 quadrants#98|147|2
 cacheexpire#180
 queryexpire#300

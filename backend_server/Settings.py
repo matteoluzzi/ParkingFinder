@@ -21,7 +21,4 @@ class Settings:
 			self.settings[key]	=	value
 			mystring=inputFile.readline()
 			mystring=mystring.split('\n')[0]
-		
-#test	=	Settings("testimp.txt")
-#print test.settings['prova']
-#print test.settings['prova2']
+

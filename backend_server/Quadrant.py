@@ -26,9 +26,6 @@ class Quadrant:
 		self.parklist	=	list()
 		self.overview_lock	=	threading.Lock()
 
-	#def changeParkList(self,aList):
-	#	self.parklist	=	aList
-
 	def addToParkList(self,anItem):
 		if self.parklist==0:
 			self.parklist = list()
@@ -67,22 +64,17 @@ class Quadrant:
 		cacheRis	=	self.updater.getUtilizationPercentage(self)
 		myTime	=	float(tm.time()) - float(startTime)
 		if (int(cacheRis)>-1):
-			#print "Quadrant.py: Cache hit percentage quadrant"+str(self.qid)+" cache time access "+str(myTime)
 			self.overview_lock.release()
 			return cacheRis
 		else:
 			try:
 				free	=	0
-				#print "Quadrant.py number of parkings in quadrant "+str(self.qid)+" = "+str(self.getNumberOfParkings())
-				#print "Quadrant.py CACHE MISS"
 				parkingList	=	self.getParkList() 
 				self.updater.batchUpdate(parkingList)
 				for item in parkingList:
 					state	=	item.getStatus()
-					#print "Quadrant.py state of parking "+str(item.getId())+" is "+str(state)+" timestamp "+str(item.timestamp)
 					if str(state)=="E":
 						free	=	free+1
-				#print "Quadrant.py state of quadrant: free "+str(free)+" total "+str(nparkings)
 				perc	=	((float(free))/(float(len(self.parklist))))*100
 				self.updater.setUtilizationPercentage(self,perc)
 				self.overview_lock.release()
@@ -108,7 +100,6 @@ class Quadrant:
 			if	pointlongitude<=maxlon:
 				if	pointlatitude>minlat:
 					if	pointlatitude<=maxlat:
-						#print "Punto appartenente al quadrante "+self.qid
 						return True
 		return False
 		
@@ -154,8 +145,6 @@ class Quadrant:
 				q3.addToParkList(item)	
 			elif q4.inside(coordinates):
 				q4.addToParkList(item)
-			#else:
-			#	raise Exception("error while splitting")
 		total	=	int(len(q1.getParkList()))+int(len(q2.getParkList()))+int(len(q3.getParkList()))+int(len(q4.getParkList()))
 		value1	=	len(self.parklist)
 		print "check "+str(len(self.parklist))+" "+str(total)

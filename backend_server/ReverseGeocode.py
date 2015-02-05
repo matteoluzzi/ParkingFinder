@@ -1,4 +1,5 @@
 #NON FUNZIONA SU AWS, SI PUO RIMUOVERE
+#USATO PER OTTENERE QUARTIERI RELATIVI AI QUADRANTI, NON FA PARTE DEL PROGETTO
 import SearchQuadrant as searchquadrant
 import QuadrantTextFileLoader as loader
 import urllib2

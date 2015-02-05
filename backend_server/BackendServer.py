@@ -62,7 +62,6 @@ else:
 
 myDBLoader		= DBloader.ParkingDYDBLoader('APPosto_posti',enablecache,cacheUrl,slowstart,slowstart)
 listaQuadranti 	= searchquadrant.SearchQuadrant(loader.QuadrantTextFileLoader.load('listaquadranti.txt',myDBLoader))
-#print expiretime
 threadList	=	list()
 if (myQuadrantsRangeStart >-1):
 	print "Range start: "+str(myQuadrantsRangeStart)+" Range end "+str(myQuadrantsRangeEnd);
@@ -77,9 +76,7 @@ if (myQuadrantsRangeStart >-1):
 	
 for item in myQuadrantsId:
 	aquadrant	=	listaQuadranti.getQuadrantInstance(int(item))
-	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)
-	#print aquadrant.getParkList()
-	#myDBLoader.batchUpdate(aquadrant.getParkList()) #inizializzo in stato consistente	
+	loader.QuadrantTextFileLoader.loadQuadrantParkings(aquadrant,"parkings/listquadrant"+str(int(item))+".txt",myDBLoader)	
 	try:
 		anHandler	=	qh.QuadrantHandler(aquadrant,settingsHandler,myDBLoader)
 		anHandler.start()
@@ -103,7 +100,7 @@ while 1:
 			print "BackendServer: effettuato recovery thread quadrante "+str(aQuadrant.getID())
 	tm.sleep(60)
 anHandler.join()
-print "non devo stampare questo messaggio..."
+
 
 	
 

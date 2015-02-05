@@ -96,8 +96,7 @@ class NotificationServer(threading.Thread):
 			self.snsConnection.subscribe(mytopic,"application",endpoint_arn)
 		except Exception:
 			print "NotificationServer.py lanciata eccezione in sottoscrizione Android..."
-#testq	=	quad.Quadrant(25,0,0,0,0)
-#testmio.mailSubscribe(testq.getID(),"paride.casulli@gmail.com")
+
 	
 		
 

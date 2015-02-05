@@ -40,7 +40,7 @@ class ParkingDYDBLoader:
 		self.qmiss			=	0
 		self.phit			=	0
 		self.pmiss			=	0
-		if (enableCache==True):	#sdcc.wpvbcm.cfg.usw2.cache.amazonaws.com:11211
+		if (enableCache==True):	
 			urlstring	=	str(myCacheURL)
 			self.cacheClient	=	cm.CacheManager(myCacheURL,cacheExpireTime) #timeout verra passato a chiamata di funzione
 			urlstring	=	str(percentageCacheURL)
@@ -107,7 +107,6 @@ class ParkingDYDBLoader:
 				if perc<1:
 					perc=101	#test, probabilmente a memcached non piace lo 0
 				res	=	self.cache2Client.setValue("Q"+str(quadrantID),str(perc),int(self.qexpire))
-				#print "ParkingDYDBLoader.py: written in cache with ID "+"Q_"+str(quadrantID)+" with result "+str(res)+" the following value "+str(perc) 
 			except:
 				print "ParkingDYDBLoader.py: failed to set values"
 			
@@ -124,15 +123,12 @@ class ParkingDYDBLoader:
 			step1	=	time.time()
 			deltaq	=	step1-step0
 			self.qtime	=	self.qtime	+	deltaq
-			#print "ParkingDYDBLoader.py: risposta grezza: "+str(res)
-			#print "ParkingDYDBLoader.py: la Query ha restituito: "+str(len(res['Responses'][str(self.table.name)]['Items']))
 			for item in res['Responses'][str(self.tablename)]['Items']:
 				idp	=	item['idposto']
 				lat		=	item['latitudine']
 				lon		=	item['longitudine']
 				state	=	item['stato']
 				extra	=	item['extra']
-					#print "ParkingDYDBLoader.py: aggiunto in cache: key "+str(idp)+" value "+str(item)+" timeout "+str(self.cexpire)
 				step0	=	time.time()
 				if(self.cache==True):
 					self.cacheClient.setValue(str(idp),item,int(self.cexpire))
@@ -144,8 +140,6 @@ class ParkingDYDBLoader:
 				step2	=	time.time()
 				deltau	=	step2-step1
 				self.utime	=	self.utime+deltau
-				#print"ParkingDYDBLoader: tempi query "+str(deltaq)+" cache "+str(deltac)+" update "+str(deltau)
-				#print "ParkingDYDBLoader.py batchquery "+str(idp)+" "+str(state)+" "+str(parkingListDict[int(idp)].getStatus())
 		except:
 			print "ParkingDYDBLoader.py: error while reading DB, query result (may be null)"
 			if res:
@@ -167,7 +161,6 @@ class ParkingDYDBLoader:
 				unposto	= self.cacheClient.getValue(str(parkId))
 				if not unposto:
 					self.pmiss	=	self.pmiss+1
-					#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 					parkingListDict[parkId]=item
 					idList.append(parkId)	
 				else:
@@ -175,9 +168,7 @@ class ParkingDYDBLoader:
 					lon		=	unposto['longitudine']
 					state	=	unposto['stato']
 					extra	=	unposto['extra']
-					#print "ParkingDYDBLoader.py batch update CACHE HIT "+str(lat)+" "+str(lon)+" "+str(state)+" "+str(extra)
 					self.phit	=	self.phit+1
-					#print "ParkingDYDBLoader.py pmiss "+str(self.pmiss)+" phit "+str(self.phit)+" qmiss "+str(self.qmiss)+" qhit "+str(self.qhit)
 					item.updateStatus(lat,lon,state,extra)
 					 
 			else:
@@ -185,14 +176,11 @@ class ParkingDYDBLoader:
 				idList.append(parkId)
 		if(len(idList)>0):
 			hundreds	=	int(len(idList)/100)+1
-			#print "ParkingDYDBLoader.py: preparo "+str(hundreds)+" liste" 
 			iterations	=	range(hundreds)
 			counter		=	0
 			for item in iterations:
-				#print "ParkingDYDBLoader.py: elaboro lista "+str(counter)
 				if counter<=hundreds:	
 					templist	=	idList[counter*100:(((counter+1)*100))]
-					#print "ParkingDYDBLoader.py: lunghezza lista da elaborare: "+str(len(templist))
 					res = self.batchQuery(templist,parkingListDict)
 					while len(res) >0:
 						print "failed, retry"
@@ -200,9 +188,7 @@ class ParkingDYDBLoader:
 						for item in res[str(self.tablename)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
-						#raise Exception("Error while inserting in DYDB "+str(len(templist))+" "+str(len(parkingList))+" "+str(len(res['posti']['Keys'])))
 				elif counter==hundreds:
-					#print "ultimo batch"
 					res = batchQuery(idList[counter*100:],parkingListDict)
 					while len(res) >0:
 						print "failed, retry"
@@ -210,9 +196,7 @@ class ParkingDYDBLoader:
 						for item in res[(self.tablename)]['Keys']:
 							templist2.append(item['HashKeyElement'])
 						res	=	self.batchQuery(templist2,parkingListDict)
-						#raise Exception("Error while inserting in DYDB"+str(len(res))+" "+str(len(parkingList)))
 				counter	=	counter+1
-		#print "parkings updated"
 		
 	def updateFromSensor(self, listab):
 			tr=Table("APPosto_posti")#da correggere
@@ -235,9 +219,6 @@ class ParkingDYDBLoader:
 						'stato' : item[1]}
 						self.cacheClient.setValue(str(item[0]),dictio,time=self.cexpire)
 						dictio={}
-					
-					#park = self.table.get_item(parkid = item[0])
-					#park ['stato']= item[1]
-					#park.save()
+
 				
 			
