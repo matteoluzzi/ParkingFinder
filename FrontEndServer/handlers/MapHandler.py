@@ -44,7 +44,6 @@ class MapHandler(tornado.websocket.WebSocketHandler):
 
 	def on_message(self, raw_message):
 		message = json.loads(raw_message)
-		print ws, connections
 
 		msg_type = message["type"]
 		
