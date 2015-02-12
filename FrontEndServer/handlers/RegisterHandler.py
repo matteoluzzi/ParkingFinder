@@ -10,7 +10,7 @@ import tornado.web
 
 class RegisterHandler(BaseHandler):
 
-	def initialize(self, front_end_address, port, table):
+	def initialize(self, table):
 
 		self._table = table
 
